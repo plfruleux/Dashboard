@@ -3,154 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Dashboard — Accueil</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+  <title>Dashboard — Accueil (vide)</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-  <div id="bg-a" aria-hidden="true"></div>
-  <div id="bg-b" aria-hidden="true"></div>
-  <div id="vig" aria-hidden="true"></div>
-
-  <header class="site-header">
-    <h1>Dashboard</h1>
-    <nav class="top-actions">
-      <a href="/pomodoro/" class="btn">Pomodoro</a>
-      <a href="#" class="btn">Refresh</a>
-    </nav>
-  </header>
-
-  <main class="grid" role="main">
-
-    <div class="left-col">
-
-      <div class="card" id="card-clock" style="animation-delay:0s">
-        <div class="ci">
-          <div class="chip">Heure</div>
-          <div class="hn-row">
-            <span id="hn-flag">🇻🇳</span>
-            <div id="hanoi-time">--<span class="sep">:</span>--</div>
-          </div>
-          <div id="hanoi-date"></div>
-          <div class="paris-row">
-            <div class="paris-left"><span id="paris-flag">🇫🇷</span><span id="paris-lbl">Paris</span></div>
-            <span id="paris-time">--:--</span>
-            <span id="paris-diff"></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" id="card-weather" style="animation-delay:.06s">
-        <div class="ci">
-          <div class="chip">Météo — <span id="w-city">Hà Nội</span></div>
-          <div class="w-cur">
-            <div id="w-icon">⋯</div>
-            <div id="w-temp"><span class="loading">…</span></div>
-            <div class="w-meta">
-              <div id="w-desc"></div>
-              <div class="w-stats">
-                <div class="ws"><span class="ws-l">Ressenti</span><span class="ws-v" id="w-feels">–</span></div>
-                <div class="ws"><span class="ws-l">Humidité</span><span class="ws-v" id="w-hum">–</span></div>
-                <div class="ws"><span class="ws-l">Vent</span><span class="ws-v" id="w-wind">–</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="w-curve-wrap">
-            <div class="w-curve-lbl">Température — 12h</div>
-            <div id="temp-svg-wrap"><span class="loading">…</span></div>
-          </div>
-          <div class="w-dl">Prévisions 3 jours</div>
-          <div class="w-days" id="w-days">
-            <div class="dc"><span class="loading">…</span></div>
-            <div class="dc"><span class="loading">…</span></div>
-            <div class="dc"><span class="loading">…</span></div>
-          </div>
-          <div class="divl"></div>
-          <div class="aqi-row">
-            <div class="aqi-dot" id="aqi-dot"></div>
-            <span id="aqi-val"><span class="loading">…</span></span>
-            <span id="aqi-lbl" style="margin-left:5px"></span>
-            <span class="aqi-pm" id="aqi-pm"></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" id="card-rss" style="animation-delay:.1s">
-        <div class="ci">
-          <div class="chip">Le Monde</div>
-          <div class="rss-ticker" id="rss-ticker">
-            <div class="rss-item"><span class="loading">Chargement…</span></div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /left-col -->
-
-    <div class="card" id="card-cal">
-
-      <div id="cal-native">
-        <div class="chip" style="margin-bottom:0">Agenda</div>
-        <div class="cal-head">
-          <div class="cal-week-range" id="cal-range">…</div>
-          <div class="cal-nav">
-            <button class="cal-btn" id="cal-prev">‹</button>
-            <button class="cal-btn" id="cal-today-btn">·</button>
-            <button class="cal-btn" id="cal-next">›</button>
-          </div>
-        </div>
-        <div class="week-strip" id="week-strip"></div>
-        <div class="allday-banner" id="allday-banner"></div>
-        <div class="day-label" id="day-label">Aujourd'hui</div>
-        <div class="hourly-wrap" id="hourly-wrap">
-          <div class="hourly-inner" id="hourly-inner"></div>
-        </div>
-
-        <div id="sync-panel">
-          <div class="sync-header" id="sync-toggle">
-            <div class="sync-header-left">
-              <div class="sync-status-dot" id="sync-dot"></div>
-              <span id="sync-header-txt">Connecter mon agenda iCloud</span>
-            </div>
-            <span id="sync-toggle-arrow">▾</span>
-          </div>
-
-          <div id="sync-methods">
-            <div class="sync-ics-form">
-              <div class="sync-ics-instructions">
-                <p class="sync-ics-step">① iPhone/iPad : <strong>Calendrier</strong> → appui long sur l'agenda → <strong>Partager le calendrier</strong></p>
-                <p class="sync-ics-step">② Activer <strong>Calendrier public</strong> → <strong>Copier le lien</strong></p>
-                <p class="sync-ics-step">③ Coller le lien <code>webcal://…</code> ci-dessous et appuyer sur <strong>Connecter</strong></p>
-              </div>
-              <div class="sync-ics-row">
-                <input
-                  type="url"
-                  id="ics-url-input"
-                  class="sync-ics-input"
-                  placeholder="webcal://p00-caldav.icloud.com/…"
-                  autocomplete="off"
-                  autocorrect="off"
-                  autocapitalize="off"
-                  spellcheck="false"
-                />
-                <button id="btn-ics-connect" class="sync-ics-btn">Connecter</button>
-              </div>
-            </div>
-          </div>
-
-          <div id="sync-msg"></div>
-        </div>
-
-      </div><!-- /cal-native -->
-
-    </div><!-- /card-cal -->
-
+  <main style="display:flex;align-items:center;justify-content:center;height:100vh;background:#07080b;color:#ddd;font-family:DM Sans,system-ui,Arial;">
+    <div style="text-align:center;max-width:720px;padding:24px;">
+      <h1 style="margin:0 0 12px;font-family:Outfit,system-ui;font-weight:700;color:#fff">Dashboard — version simplifiée attendue</h1>
+      <p style="margin:0 0 12px;color:#cfcfcf">La page principale a été vidée. Fourni la version simplifiée du HTML et je l'intégrerai en conservant strictement l'esthétique telle que tu la fournis. Pour l'instant toutes les fonctionnalités sont désactivées.</p>
+      <p style="margin:0;font-size:13px;color:#999">Quand tu seras prêt, colle ici le HTML simplifié et je le déposerai à la racine comme index.html.</p>
+    </div>
   </main>
-
-  <footer class="site-footer">
-    <div>Design: glassmorphism sombre — placeholders pour les fonctionnalités. Date: <span id="build-date"></span></div>
-  </footer>
-
-  <script src="assets/js/wallpapers.js"></script>
-  <script src="assets/js/main.js"></script>
 </body>
 </html>
