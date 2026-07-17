@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "photos": [
+    {"id":"wp01","url":"assets/wallpapers/wp01.jpg"},
+    {"id":"wp02","url":"assets/wallpapers/wp02.jpg"}
+  ]
+}
