@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dashboard — Accueil</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div id="bg-slideshow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <h1>Dashboard</h1>
+    <nav class="top-actions">
+      <a href="/pomodoro/" class="btn">Pomodoro</a>
+      <a href="#" class="btn">Refresh</a>
+    </nav>
+  </header>
+
+  <main class="grid" role="main">
+    <section id="card-clock" class="card large" aria-labelledby="clock-title">
+      <h2 id="clock-title">Horloge</h2>
+      <div class="clock-content">
+        <div class="time-large" id="time-paris">--:--:--</div>
+        <div class="meta">Paris — <span id="date-paris">—</span></div>
+        <div class="time-small">Hanoï — <span id="time-hanoi">--:--</span> <span id="hanoi-offset"></span></div>
+        <div class="mini-pomo">Mini-Pomodoro <button class="btn small">▶</button></div>
+      </div>
+    </section>
+
+    <section id="card-weather" class="card" aria-labelledby="weather-title">
+      <h2 id="weather-title">Météo (Hanoï)</h2>
+      <div class="placeholder">Icône • 27°C • Humidité • Vent</div>
+      <div class="small-note">Source: Open-Meteo (placeholder)</div>
+    </section>
+
+    <section id="card-music" class="card" aria-labelledby="music-title">
+      <h2 id="music-title">Musique / Podcast / Todos</h2>
+      <div class="tabs">
+        <button class="tab active">Musique</button>
+        <button class="tab">Podcast</button>
+        <button class="tab">Rappels</button>
+      </div>
+      <div class="placeholder">Lecteur audio intégré — contrôles à implémenter</div>
+    </section>
+
+    <section id="card-rss" class="card" aria-labelledby="rss-title">
+      <h2 id="rss-title">Actualités</h2>
+      <div class="placeholder">Aperçu • <a href="gazette.html">Voir la gazette</a></div>
+    </section>
+
+    <section id="card-cal" class="card tall" aria-labelledby="cal-title">
+      <h2 id="cal-title">Calendrier</h2>
+      <div class="calendar-grid">
+        <div class="mini-month">Mini-calendrier</div>
+        <div class="day-columns">4 jours • 7h–23h (placeholder)</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div>Design: glassmorphism sombre — placeholders pour les fonctionnalités. Date: <span id="build-date"></span></div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
