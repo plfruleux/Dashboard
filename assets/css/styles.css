@@ -74,3 +74,35 @@ body{
 /* small hover lift for cards */
 .card:hover{transform:translateY(0);box-shadow:0 20px 40px rgba(0,0,0,0.7)}
 
+/* left column and calendar layout from backup */
+.left-col{display:flex;flex-direction:column;gap:18px;grid-column: span 4}
+#card-cal{grid-column: span 8}
+.chip{display:inline-block;background:rgba(255,255,255,0.02);padding:6px 10px;border-radius:999px;color:var(--t3);font-size:13px;border:1px solid rgba(255,255,255,0.02);margin-bottom:10px}
+.ci{display:block}
+.hn-row{display:flex;align-items:baseline;gap:8px;font-family:'DM Mono',monospace;font-size:28px;color:var(--t1)}
+.paris-row{display:flex;align-items:center;gap:10px;color:var(--t3);margin-top:6px}
+.w-cur{display:flex;gap:12px;align-items:center}
+#w-temp{font-size:28px;font-family:'Outfit',sans-serif;color:var(--t1)}
+.w-meta{flex:1;color:var(--t3)}
+.w-stats{display:flex;gap:12px;margin-top:6px}
+.ws{display:flex;flex-direction:column}
+.ws-l{font-size:12px;color:var(--t3)}
+.ws-v{font-weight:600;color:var(--t1)}
+.w-curve-wrap{margin-top:12px}
+.w-days{display:flex;gap:8px;margin-top:8px}
+.dc{background:rgba(255,255,255,0.01);padding:8px;border-radius:8px;color:var(--t3);min-width:60px;text-align:center}
+.aqi-row{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--t3)}
+.aqi-dot{width:12px;height:12px;border-radius:50%;background:var(--accent);display:inline-block}
+.rss-ticker{overflow:hidden;white-space:nowrap}
+.rss-item{display:inline-block;padding-right:22px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
+.cal-nav .cal-btn{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;color:var(--t3)}
+.week-strip{display:flex;gap:8px;margin-top:10px}
+.allday-banner{background:rgba(255,255,255,0.01);padding:8px;border-radius:8px;margin-top:12px}
+.hourly-wrap{margin-top:12px;background:rgba(255,255,255,0.01);padding:8px;border-radius:8px}
+.sync-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.sync-status-dot{width:10px;height:10px;border-radius:50%;background:#ffb86b;display:inline-block;margin-right:8px}
+.sync-ics-row{display:flex;gap:8px;margin-top:8px}
+.sync-ics-input{flex:1;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);padding:8px;border-radius:8px;color:var(--t1)}
+.sync-ics-btn{background:var(--accent);border:none;color:#071018;padding:8px 12px;border-radius:8px;cursor:pointer}
+
