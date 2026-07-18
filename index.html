@@ -1599,10 +1599,99 @@ setInterval(updateClock,1000);
     document.head.appendChild(script);
   })();
 </script>
+<script>
+  (function(){
+    var calPrev = document.getElementById('cal-prev');
+    var calNext = document.getElementById('cal-next');
+    var calToday = document.getElementById('cal-today');
+    var calRange = document.getElementById('cal-range-label');
+    var calDaysBar = document.getElementById('cal-days-bar');
+    var calGrid = document.getElementById('cal-grid');
+    if(!calPrev || !calNext || !calToday || !calRange || !calDaysBar || !calGrid) return;
+
+    function addDays(date, days){
+      var next = new Date(date.getTime());
+      next.setDate(next.getDate() + days);
+      return next;
+    }
+
+    function setMidnight(date){
+      var copy = new Date(date.getTime());
+      copy.setHours(0,0,0,0);
+      return copy;
+    }
+
+    function isSameDay(a, b){
+      return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    }
+
+    function formatDayName(date){
+      return date.toLocaleDateString('fr-FR', { weekday: 'short' });
+    }
+
+    function formatRangeLabel(start){
+      var end = addDays(start, 3);
+      var options = { day: 'numeric', month: 'short' };
+      return start.toLocaleDateString('fr-FR', options) + ' – ' + end.toLocaleDateString('fr-FR', options);
+    }
+
+    var today = setMidnight(new Date());
+    var currentStart = setMidnight(today);
+
+    function renderCalendar(){
+      calRange.textContent = formatRangeLabel(currentStart);
+      var dayHeaders = ['<div></div>'];
+      var gridColumns = ['<div class="cal-time-col">'];
+
+      for(var hour = 8; hour <= 20; hour++){
+        var label = hour.toString().padStart(2, '0') + 'h';
+        gridColumns.push('<div class="cal-time-slot">' + label + '</div>');
+      }
+      gridColumns.push('</div>');
+
+      for(var i = 0; i < 4; i++){
+        var day = addDays(currentStart, i);
+        var isTodayClass = isSameDay(day, today) ? ' is-today' : '';
+        dayHeaders.push(
+          '<div class="cal-day-hd' + isTodayClass + '">' +
+            '<span class="dh-name">' + formatDayName(day) + '</span>' +
+            '<span class="dh-num">' + day.getDate() + '</span>' +
+          '</div>'
+        );
+
+        var daySlots = '';
+        for(var h = 8; h <= 20; h++){
+          daySlots += '<div class="cal-col-slot"></div>';
+        }
+        gridColumns.push('<div class="cal-col' + isTodayClass + '" data-date="' + day.toISOString().slice(0,10) + '">' + daySlots + '</div>');
+      }
+
+      calDaysBar.innerHTML = dayHeaders.join('');
+      calGrid.innerHTML = gridColumns.join('');
+    }
+
+    calPrev.addEventListener('click', function(){
+      currentStart = addDays(currentStart, -1);
+      renderCalendar();
+    });
+
+    calNext.addEventListener('click', function(){
+      currentStart = addDays(currentStart, 1);
+      renderCalendar();
+    });
+
+    calToday.addEventListener('click', function(){
+      currentStart = setMidnight(today);
+      renderCalendar();
+    });
+
+    renderCalendar();
+  })();
+</script>
+
 
 <!-- ══════════════════════════════════════════
-   BOUTON DE REFRESH GLOBAL (caché) + NOTIFICATION iOS — retiré
-     ──────────────────────────────────────────
+ BOUTON DE REFRESH GLOBAL (caché) + NOTIFICATION iOS — retiré     ──────────────────────────────────────────
      Un petit bouton quasi invisible (coin bas-droit) déclenchait en
      parallèle le rafraîchissement de tous les widgets ci-dessus (météo,
      calendrier, todos, actualités, fonds d'écran), puis affichait une
