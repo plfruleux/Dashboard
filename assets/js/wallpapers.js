@@ -58,7 +58,7 @@
   }
 
   function loadManifest(){
-    const path = 'assets/wallpapers/wallpapers.json';
+    const path = 'assets/wallpapers/wallpapers.json?cb=' + Date.now();
     fetch(path).then(r=>{
       if(!r.ok) throw new Error('no-manifest');
       return r.json();

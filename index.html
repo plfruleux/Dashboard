@@ -1591,7 +1591,14 @@ setInterval(updateClock,1000);
   });
 })();
 </script>
-<script src="assets/js/wallpapers.js" defer></script>
+<script>
+  (function(){
+    var script = document.createElement('script');
+    script.defer = true;
+    script.src = 'assets/js/wallpapers.js?cb=' + Date.now();
+    document.head.appendChild(script);
+  })();
+</script>
 
 <!-- ══════════════════════════════════════════
    BOUTON DE REFRESH GLOBAL (caché) + NOTIFICATION iOS — retiré
