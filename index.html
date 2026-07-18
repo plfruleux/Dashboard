@@ -410,17 +410,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 }
 @-webkit-keyframes pulse-matin{0%,100%{opacity:.5;}50%{opacity:1;}}
 @keyframes pulse-matin{0%,100%{opacity:.5;}50%{opacity:1;}}
-#amt-todo-btn{
-  flex:0 0 auto;background:none;border:none;color:var(--t3);
-  width:24px;height:22px;padding:0;cursor:pointer;
-  font-size:13px;line-height:1;
-  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  transition:color .15s;
-}
-#amt-todo-btn:hover{color:var(--accent);} 
-
 /* ── Vues mutuellement exclusives ── */
 .audio-mode{display:none;} 
 .audio-mode.visible{display:block;} 
@@ -467,6 +456,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 }
 #sc-credit a{color:var(--t3);text-decoration:none;} 
 #sc-credit a:hover{color:var(--accent);} 
+
+#local-playlist{display:grid;gap:4px;padding-top:4px;}
+.local-track{
+  cursor:pointer;padding:7px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.07);
+  font-family:var(--fm);font-size:8.5px;color:var(--t2);transition:background .15s,border-color .15s,color .15s;
+}
+.local-track:hover{background:rgba(255,255,255,.04);border-color:rgba(212,168,83,.2);color:var(--t1);}
+.local-track.active{background:rgba(212,168,83,.12);border-color:rgba(212,168,83,.35);color:var(--t1);}
+#local-loop-btn.active,#local-shuffle-btn.active{color:var(--accent);background:rgba(212,168,83,.12);border-color:rgba(212,168,83,.25);}
 
 /* Section Podcast */
 #pod-section{position:relative;} 
@@ -1244,7 +1242,6 @@ body{ animation:appFadeIn .6s ease both; }
           <span id="todo-list-name">QUOTIDIEN</span>
           <button class="todo-nav-btn" id="todo-next" title="Liste suivante">&#8250;</button>
           <button class="todo-hdr-btn" id="todo-expand-btn" title="Toutes les listes">&#8862;</button>
-          <button class="todo-hdr-btn" id="todo-music-btn" title="Afficher la musique">&#9834;</button>
         </div>
         <div id="todo-items">
           <div class="todo-empty">Chargement…</div>
@@ -1259,9 +1256,9 @@ body{ animation:appFadeIn .6s ease both; }
           <!-- ── Toggle 2 modes (MUSIQUE / PODCAST) + bouton todos ── -->
           <div id="audio-mode-toggle">
             <button class="amt-btn active" data-amode="music">&#9834; MUSIQUE</button>
+            <button class="amt-btn" data-amode="local">&#128187; LOCAL</button>
             <button class="amt-btn" data-amode="podcast">&#127897; PODCAST</button>
             <span id="amt-matin-dot" title="Mode matin actif" style="display:none;"></span>
-            <button id="amt-todo-btn" title="Afficher les todos">&#9776;</button>
           </div>
 
           <!-- ── MODE MUSIQUE : YouTube ── -->
@@ -1306,6 +1303,30 @@ body{ animation:appFadeIn .6s ease both; }
               <span id="sc-credit-1" style="display:none">YT · <a href="https://www.youtube.com/watch?v=J0shA9J-4Nc" target="_blank">Lofi Mix 2</a></span>
               <span id="sc-credit-2" style="display:none">YT · <a href="https://www.youtube.com/watch?v=u9YOvF22tsI" target="_blank">Ambient</a></span>
             </div>
+          </div>
+
+          <!-- ── MODE LOCAL : musique du navigateur / dossier local ── -->
+          <div id="local-section" class="audio-mode">
+            <div id="local-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;">
+              <div>
+                <div id="local-mode-label" style="font-family:var(--fm);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.14em;">Musique locale</div>
+                <div id="local-path-hint" style="font-family:var(--fm);font-size:7px;color:var(--t3);margin-top:4px;">Dossier local : assets/local-music/</div>
+              </div>
+              <button class="amt-btn" id="local-select-btn">Sélectionner</button>
+            </div>
+            <div id="local-playlist" style="display:grid;gap:4px;padding:0 2px 6px;color:var(--t3);font-family:var(--fm);font-size:8.5px;">
+              <div class="todo-empty">Aucun morceau sélectionné.</div>
+            </div>
+            <div id="local-controls" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;">
+              <button class="amt-btn" id="local-prev-btn">&#8249;</button>
+              <button class="amt-btn" id="local-play-btn">▶</button>
+              <button class="amt-btn" id="local-next-btn">&#8250;</button>
+              <button class="amt-btn" id="local-loop-btn">∞</button>
+              <button class="amt-btn" id="local-shuffle-btn">&#128256;</button>
+              <span id="local-current-title" style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t1);font-family:var(--fb);font-size:8.5px;">Aucun morceau</span>
+            </div>
+            <input type="file" id="local-file-input" accept="audio/*" multiple style="display:none">
+            <audio id="local-audio" preload="metadata"></audio>
           </div>
 
           <!-- ── MODE PODCAST ── -->
@@ -1712,6 +1733,354 @@ setInterval(updateClock,1000);
 
     renderCalendar();
   })();
+</script>
+<script>
+ (function(){
+   var modeButtons = document.querySelectorAll('#audio-mode-toggle [data-amode]');
+   var sections = {
+     music: document.getElementById('yt-section'),
+     local: document.getElementById('local-section'),
+     podcast: document.getElementById('pod-section')
+   };
+
+   var ytTabs = Array.from(document.querySelectorAll('#sc-tabs .sc-tab'));
+   var ytFrames = [
+     document.getElementById('yt-frame-0'),
+     document.getElementById('yt-frame-1'),
+     document.getElementById('yt-frame-2')
+   ];
+   var ytCredits = [
+     document.getElementById('sc-credit-0'),
+     document.getElementById('sc-credit-1'),
+     document.getElementById('sc-credit-2')
+   ];
+   var ytPlayBtn = document.getElementById('yt-play-btn');
+   var ytPlayIcon = document.getElementById('yt-play-icon');
+   var volIcon = document.getElementById('vol-icon');
+   var volSlider = document.getElementById('vol-slider');
+   var volPct = document.getElementById('vol-pct');
+
+   var localAudio = document.getElementById('local-audio');
+   var localPlaylistEl = document.getElementById('local-playlist');
+   var localCurrentTitle = document.getElementById('local-current-title');
+   var localFileInput = document.getElementById('local-file-input');
+   var localSelectBtn = document.getElementById('local-select-btn');
+   var localPrevBtn = document.getElementById('local-prev-btn');
+   var localPlayBtn = document.getElementById('local-play-btn');
+   var localNextBtn = document.getElementById('local-next-btn');
+   var localLoopBtn = document.getElementById('local-loop-btn');
+   var localShuffleBtn = document.getElementById('local-shuffle-btn');
+
+   var localFiles = [];
+   var localIndex = 0;
+   var localLoop = false;
+   var localShuffle = false;
+
+   // Cette constante indique l'emplacement où tu peux stocker des fichiers audio dans le repo.
+   // Ajoute les fichiers dans assets/local-music/ et liste-les ici si tu veux les charger automatiquement.
+   var localMusicFolder = 'assets/local-music/';
+   var localStaticList = [];
+
+   var ytActive = 0;
+   var ytPlaying = true;
+   var ytMuted = true;
+   var ytVolume = 80;
+
+   function updateMode(mode){
+     modeButtons.forEach(function(button){
+       button.classList.toggle('active', button.dataset.amode === mode);
+     });
+     Object.keys(sections).forEach(function(key){
+       var section = sections[key];
+       if(!section) return;
+       section.classList.toggle('visible', key === mode);
+     });
+     if(mode !== 'music'){
+       pauseYoutube();
+     }
+     if(mode !== 'local'){
+       pauseLocal();
+     }
+   }
+
+   modeButtons.forEach(function(button){
+     button.addEventListener('click', function(){
+       updateMode(this.dataset.amode);
+     });
+   });
+
+   function sendYTCommand(frame, func, args){
+     if(!frame || !frame.contentWindow) return;
+     try{
+       frame.contentWindow.postMessage(JSON.stringify({ event:'command', func:func, args:args||[] }), '*');
+     }catch(e){}
+   }
+
+   function ensureYtFrame(index){
+     var frame = ytFrames[index];
+     if(!frame) return;
+     if(!frame.src || frame.src.trim() === ''){
+       var src = frame.getAttribute('data-src');
+       if(src) frame.src = src;
+     }
+   }
+
+   function setActiveYt(index){
+     if(index === ytActive) return;
+     if(ytFrames[ytActive]) ytFrames[ytActive].classList.remove('active');
+     if(ytTabs[ytActive]) ytTabs[ytActive].classList.remove('active');
+     if(ytCredits[ytActive]) ytCredits[ytActive].style.display = 'none';
+     ytActive = index;
+     if(ytTabs[ytActive]) ytTabs[ytActive].classList.add('active');
+     if(ytFrames[ytActive]) ytFrames[ytActive].classList.add('active');
+     if(ytCredits[ytActive]) ytCredits[ytActive].style.display = '';
+     ensureYtFrame(ytActive);
+     if(ytPlaying){
+       sendYTCommand(ytFrames[ytActive], 'playVideo');
+     }else{
+       sendYTCommand(ytFrames[ytActive], 'pauseVideo');
+     }
+     updateYtControls();
+   }
+
+   function updateYtControls(){
+     if(ytPlayIcon){
+       ytPlayIcon.innerHTML = ytPlaying ? '<rect x="2" y="1" width="2" height="8"/><rect x="6" y="1" width="2" height="8"/>' : '<polygon points="2,1 9,5 2,9"/>';
+     }
+     if(volIcon){
+       volIcon.textContent = ytMuted ? '🔇' : '🔊';
+     }
+     if(volPct){
+       volPct.textContent = ytMuted ? 'MUTE' : ytVolume + '%';
+     }
+   }
+
+   function toggleYtPlay(){
+     var frame = ytFrames[ytActive];
+     ytPlaying = !ytPlaying;
+     if(ytPlaying){
+       ensureYtFrame(ytActive);
+       sendYTCommand(frame, 'playVideo');
+     } else {
+       sendYTCommand(frame, 'pauseVideo');
+     }
+     updateYtControls();
+   }
+
+   function pauseYoutube(){
+     ytPlaying = false;
+     var frame = ytFrames[ytActive];
+     sendYTCommand(frame, 'pauseVideo');
+     updateYtControls();
+   }
+
+   function setYtVolume(value){
+     ytVolume = Math.min(100, Math.max(0, value));
+     if(volSlider) volSlider.value = ytVolume;
+     if(volPct) volPct.textContent = ytMuted ? 'MUTE' : ytVolume + '%';
+     if(!ytMuted){
+       sendYTCommand(ytFrames[ytActive], 'setVolume', [ytVolume]);
+     }
+   }
+
+   function toggleYtMute(){
+     ytMuted = !ytMuted;
+     var frame = ytFrames[ytActive];
+     sendYTCommand(frame, ytMuted ? 'mute' : 'unMute');
+     updateYtControls();
+   }
+
+   ytTabs.forEach(function(tab, index){
+     tab.addEventListener('click', function(){
+       if(index === ytActive) return;
+       if(ytFrames[ytActive]) sendYTCommand(ytFrames[ytActive], 'pauseVideo');
+       setActiveYt(index);
+     });
+   });
+
+   if(ytPlayBtn){
+     ytPlayBtn.addEventListener('click', function(){
+       toggleYtPlay();
+     });
+   }
+
+   if(volIcon){
+     volIcon.addEventListener('click', function(){
+       toggleYtMute();
+     });
+   }
+
+   if(volSlider){
+     volSlider.addEventListener('input', function(){
+       setYtVolume(parseInt(this.value, 10));
+     });
+   }
+
+   function updateLocalPlayButton(){
+     if(!localPlayBtn) return;
+     localPlayBtn.textContent = localAudio && !localAudio.paused ? '▮▮' : '▶';
+   }
+
+   function updateLocalButtons(){
+     updateLocalPlayButton();
+     if(localLoopBtn) localLoopBtn.classList.toggle('active', localLoop);
+     if(localShuffleBtn) localShuffleBtn.classList.toggle('active', localShuffle);
+   }
+
+   function pauseLocal(){
+     if(localAudio && !localAudio.paused){
+       localAudio.pause();
+     }
+     updateLocalButtons();
+   }
+
+   function refreshLocalPlaylist(){
+     if(!localPlaylistEl) return;
+     localPlaylistEl.innerHTML = '';
+     if(!localFiles.length){
+       var empty = document.createElement('div');
+       empty.className = 'todo-empty';
+       empty.textContent = 'Aucun morceau sélectionné.';
+       localPlaylistEl.appendChild(empty);
+       if(localCurrentTitle) localCurrentTitle.textContent = 'Aucun morceau';
+       return;
+     }
+     localFiles.forEach(function(track, index){
+       var item = document.createElement('button');
+       item.type = 'button';
+       item.className = 'local-track' + (index === localIndex ? ' active' : '');
+       item.textContent = track.name;
+       item.addEventListener('click', function(){
+         setLocalTrack(index);
+       });
+       localPlaylistEl.appendChild(item);
+     });
+   }
+
+   function setLocalTrack(index){
+     if(index < 0 || index >= localFiles.length) return;
+     localIndex = index;
+     var track = localFiles[index];
+     if(!track) return;
+     if(track.url){
+       localAudio.src = track.url;
+     } else if(track.path){
+       localAudio.src = track.path;
+     }
+     if(localCurrentTitle) localCurrentTitle.textContent = track.name;
+     refreshLocalPlaylist();
+     localAudio.play().catch(function(){});
+     updateLocalButtons();
+   }
+
+   function maybeLoadStaticLocalFiles(){
+     if(!localStaticList.length) return;
+     localFiles = localStaticList.map(function(path){
+       return { name: path.split('/').pop(), path: path };
+     });
+     refreshLocalPlaylist();
+     setLocalTrack(0);
+   }
+
+   if(localSelectBtn){
+     localSelectBtn.addEventListener('click', function(){
+       if(localFileInput) localFileInput.click();
+     });
+   }
+
+   if(localFileInput){
+     localFileInput.addEventListener('change', function(event){
+       var files = Array.from(event.target.files || []);
+       if(!files.length) return;
+       var newTracks = files.map(function(file){
+         return { name: file.name, url: URL.createObjectURL(file), file: file };
+       });
+       localFiles = localFiles.concat(newTracks);
+       refreshLocalPlaylist();
+       if(localFiles.length && !localAudio.src){
+         setLocalTrack(localIndex);
+       }
+     });
+   }
+
+   if(localPlayBtn){
+     localPlayBtn.addEventListener('click', function(){
+       if(!localFiles.length) return;
+       if(localAudio.paused){
+         localAudio.play();
+       } else {
+         localAudio.pause();
+       }
+     });
+   }
+
+   if(localPrevBtn){
+     localPrevBtn.addEventListener('click', function(){
+       if(!localFiles.length) return;
+       var next = localShuffle ? Math.floor(Math.random() * localFiles.length) : (localIndex - 1 + localFiles.length) % localFiles.length;
+       setLocalTrack(next);
+     });
+   }
+
+   if(localNextBtn){
+     localNextBtn.addEventListener('click', function(){
+       if(!localFiles.length) return;
+       var next = localShuffle ? Math.floor(Math.random() * localFiles.length) : (localIndex + 1) % localFiles.length;
+       setLocalTrack(next);
+     });
+   }
+
+   if(localLoopBtn){
+     localLoopBtn.addEventListener('click', function(){
+       localLoop = !localLoop;
+       updateLocalButtons();
+     });
+   }
+
+   if(localShuffleBtn){
+     localShuffleBtn.addEventListener('click', function(){
+       localShuffle = !localShuffle;
+       updateLocalButtons();
+     });
+   }
+
+   if(localAudio){
+     localAudio.addEventListener('play', updateLocalButtons);
+     localAudio.addEventListener('pause', updateLocalButtons);
+     localAudio.addEventListener('ended', function(){
+       if(!localFiles.length) return;
+       if(localShuffle){
+         setLocalTrack(Math.floor(Math.random() * localFiles.length));
+         return;
+       }
+       var next = localIndex + 1;
+       if(next >= localFiles.length){
+         if(localLoop){
+           next = 0;
+         } else {
+           updateLocalButtons();
+           return;
+         }
+       }
+       setLocalTrack(next);
+     });
+   }
+
+   if(localAudio){
+     localAudio.addEventListener('loadedmetadata', function(){
+       if(localCurrentTitle && localFiles[localIndex]){
+         localCurrentTitle.textContent = localFiles[localIndex].name;
+       }
+     });
+   }
+
+   if(ytFrames[0]){
+     ensureYtFrame(0);
+   }
+   updateYtControls();
+   updateLocalButtons();
+   maybeLoadStaticLocalFiles();
+ })();
 </script>
 
 
