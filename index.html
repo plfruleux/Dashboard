@@ -212,11 +212,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #card-clock:hover #fr-time{ text-shadow:0 0 22px rgba(212,168,83,.4); }
 .divl{height:1px;background:rgba(255,255,255,0.10);margin:6px 0;flex-shrink:0;}
 
-/* ══ CLOCK + POMODORO EMBED ══ */
+/* ══ CLOCK + POMODORO — fonctionnel ══ */
 #card-clock{flex-shrink:0;overflow:hidden;}
 #card-clock .ci{padding:0;overflow:hidden;}
 
-/* Conteneur splitté côte à côte */
+/* Conteneur splitté côte à côte — les proportions changent quand le
+   pomodoro démarre (classe .pomo-active posée sur #card-clock). */
 .ck-split{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:horizontal;-webkit-box-direction:normal;
@@ -225,39 +226,42 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 
 /* ─ Moitié gauche : horloge ─ */
 .ck-left{
-  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1;min-width:0;
+  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1 1 0;min-width:0;
   border-right:1px solid rgba(255,255,255,0.07);
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
   -ms-flex-direction:column;flex-direction:column;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:flex .45s cubic-bezier(.4,0,.2,1);
 }
 .ck-main{
-  padding:13px 14px 10px;
+  padding:13px 14px;
   -webkit-box-flex:1;-ms-flex:1;flex:1;
-}
-.ck-city{
-  font-family:var(--fm);font-size:6px;letter-spacing:.32em;
-  text-transform:uppercase;color:var(--t3);
-  margin-bottom:5px;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
 }
 #fr-time{
   font-family:var(--fd);font-size:42px;font-weight:800;
   line-height:.95;letter-spacing:.005em;color:var(--t1);
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  transition:font-size .45s cubic-bezier(.4,0,.2,1);
 }
-.sep{color:var(--accent);margin:0 1px;animation:blink 1s step-end infinite;}
-@keyframes blink{0%,49%{opacity:.9}50%,100%{opacity:.15}}
+.sep{color:var(--accent);margin:0 1px;} /* clignotement retiré */
 #fr-date{
   font-family:var(--fm);font-size:6px;
   color:var(--t3);letter-spacing:.07em;
   margin-top:6px;text-transform:capitalize;
+  transition:opacity .25s ease,max-height .3s ease;
 }
 .ck-vn{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:baseline;-ms-flex-align:baseline;align-items:baseline;
   gap:9px;padding:7px 14px 9px;
   border-top:1px solid rgba(255,255,255,0.06);
+  transition:opacity .25s ease,max-height .3s ease;
 }
 .ck-vn-lbl{
   font-family:var(--fm);font-size:5.5px;letter-spacing:.3em;
@@ -273,30 +277,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   font-family:var(--fm);font-size:5.5px;color:var(--accent);
   letter-spacing:.06em;flex-shrink:0;
 }
+/* État pomodoro actif : l'horloge se réduit, ne montre plus que l'heure locale */
+#card-clock.pomo-active .ck-left{ -webkit-box-flex:0;-ms-flex:0 0 74px;flex:0 0 74px; }
+#card-clock.pomo-active .ck-main{ padding:8px 10px; }
+#card-clock.pomo-active #fr-time{ font-size:18px; }
+#card-clock.pomo-active #fr-date,
+#card-clock.pomo-active .ck-vn{ display:none; }
+#card-clock.pomo-active .ck-right{ -webkit-box-flex:2;-ms-flex:2 1 0;flex:2 1 0; }
 
-/* ─ Moitié droite : mini Pomodoro ─ */
+/* ─ Moitié droite : pomodoro ─ */
 .ck-right{
-  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1;min-width:0;
+  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1 1 0;min-width:0;
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
   -ms-flex-direction:column;flex-direction:column;
-  position:relative;
+  position:relative;transition:flex .45s cubic-bezier(.4,0,.2,1);
 }
-.pom-header{
-  padding:7px 10px 6px;
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-}
-.pom-header-lbl{font-family:var(--fm);font-size:5.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);} 
 #pom-fullscreen-btn{
+  position:absolute;top:6px;right:7px;z-index:2;
   background:none;border:none;cursor:pointer;
-  color:var(--t3);font-size:11px;padding:1px 3px;line-height:1;
-  text-decoration:none;display:block;
-  transition:color .2s;
+  color:var(--t3);font-size:11px;padding:2px 4px;line-height:1;
+  transition:color .2s,-webkit-transform .15s;transition:color .2s,transform .15s;
 }
-#pom-fullscreen-btn:hover{color:var(--accent);}
+#pom-fullscreen-btn:hover{color:var(--accent);-webkit-transform:scale(1.15);transform:scale(1.15);}
 .pom-body{
   -webkit-box-flex:1;-ms-flex:1;flex:1;
   display:-webkit-box;display:-ms-flexbox;display:flex;
@@ -306,14 +309,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
   padding:8px 10px;gap:5px;
 }
-#pom-mode-lbl{font-family:var(--fm);font-size:5.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);opacity:.8;}
 #pom-time{
   font-family:var(--fd);font-size:30px;font-weight:800;
   letter-spacing:-.02em;line-height:1;color:var(--t1);
+  transition:color .3s;
 }
 #pom-time.pom-urgent{color:rgba(200,90,70,.9);}
 .pom-prog-track{width:80%;height:1px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden;} 
-.pom-prog-bar{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width 1s linear;}
+.pom-prog-bar{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width 1s linear,background .3s;}
 .pom-controls{display:-webkit-box;display:-ms-flexbox;display:flex;gap:7px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}
 #pom-btn{
   width:28px;height:28px;border-radius:50%;
@@ -332,6 +335,81 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .pom-dot{width:4px;height:4px;border-radius:50%;background:rgba(240,236,228,.15);transition:all .4s;} 
 .pom-dot.done{background:rgba(240,236,228,.35);} 
 .pom-dot.active{background:var(--accent);width:10px;border-radius:2px;}
+
+/* Couleur d'accent selon la phase (travail / pause / grande pause) */
+#card-clock.pom-mode-break #pom-time,
+#pomo-full.pom-mode-break #pomo-full-time{color:var(--blue);}
+#card-clock.pom-mode-break .pom-prog-bar,
+#pomo-full.pom-mode-break .pom-prog-bar{background:var(--blue);}
+#card-clock.pom-mode-break .pom-dot.active,
+#pomo-full.pom-mode-break .pom-dot.active{background:var(--blue);}
+#card-clock.pom-mode-long #pom-time,
+#pomo-full.pom-mode-long #pomo-full-time{color:var(--green);}
+#card-clock.pom-mode-long .pom-prog-bar,
+#pomo-full.pom-mode-long .pom-prog-bar{background:var(--green);}
+#card-clock.pom-mode-long .pom-dot.active,
+#pomo-full.pom-mode-long .pom-dot.active{background:var(--green);}
+
+/* ══ POMODORO PLEIN ÉCRAN ══
+   Le fond reste le fond d'écran (#bg-a/#bg-b), simplement assombri et
+   flouté davantage via backdrop-filter, pour rester cohérent avec le
+   reste du dashboard sans dupliquer d'image. */
+#pomo-full{
+  position:fixed;inset:0;z-index:500;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  gap:26px;
+  background:rgba(4,5,9,0.88);
+  -webkit-backdrop-filter:blur(30px) saturate(1.05) brightness(.7);
+  backdrop-filter:blur(30px) saturate(1.05) brightness(.7);
+  opacity:0;visibility:hidden;pointer-events:none;
+  -webkit-transform:scale(.9);transform:scale(.9);
+  -webkit-transform-origin:92% 8%;transform-origin:92% 8%;
+  transition:opacity .4s cubic-bezier(.22,.68,0,1.15),
+             -webkit-transform .4s cubic-bezier(.22,.68,0,1.15);
+  transition:opacity .4s cubic-bezier(.22,.68,0,1.15),
+             transform .4s cubic-bezier(.22,.68,0,1.15);
+}
+#pomo-full.open{
+  opacity:1;visibility:visible;pointer-events:auto;
+  -webkit-transform:scale(1);transform:scale(1);
+}
+#pomo-full-close{
+  position:absolute;top:20px;right:22px;
+  background:none;border:1px solid rgba(255,255,255,.12);
+  color:var(--t3);width:30px;height:30px;border-radius:50%;cursor:pointer;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  font-size:13px;transition:color .15s,border-color .15s,-webkit-transform .15s;transition:color .15s,border-color .15s,transform .15s;
+}
+#pomo-full-close:hover{color:var(--accent);border-color:rgba(212,168,83,.4);-webkit-transform:rotate(90deg);transform:rotate(90deg);}
+#pomo-full-time{
+  font-family:var(--fd);font-size:min(24vw,220px);font-weight:800;
+  color:var(--t1);line-height:1;letter-spacing:-.02em;
+  transition:color .3s;
+}
+#pomo-full .pom-prog-track{width:min(60vw,320px);height:2px;background:rgba(255,255,255,.09);}
+#pomo-full .pom-dots{gap:8px;}
+#pomo-full .pom-dot{width:6px;height:6px;}
+#pomo-full .pom-dot.active{width:18px;}
+#pomo-full-btn{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--adim);border:1px solid rgba(212,168,83,.35);
+  color:var(--accent);cursor:pointer;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:background .18s,border-color .18s,-webkit-transform .1s;transition:background .18s,border-color .18s,transform .1s;
+}
+#pomo-full-btn:hover{background:rgba(212,168,83,.22);-webkit-transform:scale(1.06);transform:scale(1.06);}
+#pomo-full-clock{
+  position:absolute;bottom:22px;left:0;right:0;text-align:center;
+  font-family:var(--fm);font-size:10px;letter-spacing:.12em;color:var(--t3);
+}
 
 /* ══ WEATHER ══ */
 #card-weather{background:rgba(8,10,17,0.65);flex-shrink:0;overflow:hidden;}
@@ -1290,7 +1368,6 @@ body{ animation:appFadeIn .6s ease both; }
           <!-- Gauche : horloge -->
           <div class="ck-left">
             <div class="ck-main">
-              <div class="ck-city">France</div>
               <div id="fr-time">--<span class="sep">:</span>--</div>
               <div id="fr-date"></div>
             </div>
@@ -1300,15 +1377,10 @@ body{ animation:appFadeIn .6s ease both; }
               <span id="vn-diff"></span>
             </div>
           </div>
-          <!-- Droite : mini Pomodoro -->
+          <!-- Droite : pomodoro -->
           <div class="ck-right">
-            <div class="pom-header">
-              <span class="pom-header-lbl">Pomodoro</span>
-              <!-- Lien vers l'app Pomodoro complète, une page séparée non couverte par ce fichier -->
-              <a id="pom-fullscreen-btn" href="/pomodoro/" target="_blank" title="Plein écran">⤢</a>
-            </div>
+            <button id="pom-fullscreen-btn" title="Plein écran" aria-label="Plein écran">⤢</button>
             <div class="pom-body">
-              <div id="pom-mode-lbl">FOCUS</div>
               <div id="pom-time">25:00</div>
               <div class="pom-prog-track">
                 <div class="pom-prog-bar" id="pom-prog"></div>
@@ -1550,6 +1622,25 @@ body{ animation:appFadeIn .6s ease both; }
 
 
 
+<!-- ══ POMODORO PLEIN ÉCRAN ══ -->
+<div id="pomo-full" aria-hidden="true">
+  <button id="pomo-full-close" title="Fermer" aria-label="Fermer">&#10005;</button>
+  <div id="pomo-full-time">25:00</div>
+  <div class="pom-prog-track"><div class="pom-prog-bar" id="pomo-full-prog"></div></div>
+  <div class="pom-dots" id="pomo-full-dots">
+    <div class="pom-dot active" id="pfd0"></div>
+    <div class="pom-dot" id="pfd1"></div>
+    <div class="pom-dot" id="pfd2"></div>
+    <div class="pom-dot" id="pfd3"></div>
+  </div>
+  <button id="pomo-full-btn" title="Play / Pause">
+    <svg id="pomo-full-icon" width="20" height="20" viewBox="0 0 10 10" fill="currentColor">
+      <polygon points="2,1 9,5 2,9"/>
+    </svg>
+  </button>
+  <div id="pomo-full-clock">--:--</div>
+</div>
+
 <!-- ══ TODOS MODAL — doit être avant le script ══ -->
 <div id="todos-modal" aria-hidden="true" role="dialog" aria-label="Toutes les listes">
   <div id="todos-modal-bg"></div>
@@ -1598,10 +1689,209 @@ function updateClock(){
     var hDay=parseInt(d.toLocaleDateString('en-US',{timeZone:'Asia/Ho_Chi_Minh',day:'numeric'}),10);
     var diff=hDay-pDay;
     document.getElementById('vn-diff').textContent=diff!==0?(diff>0?'+'+diff+'j':diff+'j'):'';
+    var pomoFullClockEl = document.getElementById('pomo-full-clock');
+    if(pomoFullClockEl) pomoFullClockEl.textContent = ft[0]+':'+ft[1];
   }catch(e){}
 }
 updateClock();
 setInterval(updateClock,1000);
+
+/* ══════════════════════════════════════════
+   POMODORO — 25 min travail / 5 min pause / grande pause de 30 min
+   toutes les 4 sessions de travail. Fonctionne entièrement côté client
+   (aucun backend), avec un son de cloche synthétisé en direct via
+   l'API Web Audio (pas de fichier audio à héberger sur GitHub Pages).
+══════════════════════════════════════════ */
+(function(){
+  var POM_WORK = 25*60;
+  var POM_BREAK = 5*60;
+  var POM_LONG = 30*60;
+  var POM_LONG_EVERY = 4;
+
+  var pomCardClock = document.getElementById('card-clock');
+  var pomFull = document.getElementById('pomo-full');
+  var pomFullscreenBtn = document.getElementById('pom-fullscreen-btn');
+  var pomFullCloseBtn = document.getElementById('pomo-full-close');
+
+  var pomTimeEls = [document.getElementById('pom-time'), document.getElementById('pomo-full-time')];
+  var pomProgEls = [document.getElementById('pom-prog'), document.getElementById('pomo-full-prog')];
+  var pomBtnIcons = [document.getElementById('pom-btn-icon'), document.getElementById('pomo-full-icon')];
+  var pomBtns = [document.getElementById('pom-btn'), document.getElementById('pomo-full-btn')];
+  var pomDotIds = [
+    ['pd0','pd1','pd2','pd3'],
+    ['pfd0','pfd1','pfd2','pfd3']
+  ];
+
+  var state = {
+    mode: 'work',      // 'work' | 'break' | 'long'
+    remaining: POM_WORK,
+    running: false
+  };
+  var workCount = 0;    // sessions de travail terminées (mod 4 pour les points)
+  var pomInterval = null;
+  var audioCtx = null;
+
+  function pomDuration(mode){
+    if(mode === 'work') return POM_WORK;
+    if(mode === 'break') return POM_BREAK;
+    return POM_LONG;
+  }
+
+  // Petit carillon apaisant, synthétisé (aucun fichier audio requis).
+  function playChime(){
+    try{
+      if(!audioCtx){
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if(!Ctx) return;
+        audioCtx = new Ctx();
+      }
+      if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+      var now = audioCtx.currentTime;
+      var freqs = [660, 990, 1320]; // accord clair type carillon, non agressif
+      freqs.forEach(function(f, i){
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        var start = now + i * 0.09;
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(0.12 / (i + 1), start + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 1.9);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(start);
+        osc.stop(start + 2);
+      });
+    }catch(e){}
+  }
+
+  function unlockAudio(){
+    try{
+      if(!audioCtx){
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if(Ctx) audioCtx = new Ctx();
+      }
+      if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }catch(e){}
+  }
+
+  function formatMs(sec){
+    var m = Math.floor(sec/60);
+    var s = sec%60;
+    return m+':'+(s<10?'0':'')+s;
+  }
+
+  function setModeClasses(mode){
+    [pomCardClock, pomFull].forEach(function(el){
+      if(!el) return;
+      el.classList.remove('pom-mode-work','pom-mode-break','pom-mode-long');
+      el.classList.add('pom-mode-'+mode);
+    });
+  }
+
+  function renderDots(){
+    var doneCount = workCount % POM_LONG_EVERY;
+    if(state.mode === 'long') doneCount = POM_LONG_EVERY;
+    pomDotIds.forEach(function(group){
+      group.forEach(function(id, i){
+        var el = document.getElementById(id);
+        if(!el) return;
+        el.classList.toggle('done', i < doneCount);
+        el.classList.toggle('active', state.mode === 'work' && i === doneCount);
+      });
+    });
+  }
+
+  function render(){
+    var text = formatMs(state.remaining);
+    pomTimeEls.forEach(function(el){
+      if(!el) return;
+      el.textContent = text;
+      el.classList.toggle('pom-urgent', state.remaining <= 10 && state.running);
+    });
+    var total = pomDuration(state.mode);
+    var pct = Math.max(0, Math.min(100, ((total - state.remaining) / total) * 100));
+    pomProgEls.forEach(function(el){ if(el) el.style.width = pct+'%'; });
+    pomBtnIcons.forEach(function(el){
+      if(!el) return;
+      el.innerHTML = state.running
+        ? '<rect x="2" y="1" width="2" height="8"/><rect x="6" y="1" width="2" height="8"/>'
+        : '<polygon points="2,1 9,5 2,9"/>';
+    });
+    setModeClasses(state.mode);
+    renderDots();
+  }
+
+  function tick(){
+    if(!state.running) return;
+    state.remaining--;
+    if(state.remaining <= 0){
+      advance();
+    } else {
+      render();
+    }
+  }
+
+  function advance(){
+    playChime();
+    if(state.mode === 'work'){
+      workCount++;
+      state.mode = (workCount % POM_LONG_EVERY === 0) ? 'long' : 'break';
+    } else {
+      state.mode = 'work';
+    }
+    state.remaining = pomDuration(state.mode);
+    render();
+  }
+
+  function setRunning(run){
+    state.running = run;
+    if(run){
+      unlockAudio();
+      if(pomCardClock) pomCardClock.classList.add('pomo-active');
+      if(!pomInterval) pomInterval = setInterval(tick, 1000);
+    } else if(pomInterval){
+      clearInterval(pomInterval);
+      pomInterval = null;
+    }
+    render();
+  }
+
+  function toggleRunning(){
+    setRunning(!state.running);
+  }
+
+  pomBtns.forEach(function(btn){
+    if(!btn) return;
+    btn.addEventListener('click', toggleRunning);
+  });
+
+  if(pomFullscreenBtn && pomFull){
+    pomFullscreenBtn.addEventListener('click', function(){
+      pomFull.classList.add('open');
+      pomFull.setAttribute('aria-hidden','false');
+      render();
+    });
+  }
+
+  function closePomoFull(){
+    if(!pomFull) return;
+    pomFull.classList.remove('open');
+    pomFull.setAttribute('aria-hidden','true');
+  }
+
+  if(pomFullCloseBtn){ pomFullCloseBtn.addEventListener('click', closePomoFull); }
+  if(pomFull){
+    pomFull.addEventListener('click', function(e){
+      if(e.target === pomFull) closePomoFull();
+    });
+  }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closePomoFull();
+  });
+
+  render();
+})();
 
 /* ══════════════════════════════════════════
    MÉTÉO + COURBE SVG — code retiré (dépendait d'un fetch API externe)
@@ -1677,14 +1967,6 @@ setInterval(updateClock,1000);
    MINI-CALENDRIER MENSUEL (#cal-mini-panel, #cal-mini-grid) : petit
    calendrier du mois courant, navigable (#mini-prev / #mini-next), jour
    actuel marqué (classe .mini-day.is-today).
-
-   MINI-POMODORO (dans la carte horloge : #pom-time, #pom-mode-lbl,
-   #pom-prog, #pom-btn, #pd0..#pd3) : interrogeait toutes les 10s un timer
-   dont l'état (mode, temps restant, en cours ou non) était géré côté
-   serveur par l'app Pomodoro séparée (/pomodoro/, non couverte par ce
-   fichier). Le bouton play/pause envoyait une commande au serveur. Les
-   valeurs actuellement figées dans le HTML ("25:00", "FOCUS", 1ᵉʳ point
-   actif) sont de simples placeholders visuels, pas un vrai décompte.
 ══════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════
