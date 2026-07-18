@@ -373,27 +373,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #aqi-lbl{font-family:var(--fm);font-size:8px;color:var(--t2);} 
 .aqi-pm{font-family:var(--fm);font-size:7px;color:var(--t3);margin-left:auto;} 
 
-/* ══ MUSIQUE / PODCAST — carte fractionnée ══ */
+/* ══════════════════════════════════════════════
+   MUSIQUE / PODCAST — carte fractionnée
+   Refonte esthétique : design sobre et transparent (verre très clair,
+   pas de pastilles de couleur pleines, accent doré utilisé seulement
+   sur le texte/les icônes, jamais en aplat).
+══════════════════════════════════════════════ */
 #card-music{flex-shrink:0;overflow:hidden;} 
 #card-music .ci{padding:0;height:auto;} 
 
-/* ── Toggle 2 modes (MUSIQUE / PODCAST) ── */
+/* ── Toggle 3 modes (MUSIQUE / LOCAL / PODCAST) ── */
 #audio-mode-toggle{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:5px;padding:5px 8px;border-bottom:1px solid var(--border);
+  gap:2px;padding:6px 10px;border-bottom:1px solid var(--border);
 }
 .amt-btn{
-  flex:0 1 auto;padding:4px 9px;border-radius:5px;
-  background:transparent;border:1px solid transparent;
-  color:var(--t3);font-family:var(--fm);font-size:7px;letter-spacing:.14em;
-  cursor:pointer;transition:color .2s,background .2s,border-color .2s;
+  flex:0 1 auto;padding:4px 7px 6px;
+  background:transparent;border:none;border-bottom:1px solid transparent;
+  color:var(--t3);font-family:var(--fm);font-size:6.5px;letter-spacing:.14em;
+  cursor:pointer;transition:color .2s,border-color .2s;
   -webkit-tap-highlight-color:transparent;white-space:nowrap;
 }
-.amt-btn.active{
-  color:var(--accent);background:rgba(212,168,83,.10);
-  border-color:rgba(212,168,83,.25);
-}
+.amt-btn.active{ color:var(--t1);border-color:var(--accent); }
 .amt-btn:hover:not(.active){color:var(--t2);} 
 #amt-matin-dot{
   -webkit-box-flex:1;-ms-flex:1;flex:1;
@@ -414,91 +416,114 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .audio-mode{display:none;} 
 .audio-mode.visible{display:block;} 
 
-/* Section YouTube */
-#sc-tabs{
+/* Onglets pistes (YouTube + Podcast) — soulignement fin, pas de fond plein */
+#sc-tabs,#pod-tabs{
   display:flex;gap:0;border-bottom:1px solid var(--border);
   overflow-x:auto;scrollbar-width:none;
 }
-#sc-tabs::-webkit-scrollbar{display:none;}
+#sc-tabs::-webkit-scrollbar,#pod-tabs::-webkit-scrollbar{display:none;}
 .sc-tab{
-  flex:1;padding:5px 6px;
-  font-family:var(--fm);font-size:7px;letter-spacing:.03em;
-  color:var(--t3);background:none;border:none;border-right:1px solid var(--border);
-  cursor:pointer;transition:color .15s,background .15s;
+  flex:1;padding:6px 6px;
+  font-family:var(--fm);font-size:7px;letter-spacing:.05em;
+  color:var(--t3);background:none;border:none;
+  border-bottom:1px solid transparent;
+  cursor:pointer;transition:color .15s,border-color .15s;
   -webkit-tap-highlight-color:transparent;white-space:nowrap;text-align:center;
+  position:relative;top:1px;
 }
-.sc-tab:last-child{border-right:none;}
-.sc-tab.active{color:var(--accent);background:rgba(212,168,83,.06);} 
+.sc-tab.active{color:var(--t1);border-color:var(--accent);} 
 .sc-tab:hover:not(.active){color:var(--t2);} 
 
-/* ── Bloc vidéo YouTube (visible, flouté en fond des contrôles) ──
-   Correctif du bug : l'API IFrame de YouTube exige une taille réelle
-   d'au moins 200x200px pour s'initialiser correctement. L'ancien code
-   écrasait l'iframe à 1x1px (masqué), ce qui empêchait le lecteur de
-   fonctionner. Ici l'iframe est rendue à une taille réelle bien
-   supérieure à 200x200, recadrée en "cover" dans #yt-video-wrap, et
-   sert désormais de fond vidéo derrière les contrôles. */
+/* ── Bloc vidéo YouTube ──
+   Correctif du bug : l'ancien code (3 iframes cachées à 1x1px + API
+   branchée sur des iframes existantes) ne fonctionnait pas de façon
+   fiable. Remplacé par le schéma officiel recommandé par YouTube :
+   un seul lecteur (new YT.Player) créé dans #yt-player-mount, avec
+   changement de piste via loadVideoById plutôt que 3 lecteurs séparés.
+   La vidéo sert de fond, recadrée et assombrie derrière des contrôles
+   minimalistes en verre très transparent. */
 #yt-video-wrap{
-  position:relative;height:150px;overflow:hidden;background:#000;
-  border-bottom:1px solid var(--border);
+  position:relative;height:132px;overflow:hidden;background:#0a0b0e;
 }
-#sc-stack{
+#yt-player-mount{
+  position:absolute;inset:0;pointer-events:none;
+}
+#yt-player-mount iframe{
   position:absolute;top:50%;left:50%;
-  width:160%;height:220%;
-  transform:translate(-50%,-50%);
-  pointer-events:none;z-index:0;
+  width:160%;height:200%;
+  -webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);
+  border:none;
 }
-.sc-frame{display:none;width:100%;height:100%;border:none;}
-.sc-frame.active{display:block;}
 #yt-video-scrim{
   position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:linear-gradient(180deg,rgba(7,8,11,0.10) 0%,rgba(7,8,11,0.30) 55%,rgba(7,8,11,0.82) 100%);
-  -webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px);
+  background:linear-gradient(180deg,rgba(7,8,11,0.05) 0%,rgba(7,8,11,0.18) 60%,rgba(7,8,11,0.62) 100%);
 }
-/* Volume row — désormais posée en overlay verre dépoli au bas de la vidéo */
+#yt-video-status{
+  position:absolute;top:6px;left:8px;z-index:2;
+  font-family:var(--fm);font-size:6.5px;letter-spacing:.1em;
+  color:rgba(240,236,228,.5);pointer-events:none;
+  opacity:0;transition:opacity .3s;
+}
+#yt-video-status.show{opacity:1;}
+
+/* Volume row — overlay quasi transparent au bas de la vidéo */
 #vol-row{
   position:absolute;left:0;right:0;bottom:0;z-index:2;
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:8px;padding:7px 10px;
-  background:rgba(7,8,11,0.42);
-  -webkit-backdrop-filter:blur(8px) saturate(1.4);
-  backdrop-filter:blur(8px) saturate(1.4);
-  border-top:1px solid rgba(255,255,255,0.09);
+  gap:7px;padding:6px 9px;
+  background:rgba(7,8,11,0.18);
+  -webkit-backdrop-filter:blur(5px);
+  backdrop-filter:blur(5px);
 }
-#vol-icon{font-size:11px;color:var(--t2);flex-shrink:0;cursor:pointer;-webkit-user-select:none;user-select:none;}
+#yt-play-btn{
+  background:none;border:none;color:rgba(240,236,228,0.75);cursor:pointer;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  justify-content:center;width:18px;height:18px;padding:0;flex-shrink:0;
+  transition:color .15s,-webkit-transform .1s;transition:color .15s,transform .1s;
+}
+#yt-play-btn:hover{color:var(--accent);-webkit-transform:scale(1.12);transform:scale(1.12);} 
+#vol-icon{font-size:10px;color:rgba(240,236,228,0.5);flex-shrink:0;cursor:pointer;-webkit-user-select:none;user-select:none;transition:color .15s;}
+#vol-icon:hover{color:rgba(240,236,228,0.85);} 
 #vol-slider{
   -webkit-box-flex:1;-ms-flex:1;flex:1;
   -webkit-appearance:none;appearance:none;
-  height:2px;background:rgba(255,255,255,0.18);border-radius:2px;outline:none;cursor:pointer;
+  height:2px;background:rgba(255,255,255,0.14);border-radius:2px;outline:none;cursor:pointer;
 }
-#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:10px;height:10px;border-radius:50%;background:var(--accent);cursor:pointer;transition:-webkit-transform .1s;transition:transform .1s;}
-#vol-slider::-webkit-slider-thumb:hover{-webkit-transform:scale(1.3);transform:scale(1.3);} 
-#vol-slider::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;} 
-#vol-pct{font-family:var(--fm);font-size:7px;color:var(--t2);min-width:24px;text-align:right;} 
+#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:8px;height:8px;border-radius:50%;background:rgba(240,236,228,0.8);cursor:pointer;transition:background .15s,-webkit-transform .1s;transition:background .15s,transform .1s;}
+#vol-slider::-webkit-slider-thumb:hover{background:var(--accent);-webkit-transform:scale(1.25);transform:scale(1.25);} 
+#vol-slider::-moz-range-thumb{width:8px;height:8px;border-radius:50%;background:rgba(240,236,228,0.8);border:none;cursor:pointer;} 
+#vol-pct{font-family:var(--fm);font-size:6.5px;color:rgba(240,236,228,0.45);min-width:22px;text-align:right;} 
 #sc-credit{
-  padding:3px 10px 4px;font-size:7.5px;color:var(--t3);
+  padding:3px 10px 4px;font-size:7px;color:var(--t3);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--fm);
 }
 #sc-credit a{color:var(--t3);text-decoration:none;} 
 #sc-credit a:hover{color:var(--accent);} 
 
-/* ══ MODE LOCAL — redesign aligné sur le style du bloc YouTube ══ */
+/* ══ MODE LOCAL — même langage visuel sobre que le bloc YouTube ══ */
 #local-header{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
-  gap:8px;padding:5px 10px;border-bottom:1px solid var(--border);
+  gap:8px;padding:6px 10px;border-bottom:1px solid var(--border);
 }
 #local-mode-label{
-  font-family:var(--fm);font-size:7px;letter-spacing:.18em;
+  font-family:var(--fm);font-size:6.5px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--t3);
 }
 #local-path-hint{display:none;} /* remplacé par local-mode-label, gardé en DOM pour compat */
+#local-select-btn{
+  flex-shrink:0;background:none;border:none;color:var(--t3);
+  font-family:var(--fm);font-size:6.5px;letter-spacing:.08em;
+  cursor:pointer;padding:2px 0;transition:color .15s;
+}
+#local-select-btn:hover{color:var(--accent);} 
 
 #local-playlist{
-  max-height:110px;overflow-y:auto;overflow-x:hidden;
-  padding:4px 6px;display:flex;flex-direction:column;gap:2px;
+  max-height:100px;overflow-y:auto;overflow-x:hidden;
+  padding:2px 4px;display:flex;flex-direction:column;gap:0;
   scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;
 }
 #local-playlist::-webkit-scrollbar{width:3px;}
@@ -507,88 +532,85 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .local-track{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:8px;padding:6px 8px;border-radius:6px;
-  font-family:var(--fm);font-size:8.5px;color:var(--t2);
-  background:transparent;border:none;text-align:left;width:100%;
-  cursor:pointer;transition:background .15s,color .15s;
+  gap:8px;padding:6px 6px;border-radius:0;
+  border-bottom:1px solid rgba(255,255,255,.03);
+  font-family:var(--fm);font-size:8.5px;color:var(--t3);
+  background:transparent;border-left:2px solid transparent;border-right:none;border-top:none;
+  text-align:left;width:100%;
+  cursor:pointer;transition:color .15s,border-left-color .15s;
   -webkit-tap-highlight-color:transparent;
 }
-.local-track:hover{background:rgba(255,255,255,0.045);color:var(--t1);} 
-.local-track.active{background:rgba(212,168,83,.12);color:var(--accent);} 
+.local-track:hover{color:var(--t1);} 
+.local-track.active{color:var(--accent);border-left-color:var(--accent);} 
 .local-track .track-meta{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 
 #local-now-row{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
-  gap:8px;padding:6px 10px 0;
+  gap:8px;padding:7px 10px 0;
 }
 #local-current-title{
-  font-family:var(--fb);font-size:9.5px;color:var(--t1);
+  font-family:var(--fb);font-size:9px;color:var(--t1);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;
 }
 #local-time{font-family:var(--fm);font-size:6.5px;color:var(--t3);flex-shrink:0;} 
 
 #local-prog-wrap{
-  height:3px;background:var(--border);border-radius:2px;
-  margin:5px 10px;cursor:pointer;position:relative;overflow:hidden;
+  height:2px;background:rgba(255,255,255,.10);border-radius:2px;
+  margin:6px 10px;cursor:pointer;position:relative;overflow:hidden;
   transition:height .15s;
 }
-#local-prog-wrap:hover{height:5px;}
+#local-prog-wrap:hover{height:4px;}
 #local-prog{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .2s linear;} 
 
 #local-controls{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:6px;padding:6px 10px 8px;
+  gap:9px;padding:4px 10px 9px;
 }
 .local-round-btn{
-  width:26px;height:26px;border-radius:50%;
-  background:var(--adim);border:1px solid rgba(212,168,83,.30);
-  color:var(--accent);cursor:pointer;
+  width:auto;height:18px;border-radius:0;
+  background:none;border:none;
+  color:rgba(240,236,228,0.7);cursor:pointer;
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  padding:0;flex-shrink:0;font-size:11px;line-height:1;
-  transition:background .2s,border-color .2s,-webkit-transform .1s;transition:background .2s,border-color .2s,transform .1s;
+  padding:0;flex-shrink:0;font-size:13px;line-height:1;
+  transition:color .15s,-webkit-transform .1s;transition:color .15s,transform .1s;
 }
-.local-round-btn:hover{background:rgba(212,168,83,.22);border-color:rgba(212,168,83,.65);-webkit-transform:scale(1.08);transform:scale(1.08);} 
-#local-play-btn{width:32px;height:32px;font-size:13px;} 
+.local-round-btn:hover{color:var(--accent);-webkit-transform:scale(1.15);transform:scale(1.15);} 
+#local-play-btn{font-size:15px;} 
 .local-toggle-btn{
-  background:none;border:1px solid var(--border);color:var(--t3);
-  border-radius:5px;width:24px;height:24px;font-size:10px;
+  background:none;border:none;color:var(--t3);
+  border-radius:0;width:auto;height:18px;font-size:10px;padding:0 1px;
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  cursor:pointer;transition:color .15s,border-color .15s,background .15s;flex-shrink:0;
+  cursor:pointer;transition:color .15s;flex-shrink:0;
 }
-.local-toggle-btn.active{color:var(--accent);border-color:rgba(212,168,83,.4);background:rgba(212,168,83,.10);} 
+.local-toggle-btn.active{color:var(--accent);} 
 .local-toggle-btn:hover:not(.active){color:var(--t2);} 
-#local-select-btn{flex-shrink:0;}
 
 #local-vol-row{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   gap:6px;-webkit-box-flex:1;-ms-flex:1;flex:1;min-width:0;
 }
-#local-vol-icon{font-size:11px;color:var(--t2);flex-shrink:0;cursor:pointer;-webkit-user-select:none;user-select:none;}
+#local-vol-icon{font-size:10px;color:rgba(240,236,228,0.5);flex-shrink:0;cursor:pointer;-webkit-user-select:none;user-select:none;transition:color .15s;}
+#local-vol-icon:hover{color:rgba(240,236,228,0.85);} 
 #local-vol-slider{
   -webkit-box-flex:1;-ms-flex:1;flex:1;min-width:36px;
   -webkit-appearance:none;appearance:none;
-  height:2px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;
+  height:2px;background:rgba(255,255,255,.14);border-radius:2px;outline:none;cursor:pointer;
 }
-#local-vol-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:10px;height:10px;border-radius:50%;background:var(--accent);cursor:pointer;transition:-webkit-transform .1s;transition:transform .1s;}
-#local-vol-slider::-webkit-slider-thumb:hover{-webkit-transform:scale(1.3);transform:scale(1.3);} 
-#local-vol-slider::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;} 
+#local-vol-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:8px;height:8px;border-radius:50%;background:rgba(240,236,228,0.8);cursor:pointer;transition:background .15s,-webkit-transform .1s;transition:background .15s,transform .1s;}
+#local-vol-slider::-webkit-slider-thumb:hover{background:var(--accent);-webkit-transform:scale(1.25);transform:scale(1.25);} 
+#local-vol-slider::-moz-range-thumb{width:8px;height:8px;border-radius:50%;background:rgba(240,236,228,0.8);border:none;cursor:pointer;} 
 
 
 /* Section Podcast */
 #pod-section{position:relative;} 
-#pod-tabs{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  gap:0;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
-}
-#pod-tabs::-webkit-scrollbar{display:none;}
 #pod-info{
   padding:4px 10px 3px;font-family:var(--fm);font-size:7px;color:var(--t2);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:16px;
@@ -1385,34 +1407,16 @@ body{ animation:appFadeIn .6s ease both; }
               <button class="sc-tab" data-idx="2">&#9834; Chill</button>
             </div>
 
-            <!-- Bloc vidéo : la vidéo YouTube est désormais rendue à une
-                 taille réelle valide (bug corrigé), recadrée en fond flouté
-                 derrière les contrôles play/volume en verre dépoli. -->
+            <!-- Bloc vidéo : lecteur YouTube unique créé via l'API officielle
+                 (new YT.Player), voir script plus bas. Le changement de piste
+                 se fait par loadVideoById, pas par un jeu de 3 iframes. -->
             <div id="yt-video-wrap">
-              <div id="sc-stack" aria-hidden="true">
-                <iframe id="yt-frame-0" class="sc-frame active" frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media"
-                  src="https://www.youtube.com/embed/2LSB--cO1J8?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=2LSB--cO1J8&controls=0&modestbranding=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&playsinline=1"
-                ></iframe>
-                <iframe id="yt-frame-1" class="sc-frame" frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media"
-                  data-src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=jfKfPfyJRdk&controls=0&modestbranding=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&playsinline=1"
-                ></iframe>
-                <iframe id="yt-frame-2" class="sc-frame" frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media"
-                  data-src="https://www.youtube.com/embed/80pOuROVGFQ?autoplay=1&mute=1&enablejsapi=1&loop=1&playlist=80pOuROVGFQ&controls=0&modestbranding=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&playsinline=1"
-                ></iframe>
-              </div>
+              <div id="yt-player-mount"></div>
               <div id="yt-video-scrim"></div>
+              <span id="yt-video-status"></span>
               <div id="vol-row">
-                <button id="yt-play-btn" title="Play / Pause" style="
-                  background:none;border:none;color:var(--accent);cursor:pointer;
-                  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
-                  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-                  justify-content:center;width:22px;height:22px;padding:0;flex-shrink:0;
-                  opacity:.85;transition:opacity .15s;
-                ">
-                  <svg id="yt-play-icon" width="14" height="14" viewBox="0 0 10 10" fill="currentColor">
+                <button id="yt-play-btn" title="Play / Pause">
+                  <svg id="yt-play-icon" width="12" height="12" viewBox="0 0 10 10" fill="currentColor">
                     <polygon points="2,1 9,5 2,9"/>
                   </svg>
                 </button>
@@ -1423,9 +1427,9 @@ body{ animation:appFadeIn .6s ease both; }
             </div>
 
             <div id="sc-credit">
-              <span id="sc-credit-0">YT · <a href="https://www.youtube.com/watch?v=66RaBtGznrI" target="_blank">Classique 24/7 · Odd Eagle</a></span>
-              <span id="sc-credit-1" style="display:none">YT · <a href="https://www.youtube.com/watch?v=J0shA9J-4Nc" target="_blank">Lofi Mix 2</a></span>
-              <span id="sc-credit-2" style="display:none">YT · <a href="https://www.youtube.com/watch?v=u9YOvF22tsI" target="_blank">Ambient</a></span>
+              <span id="sc-credit-0">YT · <a href="https://www.youtube.com/watch?v=2LSB--cO1J8" target="_blank">Classique 24/7 · Odd Eagle</a></span>
+              <span id="sc-credit-1" style="display:none">YT · <a href="https://www.youtube.com/watch?v=jfKfPfyJRdk" target="_blank">Lofi Girl</a></span>
+              <span id="sc-credit-2" style="display:none">YT · <a href="https://www.youtube.com/watch?v=80pOuROVGFQ" target="_blank">Chill Beats</a></span>
             </div>
           </div>
 
@@ -1628,11 +1632,11 @@ setInterval(updateClock,1000);
    #audio-mode-toggle). Tout le HTML/CSS reste en place ; les boutons ne
    sont simplement plus câblés à du JS :
 
-   VUE MUSIQUE : 3 iframes YouTube (son + fond vidéo flouté), en autoplay
-   muet, bascule entre 3 pistes (#yt-frame-0/1/2, déjà présentes dans le
-   HTML avec leurs vraies src). Les contrôles personnalisés (#yt-play-btn,
-   #vol-slider) pilotaient l'iframe active via l'API IFrame officielle de
-   YouTube (objets YT.Player, cf. script plus bas).
+   VUE MUSIQUE : un seul lecteur YouTube (son + fond vidéo flouté), en
+   autoplay muet, monté dans #yt-player-mount via l'API IFrame officielle
+   (new YT.Player). Le changement de piste se fait par loadVideoById plutôt
+   que par plusieurs iframes séparées. Les contrôles personnalisés
+   (#yt-play-btn, #vol-slider) pilotent ce lecteur (cf. script plus bas).
 
    VUE PODCAST : récupérait le dernier épisode de 2 flux RSS France
    Info/Inter ("Journal", "Grande Matinale") via un proxy serveur
@@ -1877,11 +1881,6 @@ setInterval(updateClock,1000);
    };
 
    var ytTabs = Array.from(document.querySelectorAll('#sc-tabs .sc-tab'));
-   var ytFrames = [
-     document.getElementById('yt-frame-0'),
-     document.getElementById('yt-frame-1'),
-     document.getElementById('yt-frame-2')
-   ];
    var ytCredits = [
      document.getElementById('sc-credit-0'),
      document.getElementById('sc-credit-1'),
@@ -1892,6 +1891,8 @@ setInterval(updateClock,1000);
    var volIcon = document.getElementById('vol-icon');
    var volSlider = document.getElementById('vol-slider');
    var volPct = document.getElementById('vol-pct');
+   var ytMount = document.getElementById('yt-player-mount');
+   var ytStatusEl = document.getElementById('yt-video-status');
 
    var localAudio = document.getElementById('local-audio');
    var localPlaylistEl = document.getElementById('local-playlist');
@@ -1924,18 +1925,29 @@ setInterval(updateClock,1000);
      'assets/local-music/MedievaLo-Fi  Lofi Beats for the Medieval Knight you always wanted to be 👑.mp3'
    ];
 
+   // ── Playlist YouTube : un seul lecteur, changement de piste par loadVideoById ──
+   var YT_TRACKS = [
+     { id:'2LSB--cO1J8' },
+     { id:'jfKfPfyJRdk' },
+     { id:'80pOuROVGFQ' }
+   ];
    var ytActive = 0;
    var ytPlaying = true;
    var ytMuted = true;
    var ytVolume = 80;
-   var ytPlayers = [null, null, null];
-   var ytPlayerReady = [false, false, false];
-   var ytApiLoaded = false;
+   var ytPlayer = null;
+   var ytReady = false;
+
+   function showYtStatus(text){
+     if(!ytStatusEl) return;
+     if(!text){ ytStatusEl.classList.remove('show'); return; }
+     ytStatusEl.textContent = text;
+     ytStatusEl.classList.add('show');
+   }
 
    function loadYouTubeIframeApi(){
      if(window.YT && window.YT.Player){
-       ytApiLoaded = true;
-       createAllYtPlayers();
+       window.onYouTubeIframeAPIReady();
        return;
      }
      var tag = document.createElement('script');
@@ -1944,58 +1956,62 @@ setInterval(updateClock,1000);
      firstScript.parentNode.insertBefore(tag, firstScript);
    }
 
+   // Schéma officiel recommandé par YouTube : un lecteur créé dans un <div>
+   // (l'API génère elle-même l'iframe avec les bons attributs), plutôt que
+   // de détourner des <iframe> existantes. loadVideoById gère le changement
+   // de piste ; un seul lecteur à maintenir, donc rien à synchroniser.
    window.onYouTubeIframeAPIReady = function(){
-     ytApiLoaded = true;
-     createAllYtPlayers();
-   };
-
-   function createAllYtPlayers(){
-     ytFrames.forEach(function(frame, index){
-       ensureYtFrame(index);
-       createYtPlayer(index);
-     });
-   }
-
-   function createYtPlayer(index){
-     if(!window.YT || !YT.Player) return;
-     if(ytPlayers[index]) return;
-     var frame = ytFrames[index];
-     if(!frame || !frame.id) return;
-     // extract playlist id if present in src or data-src
-     var playerVars = { autoplay: 0, controls: 0, rel: 0, modestbranding: 1 };
+     if(!ytMount || ytPlayer) return;
+     showYtStatus('Chargement…');
      try{
-       ytPlayers[index] = new YT.Player(frame.id, {
-         playerVars: playerVars,
+       ytPlayer = new YT.Player('yt-player-mount', {
+         width: 400,
+         height: 200,
+         videoId: YT_TRACKS[ytActive].id,
+         playerVars: {
+           autoplay: 1, mute: 1, controls: 0, modestbranding: 1, rel: 0,
+           disablekb: 1, fs: 0, iv_load_policy: 3, playsinline: 1,
+           loop: 1, playlist: YT_TRACKS[ytActive].id,
+           origin: window.location.origin
+         },
          events: {
-           onReady: function(){
-             ytPlayerReady[index] = true;
-             var player = ytPlayers[index];
-             if(!player) return;
+           onReady: function(e){
+             ytReady = true;
+             showYtStatus('');
              try{
-               if(ytMuted) player.mute(); else player.unMute();
-               if(typeof player.setVolume === 'function') player.setVolume(ytVolume);
-               // Vidéo visible en fond : on limite la qualité pour économiser la bande passante,
-               // seule la piste audio + une image d'ambiance floutée comptent ici.
-               if(typeof player.setPlaybackQuality === 'function') player.setPlaybackQuality('small');
-             }catch(e){}
-             if(index === ytActive && ytPlaying){
-               try{ player.playVideo(); }catch(e){}
+               if(ytMuted) e.target.mute(); else e.target.unMute();
+               e.target.setVolume(ytVolume);
+               // Vidéo visible en fond : qualité réduite, seul le son + une
+               // image d'ambiance floutée comptent ici.
+               if(typeof e.target.setPlaybackQuality === 'function') e.target.setPlaybackQuality('small');
+               if(ytPlaying) e.target.playVideo();
+             }catch(err){}
+             updateYtControls();
+           },
+           onStateChange: function(e){
+             if(e.data === YT.PlayerState.PLAYING){ ytPlaying = true; }
+             else if(e.data === YT.PlayerState.PAUSED){ ytPlaying = false; }
+             else if(e.data === YT.PlayerState.ENDED){
+               // Boucle manuelle : fiable même après un changement de piste
+               // (le paramètre loop/playlist de l'URL ne survit pas à loadVideoById).
+               try{ e.target.seekTo(0); e.target.playVideo(); }catch(err){}
              }
              updateYtControls();
            },
-           onStateChange: function(event){
-             // YT.PlayerState: -1 unstarted, 0 ended, 1 playing, 2 paused
-             if(event.data === 1){ ytPlaying = true; }
-             else if(event.data === 2){ ytPlaying = false; }
-             else if(event.data === 0){ ytPlaying = false; }
-             updateYtControls();
+           onError: function(){
+             // Piste indisponible (embed désactivé côté propriétaire, vidéo
+             // retirée…) → on bascule automatiquement sur la piste suivante
+             // plutôt que de laisser le lecteur mort.
+             showYtStatus('Piste indisponible — suivante…');
+             var next = (ytActive + 1) % YT_TRACKS.length;
+             if(next !== ytActive) setActiveYt(next);
            }
          }
        });
-     }catch(e){
-       ytPlayers[index] = null;
+     }catch(err){
+       showYtStatus('Lecteur YouTube indisponible');
      }
-   }
+   };
 
    function updateMode(mode){
      modeButtons.forEach(function(button){
@@ -2020,68 +2036,20 @@ setInterval(updateClock,1000);
      });
    });
 
-   function sendYTCommand(frame, func, args){
-     var index = ytFrames.indexOf(frame);
-     if(index >= 0 && ytPlayers[index] && ytPlayerReady[index]){
-       var player = ytPlayers[index];
-       if(player && typeof player[func] === 'function'){
-         try{
-           player[func].apply(player, args || []);
-           return;
-         }catch(e){}
-       }
-     }
-     if(!frame || !frame.contentWindow) return;
-     try{
-       frame.contentWindow.postMessage(JSON.stringify({ event:'command', func:func, args:args||[] }), '*');
-     }catch(e){}
-   }
-
-   function ensureYtFrame(index){
-     var frame = ytFrames[index];
-     if(!frame) return;
-     if(!frame.src || frame.src.trim() === ''){
-       var src = frame.getAttribute('data-src');
-       if(src) frame.src = src;
-     }
-   }
-
    function setActiveYt(index){
-     if(index === ytActive) return;
-     if(ytFrames[ytActive]) ytFrames[ytActive].classList.remove('active');
+     if(index === ytActive && ytReady) return;
      if(ytTabs[ytActive]) ytTabs[ytActive].classList.remove('active');
      if(ytCredits[ytActive]) ytCredits[ytActive].style.display = 'none';
      ytActive = index;
      if(ytTabs[ytActive]) ytTabs[ytActive].classList.add('active');
-     if(ytFrames[ytActive]) ytFrames[ytActive].classList.add('active');
      if(ytCredits[ytActive]) ytCredits[ytActive].style.display = '';
-     ensureYtFrame(ytActive);
-     // ensure player creation
-     createYtPlayer(ytActive);
-     // if player ready, control it directly, otherwise poll until ready
-     var idx = ytActive;
-     function tryPlayPause(){
-       var p = ytPlayers[idx];
-       if(p && ytPlayerReady[idx]){
-         try{
-           if(ytPlaying) p.playVideo(); else p.pauseVideo();
-         }catch(e){}
-         updateYtControls();
-       } else {
-         var tries = 0;
-         var t = setInterval(function(){
-           tries++;
-           if(ytPlayers[idx] && ytPlayerReady[idx]){
-             try{ if(ytPlaying) ytPlayers[idx].playVideo(); else ytPlayers[idx].pauseVideo(); }catch(e){}
-             updateYtControls();
-             clearInterval(t);
-           } else if(tries > 20){
-             clearInterval(t);
-           }
-         }, 150);
-       }
-     }
-     tryPlayPause();
+     if(!ytPlayer || !ytReady) return;
+     try{
+       ytPlayer.loadVideoById({ videoId: YT_TRACKS[ytActive].id });
+       if(ytMuted) ytPlayer.mute(); else ytPlayer.unMute();
+       ytPlayer.setVolume(ytVolume);
+       if(!ytPlaying) ytPlayer.pauseVideo();
+     }catch(err){}
    }
 
    function updateYtControls(){
@@ -2097,52 +2065,45 @@ setInterval(updateClock,1000);
    }
 
    function toggleYtPlay(){
-     var frame = ytFrames[ytActive];
      ytPlaying = !ytPlaying;
-     if(ytPlaying){
-       ensureYtFrame(ytActive);
-       sendYTCommand(frame, 'playVideo');
-     } else {
-       sendYTCommand(frame, 'pauseVideo');
+     if(ytPlayer && ytReady){
+       try{ if(ytPlaying) ytPlayer.playVideo(); else ytPlayer.pauseVideo(); }catch(err){}
      }
      updateYtControls();
    }
 
    function pauseYoutube(){
      ytPlaying = false;
-     var frame = ytFrames[ytActive];
-     sendYTCommand(frame, 'pauseVideo');
+     if(ytPlayer && ytReady){
+       try{ ytPlayer.pauseVideo(); }catch(err){}
+     }
      updateYtControls();
    }
 
    function setYtVolume(value){
      ytVolume = Math.min(100, Math.max(0, value));
      if(volSlider) volSlider.value = ytVolume;
+     if(ytVolume > 0 && ytMuted){ ytMuted = false; }
      if(volPct) volPct.textContent = ytMuted ? 'MUTE' : ytVolume + '%';
-     var p = ytPlayers[ytActive];
-     if(p && ytPlayerReady[ytActive]){
-       try{ p.setVolume(ytVolume); }catch(e){}
-     } else {
-       sendYTCommand(ytFrames[ytActive], 'setVolume', [ytVolume]);
+     if(ytPlayer && ytReady){
+       try{
+         ytPlayer.setVolume(ytVolume);
+         if(ytMuted) ytPlayer.mute(); else ytPlayer.unMute();
+       }catch(err){}
      }
+     updateYtControls();
    }
 
    function toggleYtMute(){
      ytMuted = !ytMuted;
-     var p = ytPlayers[ytActive];
-     if(p && ytPlayerReady[ytActive]){
-       try{ if(ytMuted) p.mute(); else p.unMute(); }catch(e){}
-     } else {
-       var frame = ytFrames[ytActive];
-       sendYTCommand(frame, ytMuted ? 'mute' : 'unMute');
+     if(ytPlayer && ytReady){
+       try{ if(ytMuted) ytPlayer.mute(); else ytPlayer.unMute(); }catch(err){}
      }
      updateYtControls();
    }
 
    ytTabs.forEach(function(tab, index){
      tab.addEventListener('click', function(){
-       if(index === ytActive) return;
-       if(ytFrames[ytActive]) sendYTCommand(ytFrames[ytActive], 'pauseVideo');
        setActiveYt(index);
      });
    });
@@ -2378,9 +2339,6 @@ setInterval(updateClock,1000);
      });
    }
 
-   if(ytFrames[0]){
-     ensureYtFrame(0);
-   }
    loadYouTubeIframeApi();
    updateYtControls();
    updateLocalButtons();
