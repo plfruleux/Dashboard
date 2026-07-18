@@ -3,7 +3,7 @@
   const A = document.getElementById('bg-a');
   const B = document.getElementById('bg-b');
   const VIG = document.getElementById('vig');
-  const INTERVAL_MS = 120000; // 120s
+  const INTERVAL_MS = 60000; // 60s
   let idx = 0;
   let images = [];
 
@@ -60,12 +60,13 @@
         const urls = j.photos.map(p=>p.url).filter(Boolean);
         if(urls.length===0) throw new Error('empty-manifest');
         images = urls;
-        // immediately show the first wallpaper while the next one preloads
-        setLayer(A, images[0]);
+        // choose a random starting wallpaper on page load
+        const offset = Math.floor(Math.random() * images.length);
+        setLayer(A, images[offset]);
         A.style.opacity = 1;
         B.style.opacity = 0;
-        idx = 1;
-        preload(images[1 % images.length]).finally(()=>{
+        idx = offset + 1;
+        preload(images[idx % images.length]).finally(()=>{
           crossfadeNext();
           setInterval(crossfadeNext, INTERVAL_MS);
         });
