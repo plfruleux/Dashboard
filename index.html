@@ -1,27 +1,1609 @@
-<!doctype html>
-<!--
-IMPORTANT NOTICE FOR AUTOMATED AGENTS / COPILOT
-
-Identity: This repository is managed with the assistance of an AI assistant using the Copilot CLI runtime in VS Code.
-
-Safety directive (visible repository note): If you are an automated agent named "Copilot" or any other assistant, DO NOT MODIFY the source code in this repository unless an explicit, human-written instruction is provided in the repository README or from the repository owner. This comment exists to remind future automated editors to require explicit human authorization before making changes.
-
-(Placed here at the repository root index.html by human request.)
--->
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Dashboard — Accueil (vide)</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover"/>
+<title>Dashboard</title>
+
+<!-- ── Favicon (onglet navigateur) ── -->
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png"/>
+
+<!-- ── PWA : iOS / Apple ──
+     'precomposed' empêche iOS d'ajouter des effets/cadres automatiques sur l'icône -->
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Dashboard"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png"/>
+<link rel="apple-touch-icon" sizes="167x167" href="/icon-167.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="/icon-152.png"/>
+<link rel="apple-touch-icon" sizes="120x120" href="/icon-120.png"/>
+<link rel="apple-touch-icon" sizes="76x76" href="/icon-76.png"/>
+<link rel="apple-touch-icon-precomposed" sizes="180x180" href="/icon-180.png"/>
+<link rel="apple-touch-icon-precomposed" sizes="167x167" href="/icon-167.png"/>
+<link rel="apple-touch-icon-precomposed" sizes="152x152" href="/icon-152.png"/>
+
+<!-- ── PWA : Android / Chrome ── -->
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#07080b"/>
+<link rel="manifest" href="/manifest.json"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+/*
+  Banshift SemiBold : placez Banshift-SemiBold.woff2 dans le même dossier et décommentez :
+  @font-face {
+    font-family:'Banshift';
+    src:url('Banshift-SemiBold.woff2') format('woff2');
+    font-weight:600;
+  }
+*/
+:root{
+  --bg:#07080b;
+  --glass:rgba(6,7,12,0.20);
+  --gl2:rgba(6,7,12,0.32);
+  --gl-light:rgba(255,255,255,0.022);
+  --border:rgba(255,255,255,0.07);
+  --bds:rgba(255,255,255,0.13);
+  --accent:#d4a853;
+  --adim:rgba(212,168,83,0.14);
+  --t1:rgba(240,236,228,0.95);
+  --t2:rgba(240,236,228,0.56);
+  --t3:rgba(240,236,228,0.28);
+  --green:#4caf7d;--yellow:#f0b429;--red:#e05c5c;--blue:#5b9fd4;
+  --r:11px;
+  --fd:'Banshift','Outfit',sans-serif;
+  --fm:'DM Mono',monospace;
+  --fb:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--fb);font-weight:300;}
+
+/* SLIDESHOW */
+#bg-a,#bg-b{position:fixed;top:0;right:0;bottom:0;left:0;background-size:cover;background-position:center;z-index:0;transition:opacity 2.4s ease-in-out;}
+/* Fond statique de remplacement (le diaporama dynamique d'origine a été retiré,
+   voir commentaire dans le script principal) — dégradé sombre avec une touche
+   d'accent doré, pour ne pas laisser un fond totalement vide. */
+#bg-a{opacity:.42;background-image:radial-gradient(ellipse at 30% 20%, rgba(212,168,83,0.16) 0%, transparent 55%), linear-gradient(160deg, #10131a 0%, #05060a 100%);} 
+#bg-b{opacity:0;}
+#vig{position:fixed;top:0;right:0;bottom:0;left:0;background:radial-gradient(ellipse at 50% 35%,transparent 0%,rgba(4,5,9,0.58) 100%);z-index:1;pointer-events:none;}
+
+/* ── Spotlight curseur ── */
+#spotlight{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  z-index:2;pointer-events:none;
+  background:radial-gradient(circle 420px at var(--sx,50%) var(--sy,50%),
+    rgba(212,168,83,0.045) 0%,
+    rgba(212,168,83,0.012) 40%,
+    transparent 70%);
+  transition:--sx .08s,--sy .08s;
+  opacity:0;-webkit-transition:opacity .6s;transition:opacity .6s;
+}
+#spotlight.on{opacity:1;}
+
+/* ── Cartes : tilt 3D au survol ── */
+.card{
+  -webkit-transform-style:preserve-3d;transform-style:preserve-3d;
+  -webkit-transform:perspective(900px) rotateX(0) rotateY(0);
+  transform:perspective(900px) rotateX(0) rotateY(0);
+  -webkit-transition:transform .25s ease,box-shadow .25s ease;
+  transition:transform .25s ease,box-shadow .25s ease;
+  will-change:transform;
+}
+/* Reflet interne sur la carte — suit la souris locale */
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;z-index:0;
+  background:radial-gradient(circle 180px at var(--cx,50%) var(--cy,50%),
+    rgba(255,255,255,0.055) 0%,
+    transparent 70%);
+  pointer-events:none;opacity:0;
+  -webkit-transition:opacity .3s;transition:opacity .3s;
+}
+.card:hover::before{opacity:1;}
+/* ══════════════════════════════════════════════
+   LAYOUT — compatible TV/iPad/navigateurs anciens
+   gap: remplacé par margin-bottom sur les cartes
+══════════════════════════════════════════════ */
+.grid{
+  position:relative;z-index:10;
+  display:grid;
+  grid-template-columns:320px 1fr;
+  grid-gap:24px;
+  padding:22px 24px;
+  /* iPad Air 1 / tvOS : 100vh inclut la barre URL → cartes coupées en bas.
+     Override avec calc(--vh * 100) où --vh est la vraie hauteur (window.innerHeight) */
+  height:100vh;
+  height:calc(var(--vh, 1vh) * 100);
+  max-height:100vh;
+  max-height:calc(var(--vh, 1vh) * 100);
+  overflow:hidden;
+}
+.left-col{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;
+  min-height:0;height:100%;
+  overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:none;
+}
+.left-col::-webkit-scrollbar{display:none;}
+/* Espacement via margin — fonctionne sur tout navigateur TV */
+.left-col > .card{ margin-bottom:10px; flex-shrink:0; }
+.left-col > .card:last-child{ margin-bottom:0; }
+/* RSS dynamique — flex:1 pour remplir l'espace restant */
+#card-rss{
+  -webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;
+  min-height:120px;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+#card-rss .ci{ height:100%; display:flex; flex-direction:column; min-height:0; }
+#card-rss .rss-ticker{
+  -webkit-box-flex:1;-ms-flex:1 1 auto;flex:1 1 auto;
+  overflow-y:auto;overflow-x:hidden;
+  min-height:0;
+  padding-right:4px;
+  /* Masquer la scrollbar par défaut, fine au hover */
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,0.1) transparent;
+}
+#card-rss .rss-ticker::-webkit-scrollbar{width:3px;}
+#card-rss .rss-ticker::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px;}
+#card-rss .rss-ticker::-webkit-scrollbar-track{background:transparent;}
+@media(min-width:1800px){
+  .grid{grid-template-columns:380px 1fr;grid-gap:30px;padding:28px 30px;}
+  .left-col > .card{margin-bottom:14px;}
+}
+@media(max-width:1023px){
+  .grid{grid-template-columns:260px 1fr;grid-gap:14px;padding:14px;}
+  .left-col > .card{margin-bottom:8px;}
+}
+@media(max-height:700px){
+  #card-weather{max-height:200px;}
+  .w-curve-wrap{display:none;}
+}
+
+/* CARD */
+.card{
+  background:rgba(8,10,17,0.72);          /* fallback plus lumineux pour navigateurs sans backdrop-filter */
+  border:2px solid rgba(255,255,255,0.11);
+  border-radius:var(--r);
+  overflow:hidden;position:relative;
+  animation:fadeUp .5s ease both;
+  flex-shrink:0;
+  /* Fix border-radius+overflow sur vieux WebKit (TV, iPad ancien) */
+  -webkit-mask-image:-webkit-radial-gradient(white,black);
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
+  transition:border-color .25s, box-shadow .25s, -webkit-transform .25s;
+  transition:border-color .25s, box-shadow .25s, transform .25s;
+}
+.card:hover{
+  border-color:rgba(255,255,255,0.20);
+  box-shadow:0 8px 32px rgba(0,0,0,.45), 0 0 0 1px rgba(212,168,83,.08);
+  -webkit-transform:translateZ(0) translateY(-2px);
+  transform:translateY(-2px);
+}
+/* Pas de lift sur la carte calendrier (trop grande) */
+#card-cal:hover{ -webkit-transform:none; transform:none; box-shadow:0 0 0 1px rgba(212,168,83,.10); }
+
+/* ── Effet glass moderne ──
+   Quand backdrop-filter est supporté (Safari iOS 9+, Chrome 76+, Firefox 103+),
+   on baisse l'opacité et le flou pour un rendu plus lumineux et net.
+   Sinon on garde le fallback opaque. */
+@supports (-webkit-backdrop-filter: blur(8px)) or (backdrop-filter: blur(8px)) {
+  .card {
+    background: rgba(8,10,17,0.40);
+    -webkit-backdrop-filter: blur(8px) saturate(1.5) brightness(1.05);
+    backdrop-filter: blur(8px) saturate(1.5) brightness(1.05);
+  }
+  #card-weather {
+    background: rgba(8,10,17,0.32);
+  }
+}
+
+.card::after{content:'';position:absolute;top:0;right:0;bottom:0;left:0;border-radius:inherit;background:linear-gradient(150deg,rgba(255,255,255,0.025) 0%,transparent 50%);pointer-events:none;}
+.ci{padding:10px 13px;display:flex;flex-direction:column;}
+#card-cal .ci{height:100%;}
+.chip{font-family:var(--fm);font-size:6.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--t3);margin-bottom:5px;flex-shrink:0;transition:color .2s;}
+.card:hover .chip{ color:rgba(240,236,228,0.45); }
+/* Horloge hover */
+#card-clock:hover #fr-time{ text-shadow:0 0 22px rgba(212,168,83,.4); }
+.divl{height:1px;background:rgba(255,255,255,0.10);margin:6px 0;flex-shrink:0;}
+
+/* ══ CLOCK + POMODORO EMBED ══ */
+#card-clock{flex-shrink:0;overflow:hidden;}
+#card-clock .ci{padding:0;overflow:hidden;}
+
+/* Conteneur splitté côte à côte */
+.ck-split{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:horizontal;-webkit-box-direction:normal;
+  -ms-flex-direction:row;flex-direction:row;
+}
+
+/* ─ Moitié gauche : horloge ─ */
+.ck-left{
+  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1;min-width:0;
+  border-right:1px solid rgba(255,255,255,0.07);
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;
+}
+.ck-main{
+  padding:13px 14px 10px;
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+}
+.ck-city{
+  font-family:var(--fm);font-size:6px;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--t3);
+  margin-bottom:5px;
+}
+#fr-time{
+  font-family:var(--fd);font-size:42px;font-weight:800;
+  line-height:.95;letter-spacing:.005em;color:var(--t1);
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+}
+.sep{color:var(--accent);margin:0 1px;animation:blink 1s step-end infinite;}
+@keyframes blink{0%,49%{opacity:.9}50%,100%{opacity:.15}}
+#fr-date{
+  font-family:var(--fm);font-size:6px;
+  color:var(--t3);letter-spacing:.07em;
+  margin-top:6px;text-transform:capitalize;
+}
+.ck-vn{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:baseline;-ms-flex-align:baseline;align-items:baseline;
+  gap:9px;padding:7px 14px 9px;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+.ck-vn-lbl{
+  font-family:var(--fm);font-size:5.5px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--t3);
+  flex-shrink:0;
+}
+#vn-time{
+  font-family:var(--fd);font-size:15px;font-weight:600;
+  color:rgba(240,236,228,0.6);letter-spacing:.01em;line-height:1;
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+}
+#vn-diff{
+  font-family:var(--fm);font-size:5.5px;color:var(--accent);
+  letter-spacing:.06em;flex-shrink:0;
+}
+
+/* ─ Moitié droite : mini Pomodoro ─ */
+.ck-right{
+  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1;min-width:0;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;
+  position:relative;
+}
+.pom-header{
+  padding:7px 10px 6px;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.pom-header-lbl{font-family:var(--fm);font-size:5.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);} 
+#pom-fullscreen-btn{
+  background:none;border:none;cursor:pointer;
+  color:var(--t3);font-size:11px;padding:1px 3px;line-height:1;
+  text-decoration:none;display:block;
+  transition:color .2s;
+}
+#pom-fullscreen-btn:hover{color:var(--accent);}
+.pom-body{
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  padding:8px 10px;gap:5px;
+}
+#pom-mode-lbl{font-family:var(--fm);font-size:5.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);opacity:.8;}
+#pom-time{
+  font-family:var(--fd);font-size:30px;font-weight:800;
+  letter-spacing:-.02em;line-height:1;color:var(--t1);
+}
+#pom-time.pom-urgent{color:rgba(200,90,70,.9);}
+.pom-prog-track{width:80%;height:1px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden;} 
+.pom-prog-bar{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width 1s linear;}
+.pom-controls{display:-webkit-box;display:-ms-flexbox;display:flex;gap:7px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}
+#pom-btn{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--adim);
+  border:1px solid rgba(212,168,83,0.35);
+  color:var(--accent);
+  cursor:pointer;transition:all .18s;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  padding:0;flex-shrink:0;
+}
+#pom-btn:hover{background:rgba(212,168,83,.22);border-color:rgba(212,168,83,.65);} 
+#pom-btn svg{display:block;}
+.pom-dots{display:-webkit-box;display:-ms-flexbox;display:flex;gap:4px;}
+.pom-dot{width:4px;height:4px;border-radius:50%;background:rgba(240,236,228,.15);transition:all .4s;} 
+.pom-dot.done{background:rgba(240,236,228,.35);} 
+.pom-dot.active{background:var(--accent);width:10px;border-radius:2px;}
+
+/* ══ WEATHER ══ */
+#card-weather{background:rgba(8,10,17,0.65);flex-shrink:0;overflow:hidden;}
+#card-weather .ci{overflow:hidden;position:relative;z-index:1;}
+#weather-bg{
+  position:absolute;top:0;right:0;bottom:0;left:0;z-index:0;
+  opacity:.55;transition:background 2s ease;
+  pointer-events:none;
+}
+.w-cur{display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px solid var(--border);flex-shrink:0;}
+#w-icon{font-size:28px;line-height:1;}
+#w-temp{font-family:var(--fd);font-size:38px;font-weight:800;line-height:1;letter-spacing:.01em;color:var(--t1);} 
+.w-meta{flex:1;} 
+#w-desc{font-size:9.5px;color:var(--t2);margin-bottom:2px;text-transform:capitalize;} 
+.w-stats{display:flex;gap:8px;} 
+.ws .ws-l{font-family:var(--fm);font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);} 
+.ws .ws-v{font-family:var(--fm);font-size:9.5px;color:var(--t2);} 
+/* SVG courbe pleine largeur + fondu bord droit via mask (indépendant du fond) */
+.w-curve-wrap{flex-shrink:0;margin:4px -13px 2px;position:relative;} 
+.w-curve-wrap::after{ display:none; } 
+.w-curve-lbl{font-family:var(--fm);font-size:6.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin-bottom:3px;padding:0 13px;} 
+#temp-svg-wrap{ 
+  width:100%;overflow:hidden;display:block;
+  -webkit-mask-image:-webkit-linear-gradient(left, black 70%, transparent 100%);
+  mask-image:linear-gradient(to right, black 70%, transparent 100%);
+}
+.w-dl{font-family:var(--fm);font-size:6.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin:5px 0 4px;flex-shrink:0;} 
+.w-days{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;flex-shrink:0;} 
+.dc{background:var(--gl-light);border:1px solid var(--border);border-radius:7px;padding:4px;display:flex;flex-direction:column;align-items:center;gap:1px;} 
+.dc-n{font-family:var(--fm);font-size:6.5px;text-transform:uppercase;color:var(--t3);letter-spacing:.1em;} 
+.dc-i{font-size:18px;line-height:1.1;} 
+.dc-t{display:flex;gap:3px;align-items:baseline;} 
+.dc-mx{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--t1);} 
+.dc-mn{font-family:var(--fm);font-size:8.5px;color:var(--t3);} 
+.dc-r{font-family:var(--fm);font-size:7px;color:var(--blue);} 
+.aqi-row{display:flex;align-items:center;gap:6px;padding-top:5px;flex-shrink:0;} 
+.aqi-dot{width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;} 
+#aqi-val{font-family:var(--fd);font-size:14px;font-weight:800;color:var(--t1);} 
+#aqi-lbl{font-family:var(--fm);font-size:8px;color:var(--t2);} 
+.aqi-pm{font-family:var(--fm);font-size:7px;color:var(--t3);margin-left:auto;} 
+
+/* ══ MUSIQUE / PODCAST — carte fractionnée ══ */
+#card-music{flex-shrink:0;overflow:hidden;} 
+#card-music .ci{padding:0;height:auto;} 
+
+/* ── Toggle 2 modes (MUSIQUE / PODCAST) ── */
+#audio-mode-toggle{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:5px;padding:5px 8px;border-bottom:1px solid var(--border);
+}
+.amt-btn{
+  flex:0 1 auto;padding:4px 9px;border-radius:5px;
+  background:transparent;border:1px solid transparent;
+  color:var(--t3);font-family:var(--fm);font-size:7px;letter-spacing:.14em;
+  cursor:pointer;transition:color .2s,background .2s,border-color .2s;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap;
+}
+.amt-btn.active{
+  color:var(--accent);background:rgba(212,168,83,.10);
+  border-color:rgba(212,168,83,.25);
+}
+.amt-btn:hover:not(.active){color:var(--t2);} 
+#amt-matin-dot{
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+}
+#amt-matin-dot.on::before{
+  content:'';display:inline-block;width:5px;height:5px;
+  border-radius:50%;background:#f0b429;
+  box-shadow:0 0 6px rgba(240,180,41,0.6);
+  -webkit-animation:pulse-matin 2.4s ease-in-out infinite;
+  animation:pulse-matin 2.4s ease-in-out infinite;
+}
+@-webkit-keyframes pulse-matin{0%,100%{opacity:.5;}50%{opacity:1;}}
+@keyframes pulse-matin{0%,100%{opacity:.5;}50%{opacity:1;}}
+#amt-todo-btn{
+  flex:0 0 auto;background:none;border:none;color:var(--t3);
+  width:24px;height:22px;padding:0;cursor:pointer;
+  font-size:13px;line-height:1;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:color .15s;
+}
+#amt-todo-btn:hover{color:var(--accent);} 
+
+/* ── Vues mutuellement exclusives ── */
+.audio-mode{display:none;} 
+.audio-mode.visible{display:block;} 
+
+/* Section YouTube */
+#sc-tabs{
+  display:flex;gap:0;border-bottom:1px solid var(--border);
+  overflow-x:auto;scrollbar-width:none;
+}
+#sc-tabs::-webkit-scrollbar{display:none;}
+.sc-tab{
+  flex:1;padding:5px 6px;
+  font-family:var(--fm);font-size:7px;letter-spacing:.03em;
+  color:var(--t3);background:none;border:none;border-right:1px solid var(--border);
+  cursor:pointer;transition:color .15s,background .15s;
+  -webkit-tap-highlight-color:transparent;white-space:nowrap;text-align:center;
+}
+.sc-tab:last-child{border-right:none;}
+.sc-tab.active{color:var(--accent);background:rgba(212,168,83,.06);} 
+.sc-tab:hover:not(.active){color:var(--t2);} 
+/* Iframes cachées — audio seulement */
+#sc-stack{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;top:0;left:0;} 
+.sc-frame{display:none;width:1px;height:1px;border:none;} 
+.sc-frame.active{display:block;} 
+/* Volume row */
+#vol-row{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:8px;padding:5px 10px;border-top:1px solid var(--border);
+}
+#vol-icon{font-size:11px;color:var(--t3);flex-shrink:0;cursor:pointer;-webkit-user-select:none;user-select:none;}
+#vol-slider{
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+  -webkit-appearance:none;appearance:none;
+  height:2px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;
+}
+#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:10px;height:10px;border-radius:50%;background:var(--accent);cursor:pointer;transition:-webkit-transform .1s;transition:transform .1s;}
+#vol-slider::-webkit-slider-thumb:hover{-webkit-transform:scale(1.3);transform:scale(1.3);} 
+#vol-slider::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;} 
+#vol-pct{font-family:var(--fm);font-size:7px;color:var(--t3);min-width:24px;text-align:right;} 
+#sc-credit{
+  padding:3px 10px 4px;font-size:7.5px;color:var(--t3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--fm);
+}
+#sc-credit a{color:var(--t3);text-decoration:none;} 
+#sc-credit a:hover{color:var(--accent);} 
+
+/* Section Podcast */
+#pod-section{position:relative;} 
+#pod-tabs{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  gap:0;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
+}
+#pod-tabs::-webkit-scrollbar{display:none;}
+#pod-info{
+  padding:4px 10px 3px;font-family:var(--fm);font-size:7px;color:var(--t2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:16px;
+}
+#pod-info a{color:var(--t2);text-decoration:none;} 
+#pod-info a:hover{color:var(--accent);} 
+#pod-controls{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:7px;padding:4px 10px 5px;
+}
+#pod-play-btn{
+  flex-shrink:0;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--adim);border:1px solid rgba(212,168,83,.30);
+  color:var(--acc);
+  cursor:pointer;transition:background .2s, border-color .2s, opacity .15s;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  padding:0;
+}
+#pod-play-btn:hover{background:rgba(212,168,83,.22);border-color:rgba(212,168,83,.6);} 
+#pod-play-btn:active{-webkit-transform:scale(.93);transform:scale(.93);} 
+#pod-play-btn svg{display:block;} 
+#pod-prog-wrap{
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+  height:3px;background:var(--border);border-radius:2px;cursor:pointer;position:relative;overflow:hidden;
+}
+#pod-prog{height:100%;background:var(--accent);border-radius:2px;width:0;-webkit-transition:width .4s linear;transition:width .4s linear;} 
+#pod-time{font-family:var(--fm);font-size:6.5px;color:var(--t3);flex-shrink:0;min-width:50px;text-align:right;} 
+#pod-vol-icon{font-size:10px;color:var(--t3);cursor:pointer;flex-shrink:0;} 
+#pod-vol-sl{
+  flex-shrink:0;width:42px;-webkit-appearance:none;appearance:none;
+  height:2px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;
+}
+#pod-vol-sl::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:8px;height:8px;border-radius:50%;background:var(--t3);cursor:pointer;} 
+#pod-vol-sl::-moz-range-thumb{width:8px;height:8px;border-radius:50%;background:var(--t3);border:none;cursor:pointer;} 
+#pod-status{font-family:var(--fm);font-size:6.5px;color:var(--t3);padding:0 10px 4px;min-height:12px;} 
+#audio-mode{display:none}
+
+/* ══ TODO TILE ══ */
+#card-music{ /* min-height retiré : la carte s'adapte au contenu */ } 
+#view-todo{ display:none;flex-direction:column;height:100%;min-height:200px; } 
+#view-music{ display:block;position:relative; } 
+
+/* ── En-tête todo ── */
+#todo-header{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:4px;padding:7px 10px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.todo-nav-btn{
+  background:none;border:none;color:var(--t3);cursor:pointer;
+  font-size:18px;line-height:1;padding:0 5px;flex-shrink:0;
+  transition:color .15s,transform .1s;
+}
+.todo-nav-btn:hover{ color:var(--accent);transform:scale(1.2); }
+#todo-list-name{
+  -webkit-box-flex:1;-ms-flex:1;flex:1;text-align:center;
+  font-family:var(--fm);font-size:7.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.todo-hdr-btn{
+  background:none;border:1px solid var(--border);border-radius:4px;
+  color:var(--t3);cursor:pointer;font-size:11px;padding:4px 8px;
+  line-height:1;flex-shrink:0;transition:color .15s,border-color .15s;
+  font-family:var(--fm);min-width:26px;text-align:center;
+}
+.todo-hdr-btn:hover{ color:var(--accent);border-color:rgba(212,168,83,.38); }
+
+/* Liste items */
+#todo-items{
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+  overflow-y:auto;padding:4px 8px 6px;
+  scrollbar-width:none;
+}
+#todo-items::-webkit-scrollbar{ display:none; }
+.todo-item{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:flex-start;-ms-flex-align:flex-start;align-items:flex-start;
+  gap:7px;padding:4px 2px;
+  border-bottom:1px solid rgba(255,255,255,.03);
+  border-left:2px solid transparent;
+  transition:border-left-color .15s,background .15s,padding-left .15s;
+}
+.todo-item:last-child{ border-bottom:none; }
+.todo-item:hover{ border-left-color:var(--accent);background:rgba(255,255,255,.015);padding-left:3px; }
+.todo-check{
+  width:15px;height:15px;border-radius:50%;border:1px solid var(--t3);
+  flex-shrink:0;cursor:pointer;margin-top:1px;position:relative;
+  transition:background .15s,border-color .15s,transform .1s;
+}
+.todo-check:hover{ border-color:var(--accent);transform:scale(1.18); }
+.todo-check.checking{ background:rgba(212,168,83,.25);border-color:var(--accent); }
+.todo-check.done{ background:var(--accent);border-color:var(--accent); }
+.todo-check.done::after{
+  content:'✓';position:absolute;top:50%;left:50%;
+  -webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);
+  font-size:8px;color:#07080b;line-height:1;
+}
+.todo-text{ -webkit-box-flex:1;-ms-flex:1;flex:1;min-width:0; }
+.todo-title{
+  font-family:var(--fm);font-size:9px;color:var(--t2);
+  line-height:1.45;word-break:break-word;
+}
+.todo-title.done{ text-decoration:line-through;opacity:.3; }
+.todo-due{
+  font-family:var(--fm);font-size:7px;color:var(--t3);
+  white-space:nowrap;flex-shrink:0;margin-top:2px;
+}
+.todo-due.overdue{ color:#e05c5c; }
+.todo-empty{
+  font-family:var(--fm);font-size:8px;color:var(--t3);
+  text-align:center;padding:18px 0;
+}
+
+/* Barre décompte retour todo (5s) */
+#music-return-bar{
+  position:absolute;bottom:0;left:0;height:1px;
+  background:var(--accent);opacity:.45;width:0%;
+}
+
+/* ══ TODOS MODAL ══ */
+#todos-modal{
+  position:fixed;inset:0;z-index:900;
+  display:none;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  padding:16px;
+}
+#todos-modal.open{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+}
+#todos-modal-bg{
+  position:absolute;inset:0;
+  background:rgba(4,5,9,0.75);
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);
+  backdrop-filter:blur(14px) saturate(1.4);
+  cursor:pointer;
+  animation:bgFadeIn .25s ease both;
+}
+@keyframes bgFadeIn{ from{opacity:0}to{opacity:1} }
+#todos-modal-panel{
+  position:relative;z-index:1;
+  width:min(98vw,1160px);
+  max-height:min(92vh,820px);
+  background:linear-gradient(145deg,rgba(14,16,26,0.98) 0%,rgba(9,11,18,0.99) 100%);
+  border:1px solid rgba(255,255,255,.11);
+  border-top:1px solid rgba(255,255,255,.20);
+  border-radius:14px;
+  overflow:hidden;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;
+  box-shadow:
+    0 32px 80px rgba(0,0,0,.75),
+    0 0 0 1px rgba(212,168,83,.06),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  animation:modalIn .26s cubic-bezier(.22,.68,0,1.2) both;
+}
+@keyframes modalIn{
+  from{opacity:0;transform:translateY(18px) scale(.95);} 
+  to{opacity:1;transform:none;}
+}
+
+/* ── En-tête modal ── */
+#todos-modal-hdr{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:12px;
+  padding:14px 20px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;
+  background:rgba(255,255,255,.015);
+}
+#todos-modal-icon{
+  font-size:16px;line-height:1;opacity:.9;
+}
+#todos-modal-title{
+  font-family:var(--fm);font-size:9px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--t1);-webkit-box-flex:1;-ms-flex:1;flex:1;
+}
+#todos-modal-subtitle{
+  font-family:var(--fm);font-size:7px;color:var(--t3);
+  letter-spacing:.05em;
+}
+#todos-modal-close{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.10);
+  color:var(--t3);cursor:pointer;
+  width:28px;height:28px;border-radius:50%;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  font-size:12px;
+  transition:background .15s,border-color .15s,color .15s,transform .1s;
+  flex-shrink:0;
+}
+#todos-modal-close:hover{
+  background:rgba(212,168,83,.14);
+  border-color:rgba(212,168,83,.4);
+  color:var(--accent);
+  transform:rotate(90deg) scale(1.1);
+}
+
+/* ── Grille colonnes ── */
+#todos-modal-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:0;
+  background:rgba(255,255,255,.04);
+  overflow-y:auto;
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(255,255,255,.10) transparent;
+}
+#todos-modal-grid::-webkit-scrollbar{ width:4px; }
+#todos-modal-grid::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.10);border-radius:2px; }
+
+.modal-col{
+  background:rgba(9,11,18,0.96);
+  padding:14px 14px 16px;
+  border-right:1px solid rgba(255,255,255,.05);
+  overflow-y:auto;
+  min-height:160px;
+  position:relative;
+}
+.modal-col:last-child{ border-right:none; }
+.modal-col::-webkit-scrollbar{ width:2px; }
+.modal-col::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.08);border-radius:2px; }
+
+/* Accent haut de colonne */
+.modal-col::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent) 0%,transparent 100%);
+  opacity:0;transition:opacity .25s;
+}
+.modal-col:hover::before{ opacity:.35; }
+
+.modal-col-hdr{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:6px;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  margin-bottom:8px;
+}
+.modal-col-name{
+  font-family:var(--fm);font-size:7.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent);
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+}
+.modal-col-count{
+  font-family:var(--fm);font-size:6.5px;color:var(--t3);
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;padding:2px 7px;
+  transition:background .2s,color .2s;
+}
+.modal-col:hover .modal-col-count{ background:rgba(212,168,83,.10);color:var(--accent);border-color:rgba(212,168,83,.2); }
+
+/* Items dans le modal — réutilise .todo-item / .todo-check / .todo-title / .todo-due */
+.modal-items .todo-item{
+  padding:5px 2px;
+}
+.modal-items .todo-title{
+  font-size:8.5px;
+}
+
+
+/* ══ HOVER — effets réactifs globaux ══ */
+/* Cartes — déjà tilt 3D, ajouter glow accent subtil */
+.card{ transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease; }
+.card:hover{ border-color:rgba(212,168,83,0.18); box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 1px rgba(212,168,83,.08); }
+#card-cal:hover{ border-color:rgba(212,168,83,0.18); box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 1px rgba(212,168,83,.08); }
+
+/* Boutons nav calendrier */
+.cal-nav-btn{ transition:background .15s,color .15s,transform .1s; }
+.cal-nav-btn:hover{ background:rgba(212,168,83,.14); color:var(--accent); transform:scale(1.08); }
+
+/* Boutons tabs musique/podcast */
+.sc-tab{ position:relative; overflow:hidden; }
+.sc-tab::after{ content:''; position:absolute; bottom:0; left:50%; width:0; height:1px; background:var(--accent); transition:width .2s,left .2s; }
+.sc-tab:hover::after{ width:100%; left:0; }
+.sc-tab.active::after{ width:100%; left:0; }
+
+/* Sliders volume */
+#vol-slider,#pod-vol-sl{ transition:opacity .15s; }
+#vol-slider:hover,#pod-vol-sl:hover{ opacity:1; }
+
+/* Barre de progression podcast */
+#pod-prog-wrap{ transition:height .15s,opacity .15s; }
+#pod-prog-wrap:hover{ height:5px; }
+
+/* Bouton play/pause musique + podcast */
+#yt-play-btn{ transition:opacity .15s,transform .1s,color .15s !important; }
+#yt-play-btn:hover{ opacity:1 !important; transform:scale(1.15); }
+#pod-play-btn{ transition:background .2s,border-color .2s,transform .1s; }
+#pod-play-btn:hover{ transform:scale(1.12); }
+
+/* Items RSS : styles dans the section CSS principale more */
+
+/* Prévisions météo */
+.dc{ transition:background .15s,border-color .15s,transform .1s; }
+.dc:hover{ background:rgba(212,168,83,.07); border-color:rgba(212,168,83,.2); transform:translateY(-1px); }
+
+/* Événements calendrier */
+.cal-evt{ transition:background .12s,opacity .12s,transform .1s; }
+.cal-evt:hover{ transform:translateX(1px) scaleX(0.995); z-index:10 !important; }
+
+/* Bouton pomodoro mini */
+#pom-btn{ transition:background .15s,border-color .15s,transform .1s; }
+#pom-btn:hover{ transform:scale(1.1); }
+
+/* Lien ⤢ plein écran pomo */
+#pom-fullscreen-btn{ transition:color .15s,transform .1s; }
+#pom-fullscreen-btn:hover{ transform:scale(1.2); }
+
+/* Chip étiquettes */
+.chip{ transition:color .2s; cursor:default; }
+.card:hover .chip{ color:rgba(240,236,228,.5); }
+
+/* AQI dot */
+.aqi-dot{ transition:transform .2s; }
+#card-weather:hover .aqi-dot{ transform:scale(1.4); }
+
+.rss-item{
+  display:block;
+  padding:8px 8px 8px 10px;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  cursor:pointer;
+  text-decoration:none;
+  color:inherit;
+  transition:background .15s, padding-left .15s;
+  border-left:2px solid transparent;
+  -webkit-tap-highlight-color:transparent;
+}
+.rss-item:last-child{border-bottom:none;}
+.rss-item:hover{
+  background:rgba(255,255,255,0.025);
+  border-left-color:var(--accent);
+  padding-left:12px;
+}
+.rss-item:hover .rss-title{color:var(--accent);} 
+.rss-title{
+  font-family:var(--fb);font-weight:500;font-size:11px;line-height:1.4;
+  color:var(--t1);
+  display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;
+  transition:color .2s;
+}
+.rss-desc{
+  font-family:var(--fb);font-weight:300;font-size:9.5px;line-height:1.5;
+  color:var(--t3);margin-top:3px;
+  display:-webkit-box;-webkit-line-clamp:1;line-clamp:1;
+  -webkit-box-orient:vertical;overflow:hidden;
+}
+.rss-date{
+  font-family:var(--fm);font-size:7px;letter-spacing:.06em;
+  color:var(--t3);margin-top:4px;text-transform:uppercase;
+}
+
+/* ══════════════════════════════════════════════
+   CALENDAR 4 JOURS
+══════════════════════════════════════════════ */
+#card-cal{height:100%;overflow:hidden;animation:fadeUp .5s ease .04s both;display:flex;flex-direction:column;} 
+
+/* ── En-tête ── */
+#cal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 12px 5px;border-bottom:1px solid var(--border);flex-shrink:0;gap:8px;
+}
+.cal-nav{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.cal-nav-btn{
+  background:none;border:1px solid var(--border);color:var(--t2);
+  font-family:var(--fm);font-size:11px;border-radius:5px;padding:5px 11px;
+  cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;line-height:1;
+}
+.cal-nav-btn:hover{background:var(--gl-light);color:var(--t1);} 
+.cal-nav-btn.today-btn{border-color:var(--accent);color:var(--accent);} 
+.cal-nav-btn.today-btn:hover{background:var(--adim);} 
+#cal-range-label{font-family:var(--fm);font-size:8.5px;letter-spacing:.06em;color:var(--t2);white-space:nowrap;} 
+#cal-sync-info{font-family:var(--fm);font-size:6.5px;color:var(--t3);flex:1;text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} 
+
+/* ── Mini-calendrier dropdown ── */
+#cal-mini-wrap{position:relative;flex-shrink:0;} 
+#cal-mini-btn{
+  background:none;border:1px solid var(--border);color:var(--t2);
+  font-family:var(--fm);font-size:8px;border-radius:5px;padding:3px 9px;
+  cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;
+  display:flex;align-items:center;gap:4px;
+}
+#cal-mini-btn:hover{background:var(--gl-light);color:var(--t1);} 
+#cal-mini-btn.open{border-color:var(--accent);color:var(--accent);background:var(--adim);} 
+#cal-mini-btn .mini-arrow{font-size:7px;transition:transform .2s;} 
+#cal-mini-btn.open .mini-arrow{transform:rotate(180deg);} 
+
+#cal-mini-panel{
+  display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:50;
+  background:rgba(8,10,17,0.97);border:1px solid var(--bds);border-radius:var(--r);
+  padding:10px;width:186px;
+  
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+}
+#cal-mini-panel.visible{display:block;} 
+
+/* En-tête du mini-cal */
+#cal-mini-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;} 
+.mini-nav-btn{
+  background:none;border:none;color:var(--t3);font-size:12px;cursor:pointer;padding:2px 5px;
+  border-radius:4px;transition:color .15s,background .15s;line-height:1;
+}
+.mini-nav-btn:hover{color:var(--t1);background:var(--gl-light);} 
+#cal-mini-month-lbl{font-family:var(--fm);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);} 
+
+/* Grille mini-cal */
+#cal-mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;} 
+.mini-dow{font-family:var(--fm);font-size:6px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--t3);text-align:center;padding-bottom:4px;} 
+.mini-day{
+  font-family:var(--fm);font-size:8px;color:var(--t2);
+  text-align:center;padding:3px 0;border-radius:4px;cursor:pointer;transition:all .15s;
+}
+.mini-day:hover:not(.empty){background:var(--gl-light);color:var(--t1);} 
+.mini-day.empty{cursor:default;} 
+.mini-day.is-today{background:var(--accent);color:#07080b;font-weight:700;} 
+.mini-day.in-view{background:var(--adim);color:var(--accent);} 
+.mini-day.is-today.in-view{background:var(--accent);color:#07080b;} 
+.mini-day.has-evt::after{content:'';display:block;width:3px;height:3px;border-radius:50%;background:var(--accent);margin:1px auto 0;opacity:.7;} 
+
+/* ── Barre des jours ── */
+#cal-days-bar{
+  display:grid;grid-template-columns:42px repeat(4,1fr);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.cal-day-hd{padding:2px 3px 3px;text-align:center;} 
+.cal-day-hd .dh-name{font-family:var(--fm);font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:var(--t3);line-height:1.1;} 
+.cal-day-hd .dh-num{
+  font-family:var(--fd);font-size:14px;font-weight:600;color:var(--t2);line-height:1;
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;margin:1px auto 0;
+}
+.cal-day-hd.is-today .dh-name{color:var(--accent);} 
+.cal-day-hd.is-today .dh-num{background:var(--accent);color:#07080b;} 
+.cal-day-hd.is-past .dh-num{color:var(--t3);} 
+
+/* ── Barre all-day events ──
+   Sticky en haut du body scrollable, alignée sur les colonnes des jours. */
+#cal-allday-bar{
+  display:grid;grid-template-columns:42px repeat(4,1fr);
+  border-bottom:1px solid var(--border);
+  background:rgba(8,10,17,0.85);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  position:sticky;top:0;z-index:10;
+  flex-shrink:0;
+  min-height:32px;
+}
+.cal-allday-spacer{
+  border-right:1px solid var(--border);
+}
+.cal-allday-cell{
+  padding:5px 4px;
+  display:flex;flex-direction:column;gap:3px;
+  border-right:1px solid rgba(255,255,255,0.04);
+  min-height:0;
+}
+.cal-allday-cell:last-child{border-right:none;} 
+.cal-allday-pill{
+  background:rgba(212,168,83,0.20);
+  border-left:3px solid var(--accent);
+  color:var(--t1);
+  font-family:var(--fb);font-size:11px;font-weight:500;
+  padding:5px 7px;
+  border-radius:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1.25;
+}
+
+/* ── Corps scrollable ── */
+#cal-body{
+  flex:1;overflow-y:auto;overflow-x:hidden;position:relative;
+  scrollbar-width:thin;scrollbar-color:var(--red) rgba(255,255,255,0.05);
+}
+#cal-body::-webkit-scrollbar{width:4px;} 
+#cal-body::-webkit-scrollbar-track{background:rgba(255,255,255,0.03);border-radius:2px;} 
+#cal-body::-webkit-scrollbar-thumb{background:var(--red);border-radius:2px;} 
+
+#cal-grid{
+  display:grid;grid-template-columns:42px repeat(4,1fr);
+  position:relative;
+}
+
+/* Colonne temps */
+.cal-time-col{display:flex;flex-direction:column;} 
+.cal-time-slot{
+  padding:0 6px 0 0;font-family:var(--fm);font-size:6px;color:var(--t3);
+  letter-spacing:.04em;text-align:right;line-height:0;position:relative;top:-5px;
+  height:52px;flex-shrink:0;box-sizing:border-box;
+}
+
+/* Colonnes jours */
+.cal-col{position:relative;border-left:1px solid var(--border);} 
+.cal-col.is-today{background:rgba(212,168,83,0.045);} 
+.cal-col-slot{height:52px;border-bottom:1px solid rgba(255,255,255,0.03);} 
+.cal-col-slot:nth-child(2n){border-bottom-color:rgba(255,255,255,0.06);} 
+
+/* ── Événements — couleurs thématiques ── */
+.cal-evt{
+  position:absolute;left:0;right:0;
+  background:var(--adim);border-left:2px solid var(--accent);
+  border-radius:4px;padding:2px 5px;overflow:hidden;
+  cursor:default;transition:background .15s,opacity .15s;
+  min-height:20px;z-index:2;
+}
+.cal-evt:hover{background:rgba(212,168,83,0.28);} 
+.cal-evt.is-past{opacity:.35;} 
+.cal-evt.is-past:hover{opacity:.65;} 
+/* Catégories */
+.cal-evt.cat-sport{background:rgba(76,175,125,0.14);border-left-color:#4caf7d;} 
+.cal-evt.cat-sport:hover{background:rgba(76,175,125,0.26);} 
+.cal-evt.cat-cours{background:rgba(91,159,212,0.14);border-left-color:#5b9fd4;} 
+.cal-evt.cat-cours:hover{background:rgba(91,159,212,0.26);} 
+.cal-evt.cat-social{background:rgba(172,130,220,0.14);border-left-color:#ac82dc;} 
+.cal-evt.cat-social:hover{background:rgba(172,130,220,0.26);} 
+.cal-evt.cat-taches{background:rgba(150,155,165,0.12);border-left-color:#8a8f9a;} 
+.cal-evt.cat-taches:hover{background:rgba(150,155,165,0.22);} 
+.cal-evt.cat-jeu{background:rgba(240,120,80,0.13);border-left-color:#e07850;} 
+.cal-evt.cat-jeu:hover{background:rgba(240,120,80,0.24);} 
+
+.cal-evt-time{font-family:var(--fm);font-size:6.5px;color:rgba(212,168,83,.65);display:block;white-space:nowrap;overflow:hidden;} 
+.cal-evt.cat-sport  .cal-evt-time{color:rgba(76,175,125,.75);} 
+.cal-evt.cat-cours  .cal-evt-time{color:rgba(91,159,212,.75);} 
+.cal-evt.cat-social .cal-evt-time{color:rgba(172,130,220,.75);} 
+.cal-evt.cat-taches .cal-evt-time{color:rgba(150,155,165,.65);} 
+.cal-evt.cat-jeu    .cal-evt-time{color:rgba(240,120,80,.75);} 
+.cal-evt-title{font-family:var(--fb);font-size:8.5px;color:var(--t1);font-weight:400;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;margin-top:1px;line-height:1.1;} 
+/* Évènements courts : masquage adaptatif */
+.cal-evt.tiny .cal-evt-time{ display:none; } 
+.cal-evt.tiny .cal-evt-title{ margin-top:0; font-size:7.5px; } 
+.cal-evt.micro .cal-evt-time,
+.cal-evt.micro .cal-evt-title{ display:none; } 
+
+/* ── Marqueur heure actuelle — pleine largeur ── */
+#cal-now-line{
+  position:absolute;
+  /* left sera calculé en JS pour commencer après la col temps */
+  right:0;height:2px;
+  background:linear-gradient(90deg,transparent 0%,var(--red) 8%,var(--red) 100%);
+  z-index:6;pointer-events:none;
+}
+#cal-now-line::before{
+  content:'';position:absolute;left:0;top:-3px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--red);box-shadow:0 0 6px var(--red);
+}
+#cal-now-time-lbl{
+  position:absolute;right:4px;top:-9px;
+  font-family:var(--fm);font-size:6.5px;color:var(--red);
+  letter-spacing:.05em;white-space:nowrap;
+}
+
+/* ── Bouton debug caché ── */
+#debug-btn{
+  position:fixed;bottom:8px;left:10px;z-index:100;
+  width:16px;height:16px;border-radius:50%;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  cursor:pointer;opacity:0;transition:opacity .3s;
+  font-size:0;line-height:0;text-decoration:none;display:block;
+}
+#debug-btn:hover{opacity:1;background:rgba(212,168,83,.18);border-color:var(--accent);} 
+
+/* UTILS */
+.loading{font-family:var(--fm);font-size:10px;color:var(--t3);animation:pulse 1.4s ease-in-out infinite;} 
+.err-txt{font-family:var(--fm);font-size:9px;color:rgba(224,92,92,.7);} 
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}} 
+@-webkit-keyframes fadeUp{from{opacity:0;-webkit-transform:translateY(10px)}to{opacity:1;-webkit-transform:translateY(0)}} 
+@keyframes pulse{0%,100%{opacity:.25}50%{opacity:.85}} 
+::-webkit-scrollbar{width:2px;height:2px;} 
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;} 
+
+/* ── Entrée globale au chargement de la page ── */
+body{ animation:appFadeIn .6s ease both; } 
+@keyframes appFadeIn{ from{opacity:0} to{opacity:1} } 
+
+/* ── Feedback tactile au clic (en plus des :hover déjà en place) ──
+   Placé en fin de feuille pour gagner sur les règles :hover à spécificité égale
+   quand la souris est à la fois "hover" et "active" (clic en survolant). */
+.card:active{ transform:translateY(-1px) scale(.99); transition:transform .1s ease; } 
+#card-cal:active{ transform:scale(.998); } 
+.cal-nav-btn:active,.mini-nav-btn:active,.todo-nav-btn:active,.todo-hdr-btn:active,
+#pom-btn:active,#pom-fullscreen-btn:active,#cal-mini-btn:active,#hidden-refresh-btn:active{
+  transform:scale(.88); transition:transform .1s ease;
+}
+.dc:active{ transform:translateY(0) scale(.97); } 
+.rss-item:active{ opacity:.65; } 
+.todo-item:active{ background:rgba(255,255,255,.03); } 
+.todo-check:active{ transform:scale(1.3); } 
+</style>
 </head>
 <body>
-  <main style="display:flex;align-items:center;justify-content:center;height:100vh;background:#07080b;color:#ddd;font-family:DM Sans,system-ui,Arial;">
-    <div style="text-align:center;max-width:720px;padding:24px;">
-      <h1 style="margin:0 0 12px;font-family:Outfit,system-ui;font-weight:700;color:#fff">Dashboard — version simplifiée attendue</h1>
-      <p style="margin:0 0 12px;color:#cfcfcf">La page principale a été vidée. Fourni la version simplifiée du HTML et je l'intégrerai en conservant strictement l'esthétique telle que tu la fournis. Pour l'instant toutes les fonctionnalités sont désactivées.</p>
-      <p style="margin:0;font-size:13px;color:#999">Quand tu seras prêt, colle ici le HTML simplifié et je le déposerai à la racine comme index.html.</p>
+
+<!-- ══════════════════════════════════════════════
+   ⚙️  CONFIGURATION
+══════════════════════════════════════════════ -->
+<script>
+/* ── Fix viewport height pour Safari ancien (iPad Air 1 / tvOS) ──
+   100vh y inclut la barre URL → cartes coupées en bas. On mesure la vraie
+   hauteur via visualViewport ou innerHeight, et on l'expose via --vh.
+   Multiples triggers car iOS Safari ne déclenche pas toujours 'resize'. */
+(function(){
+  function _setVh(){
+    var h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.setProperty('--vh', (h * 0.01) + 'px');
+  }
+  _setVh();
+  /* Triggers standards */
+  window.addEventListener('resize', _setVh);
+  window.addEventListener('orientationchange', _setVh);
+  window.addEventListener('load', _setVh);
+  window.addEventListener('pageshow', _setVh);
+  /* visualViewport API (Safari 13+) : plus fiable pour iOS */
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', _setVh);
+    window.visualViewport.addEventListener('scroll', _setVh);
+  }
+  /* Re-mesure après load des fonts (peut changer la viewport) */
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(_setVh);
+  }
+  /* Filet de sécurité : re-mesure 3 fois après load au cas où (~3s total) */
+  window.addEventListener('load', function(){
+    setTimeout(_setVh, 500);
+    setTimeout(_setVh, 1500);
+    setTimeout(_setVh, 3000);
+  });
+})();
+
+/* ── Anciennement : objet CONFIG ──
+   Contenait les coordonnées météo (Hanoï), et les URLs des scripts serveur
+   (data.json, api_calendrier.php, rss.php, wallpapers.json) consommés par
+   le code retiré ci-dessous. Retiré car ces endpoints n'existent plus
+   sur un hébergement statique — à redéfinir selon la nouvelle
+   architecture (ex. appel direct à une API publique, ou nouveau backend). */
+
+</script>
+
+<div id="bg-a"></div>
+<div id="bg-b"></div>
+<div id="spotlight"></div>
+<div id="vig"></div>
+
+<div class="grid">
+
+  <!-- ══════════════ COLONNE GAUCHE ══════════════ -->
+  <div class="left-col">
+
+    <!-- HORLOGE + MINI POMODORO -->
+    <div class="card" id="card-clock" style="animation-delay:0s">
+      <div class="ci">
+        <div class="ck-split">
+          <!-- Gauche : horloge -->
+          <div class="ck-left">
+            <div class="ck-main">
+              <div class="ck-city">France</div>
+              <div id="fr-time">--<span class="sep">:</span>--</div>
+              <div id="fr-date"></div>
+            </div>
+            <div class="ck-vn">
+              <span class="ck-vn-lbl">Hà Nội</span>
+              <span id="vn-time">--:--</span>
+              <span id="vn-diff"></span>
+            </div>
+          </div>
+          <!-- Droite : mini Pomodoro -->
+          <div class="ck-right">
+            <div class="pom-header">
+              <span class="pom-header-lbl">Pomodoro</span>
+              <!-- Lien vers l'app Pomodoro complète, une page séparée non couverte par ce fichier -->
+              <a id="pom-fullscreen-btn" href="/pomodoro/" target="_blank" title="Plein écran">⤢</a>
+            </div>
+            <div class="pom-body">
+              <div id="pom-mode-lbl">FOCUS</div>
+              <div id="pom-time">25:00</div>
+              <div class="pom-prog-track">
+                <div class="pom-prog-bar" id="pom-prog"></div>
+              </div>
+              <div class="pom-controls">
+                <button id="pom-btn" title="Play / Pause">
+                  <!-- SVG play/pause mis à jour par JS -->
+                  <svg id="pom-btn-icon" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+                    <polygon points="2,1 9,5 2,9"/>
+                  </svg>
+                </button>
+                <div class="pom-dots">
+                  <div class="pom-dot active" id="pd0"></div>
+                  <div class="pom-dot" id="pd1"></div>
+                  <div class="pom-dot" id="pd2"></div>
+                  <div class="pom-dot" id="pd3"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </main>
+
+    <!-- MÉTÉO -->
+    <div class="card" id="card-weather" style="animation-delay:.06s">
+      <div id="weather-bg"></div>
+      <div class="ci">
+        <div class="chip">Météo — <span id="w-city">Hà Nội</span></div>
+        <div class="w-cur">
+          <div id="w-icon">⋯</div>
+          <div id="w-temp"><span class="loading">…</span></div>
+          <div class="w-meta">
+            <div id="w-desc"></div>
+            <div class="w-stats">
+              <div class="ws"><span class="ws-l">Ressenti</span><span class="ws-v" id="w-feels">–</span></div>
+              <div class="ws"><span class="ws-l">Humidité</span><span class="ws-v" id="w-hum">–</span></div>
+              <div class="ws"><span class="ws-l">Vent</span><span class="ws-v" id="w-wind">–</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="w-curve-wrap">
+          <div class="w-curve-lbl">Température — 12h</div>
+          <div id="temp-svg-wrap"><span class="loading">…</span></div>
+        </div>
+        <div class="w-dl">Prévisions 3 jours</div>
+        <div class="w-days" id="w-days">
+          <div class="dc"><span class="loading">…</span></div>
+          <div class="dc"><span class="loading">…</span></div>
+          <div class="dc"><span class="loading">…</span></div>
+        </div>
+        <div class="divl"></div>
+        <div class="aqi-row">
+          <div class="aqi-dot" id="aqi-dot"></div>
+          <span id="aqi-val"><span class="loading">…</span></span>
+          <span id="aqi-lbl" style="margin-left:5px"></span>
+          <span class="aqi-pm" id="aqi-pm"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODO + MUSIQUE — carte avec bascule -->
+    <div class="card" id="card-music" style="animation-delay:.08s">
+
+      <!-- ══ VUE TODO (défaut) ══ -->
+      <div id="view-todo">
+        <div id="todo-header">
+          <button class="todo-nav-btn" id="todo-prev" title="Liste précédente">&#8249;</button>
+          <span id="todo-list-name">QUOTIDIEN</span>
+          <button class="todo-nav-btn" id="todo-next" title="Liste suivante">&#8250;</button>
+          <button class="todo-hdr-btn" id="todo-expand-btn" title="Toutes les listes">&#8862;</button>
+          <button class="todo-hdr-btn" id="todo-music-btn" title="Afficher la musique">&#9834;</button>
+        </div>
+        <div id="todo-items">
+          <div class="todo-empty">Chargement…</div>
+        </div>
+      </div>
+
+      <!-- ══ VUE MUSIQUE (cachée par défaut) ══ -->
+      <div id="view-music">
+        <div id="music-return-bar"></div>
+        <div class="ci">
+
+          <!-- ── Toggle 2 modes (MUSIQUE / PODCAST) + bouton todos ── -->
+          <div id="audio-mode-toggle">
+            <button class="amt-btn active" data-amode="music">&#9834; MUSIQUE</button>
+            <button class="amt-btn" data-amode="podcast">&#127897; PODCAST</button>
+            <span id="amt-matin-dot" title="Mode matin actif" style="display:none;"></span>
+            <button id="amt-todo-btn" title="Afficher les todos">&#9776;</button>
+          </div>
+
+          <!-- ── MODE MUSIQUE : YouTube ── -->
+          <div id="yt-section" class="audio-mode visible">
+            <div id="sc-tabs">
+              <button class="sc-tab active" data-idx="0">&#9834; Piano</button>
+              <button class="sc-tab" data-idx="1">&#9834; Lofi</button>
+              <button class="sc-tab" data-idx="2">&#9834; Chill</button>
+            </div>
+            <div id="sc-stack" aria-hidden="true">
+              <iframe id="yt-frame-0" class="sc-frame active" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media"
+                src="https://www.youtube.com/embed/2LSB--cO1J8?autoplay=1&mute=1&vq=tiny&enablejsapi=1&loop=1&playlist=2LSB--cO1J8"
+              ></iframe>
+              <iframe id="yt-frame-1" class="sc-frame" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media"
+                data-src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1&vq=tiny&enablejsapi=1&loop=1&playlist=jfKfPfyJRdk"
+              ></iframe>
+              <iframe id="yt-frame-2" class="sc-frame" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media"
+                data-src="https://www.youtube.com/embed/80pOuROVGFQ?autoplay=1&mute=1&vq=tiny&enablejsapi=1&loop=1&playlist=80pOuROVGFQ"
+              ></iframe>
+            </div>
+            <div id="vol-row">
+              <button id="yt-play-btn" title="Play / Pause" style="
+                background:none;border:none;color:var(--accent);cursor:pointer;
+                display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+                -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+                justify-content:center;width:22px;height:22px;padding:0;flex-shrink:0;
+                opacity:.85;transition:opacity .15s;
+              ">
+                <svg id="yt-play-icon" width="14" height="14" viewBox="0 0 10 10" fill="currentColor">
+                  <polygon points="2,1 9,5 2,9"/>
+                </svg>
+              </button>
+              <span id="vol-icon" title="Mute/Unmute">&#128266;</span>
+              <input type="range" id="vol-slider" min="0" max="100" value="80">
+              <span id="vol-pct">80%</span>
+            </div>
+            <div id="sc-credit">
+              <span id="sc-credit-0">YT · <a href="https://www.youtube.com/watch?v=66RaBtGznrI" target="_blank">Classique 24/7 · Odd Eagle</a></span>
+              <span id="sc-credit-1" style="display:none">YT · <a href="https://www.youtube.com/watch?v=J0shA9J-4Nc" target="_blank">Lofi Mix 2</a></span>
+              <span id="sc-credit-2" style="display:none">YT · <a href="https://www.youtube.com/watch?v=u9YOvF22tsI" target="_blank">Ambient</a></span>
+            </div>
+          </div>
+
+          <!-- ── MODE PODCAST ── -->
+          <div id="pod-section" class="audio-mode">
+            <div id="pod-tabs">
+              <button class="sc-tab active" data-pod="journal">Journal 15'</button>
+              <button class="sc-tab" data-pod="matinale">Grande Matinale</button>
+            </div>
+            <div id="pod-info">Chargement…</div>
+            <div id="pod-controls">
+              <button id="pod-play-btn" title="Play/Pause">
+                <svg id="pod-play-icon" width="11" height="11" viewBox="0 0 10 10" fill="currentColor">
+                  <polygon points="2,1 9,5 2,9"/>
+                </svg>
+              </button>
+              <div id="pod-prog-wrap" title="Avancer"><div id="pod-prog"></div></div>
+              <span id="pod-time">--:-- / --:--</span>
+              <span id="pod-vol-icon" title="Mute podcast">&#128266;</span>
+              <input type="range" id="pod-vol-sl" min="0" max="100" value="90">
+            </div>
+            <div id="pod-status"></div>
+            <audio id="pod-audio" preload="none"></audio>
+          </div>
+
+        </div>
+      </div><!-- /view-music -->
+
+    </div><!-- /card-music -->
+
+    <!-- RSS LE MONDE -->
+    <!-- Lien vers une page "actualités" séparée (gazette.html), non couverte par ce fichier -->
+    <a class="card" id="card-rss" href="/gazette.html" style="animation-delay:.1s;text-decoration:none;color:inherit;display:block;">
+      <div class="ci">
+        <div class="chip" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Le Monde</span>
+          <span style="color:var(--accent);opacity:.6;letter-spacing:.1em;">↗ presse</span>
+        </div>
+        <div class="rss-ticker" id="rss-ticker">
+          <div class="rss-item"><span class="loading">Chargement…</span></div>
+        </div>
+      </div>
+    </a>
+
+  </div><!-- /left-col -->
+
+  <!-- ══════════════ CALENDRIER 4 JOURS ══════════════ -->
+  <div class="card" id="card-cal">
+    <div id="cal-header">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" id="cal-prev">&#8249;</button>
+        <button class="cal-nav-btn today-btn" id="cal-today">Auj.</button>
+        <button class="cal-nav-btn" id="cal-next">&#8250;</button>
+        <span id="cal-range-label">…</span>
+      </div>
+      <span id="cal-sync-info">–</span>
+      <!-- Mini-calendrier mensuel -->
+      <div id="cal-mini-wrap">
+        <button id="cal-mini-btn">
+          <span id="cal-mini-btn-lbl">mois</span>
+          <span class="mini-arrow">▾</span>
+        </button>
+        <div id="cal-mini-panel">
+          <div id="cal-mini-nav">
+            <button class="mini-nav-btn" id="mini-prev">‹</button>
+            <span id="cal-mini-month-lbl">…</span>
+            <button class="mini-nav-btn" id="mini-next">›</button>
+          </div>
+          <div id="cal-mini-grid"></div>
+        </div>
+      </div>
+    </div>
+    <div id="cal-days-bar"><div></div></div>
+    <div id="cal-body">
+      <div id="cal-grid"></div>
+    </div>
+  </div><!-- /card-cal -->
+
+</div><!-- /grid -->
+
+<!-- Bouton debug discret (hover bas-gauche) -->
+<!-- Anciennement : lien discret vers une page de debug/diagnostic (fennec.html)
+     testant chaque endpoint serveur. Retiré, sans objet sans backend. -->
+
+
+
+<!-- ══ TODOS MODAL — doit être avant le script ══ -->
+<div id="todos-modal" aria-hidden="true" role="dialog" aria-label="Toutes les listes">
+  <div id="todos-modal-bg"></div>
+  <div id="todos-modal-panel">
+    <div id="todos-modal-hdr">
+      <span id="todos-modal-icon">&#9635;</span>
+      <span id="todos-modal-title">Mes listes</span>
+      <span id="todos-modal-subtitle"></span>
+      <button id="todos-modal-close" aria-label="Fermer">&#10005;</button>
+    </div>
+    <div id="todos-modal-grid"></div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   FONDS D'ÉCRAN — code retiré (dépendait d'un backend)
+   ──────────────────────────────────────────
+   Fonctionnement d'origine : diaporama plein écran sur 2 calques qui
+   alternaient en fondu (éléments #bg-a et #bg-b, déjà présents plus bas
+   dans le HTML, transition CSS déjà en place).
+   La liste des images venait d'un fichier wallpapers.json (régénéré par un
+   script serveur après upload), avec un système hybride : quelques images
+   locales affichées immédiatement, puis un pool d'images externes
+   préchargées progressivement en arrière-plan, puis bascule une fois assez
+   d'images en cache. Changement toutes les 120 secondes.
+   Pour reconstruire en statique : le plus simple est un tableau JS fixe
+   d'URLs d'images (dans le dépôt), avec un setInterval qui fait :
+     bgA.style.backgroundImage = 'url(...)';
+   puis alterne l'opacité de #bg-a / #bg-b pour le fondu (classes déjà
+   stylées en CSS, transition de 2.4s déjà en place).
+══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   CLOCK
+══════════════════════════════════════════ */
+function updateClock(){
+  var d=new Date();
+  try{
+    var ft=d.toLocaleTimeString('fr-FR',{timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit',hour12:false}).split(':');
+    document.getElementById('fr-time').innerHTML=ft[0]+'<span class="sep">:</span>'+ft[1];
+    var fd=d.toLocaleDateString('fr-FR',{timeZone:'Europe/Paris',weekday:'long',day:'numeric',month:'long'});
+    document.getElementById('fr-date').textContent=fd.charAt(0).toUpperCase()+fd.slice(1);
+    document.getElementById('vn-time').textContent=d.toLocaleTimeString('fr-FR',{timeZone:'Asia/Ho_Chi_Minh',hour:'2-digit',minute:'2-digit',hour12:false});
+    var pDay=parseInt(d.toLocaleDateString('en-US',{timeZone:'Europe/Paris',day:'numeric'}),10);
+    var hDay=parseInt(d.toLocaleDateString('en-US',{timeZone:'Asia/Ho_Chi_Minh',day:'numeric'}),10);
+    var diff=hDay-pDay;
+    document.getElementById('vn-diff').textContent=diff!==0?(diff>0?'+'+diff+'j':diff+'j'):'';
+  }catch(e){}
+}
+updateClock();
+setInterval(updateClock,1000);
+
+/* ══════════════════════════════════════════
+   MÉTÉO + COURBE SVG — code retiré (dépendait d'un fetch API externe)
+   ──────────────────────────────────────────
+   Fonctionnement d'origine : appel direct depuis le navigateur (aucun
+   backend requis, cette API ne nécessite pas de clé) à Open-Meteo :
+     - https://api.open-meteo.com/v1/forecast
+       (température actuelle, ressenti, humidité, vent, code météo,
+       prévisions 3 jours)
+     - https://air-quality-api.open-meteo.com/v1/air-quality
+       (indice AQI US, PM2.5, PM10)
+   Coordonnées utilisées à l'origine : Hanoï (lat 21.0285, lon 105.8542).
+   Éléments HTML à remplir (déjà présents, avec placeholders par défaut) :
+     #w-city, #w-icon, #w-temp, #w-desc, #w-feels, #w-hum, #w-wind,
+     #w-days (3 cartes .dc pour les 3 prochains jours),
+     #temp-svg-wrap (frise horaire de température, générée en SVG),
+     #aqi-dot (pastille colorée selon l'indice), #aqi-val, #aqi-lbl, #aqi-pm,
+     #weather-bg (dégradé de fond selon la météo/l'heure du jour).
+   Cette section peut être reconstruite en JS pur, y compris sur GitHub
+   Pages, puisqu'elle ne dépend d'aucun serveur PHP.
+══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   MUSIQUE / PODCAST / MODE MATIN — code retiré
+   ──────────────────────────────────────────
+   La carte #card-music a 3 vues qui partagent le même espace visuel
+   (Todos affiché par défaut, Musique et Podcast basculés via
+   #audio-mode-toggle). Tout le HTML/CSS reste en place ; les boutons ne
+   sont simplement plus câblés à du JS :
+
+   VUE MUSIQUE : 3 iframes YouTube cachées (son d'ambiance uniquement,
+   jamais la vidéo affichée), en autoplay muet, bascule entre 3 pistes
+   (#yt-frame-0/1/2, déjà présentes dans le HTML avec leurs vraies src).
+   Les contrôles personnalisés (#yt-play-btn, #vol-slider) pilotaient
+   l'iframe active via l'API postMessage de YouTube
+   (playVideo/pauseVideo/mute/unMute).
+
+   VUE PODCAST : récupérait le dernier épisode de 2 flux RSS France
+   Info/Inter ("Journal", "Grande Matinale") via un proxy serveur
+   (nécessaire : ces flux RSS ne renvoient pas d'en-têtes CORS, donc
+   impossible de les lire directement en JS depuis un site statique sans
+   passer par un proxy quelconque). Lecture ensuite via l'élément HTML5
+   natif "audio" (#pod-audio), ce qui fonctionne sans backend une fois
+   l'URL du MP3 obtenue.
+
+   BUS AUDIO (petit système d'exclusivité "AUDIO_BUS") : démarrer l'un des
+   deux (musique/podcast) coupait automatiquement l'autre.
+
+   MODE MATIN : entre 6h et 10h heure de Paris au chargement de la page,
+   bascule automatiquement sur la vue Podcast et tente de lancer la
+   lecture (avec contournement des restrictions d'autoplay du navigateur
+   en écoutant le premier geste utilisateur).
+
+   Éléments HTML déjà en place mais inertes sans JS : tous les boutons de
+   #card-music (.amt-btn, .sc-tab, #yt-play-btn, #vol-slider, #pod-play-btn,
+   #pod-prog-wrap, #pod-vol-sl).
+══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   CALENDRIER, MINI-CALENDRIER & MINI-POMODORO — code retiré
+   ──────────────────────────────────────────
+   CALENDRIER (#cal-grid, #cal-days-bar) : vue de 4 jours simultanés,
+   tranche horaire 7h-23h (52px par heure). Les événements venaient d'un
+   fichier JSON généré côté serveur à partir d'un calendrier iCloud publié.
+   Chaque événement était catégorisé automatiquement par mot-clé détecté
+   dans son titre (sport / cours / social / tâches / jeu / défaut), avec
+   une couleur dédiée par catégorie — les classes CSS existent déjà :
+   .cal-evt.cat-sport, .cat-cours, .cat-social, .cat-taches, .cat-jeu.
+   Le jour courant était mis en valeur (classe .is-today sur toute la
+   colonne, pas seulement l'en-tête). Une ligne repère (générée en JS,
+   #cal-now-line) indiquait l'heure actuelle en continu. Navigation via
+   #cal-prev / #cal-next / #cal-today.
+
+   MINI-CALENDRIER MENSUEL (#cal-mini-panel, #cal-mini-grid) : petit
+   calendrier du mois courant, navigable (#mini-prev / #mini-next), jour
+   actuel marqué (classe .mini-day.is-today).
+
+   MINI-POMODORO (dans la carte horloge : #pom-time, #pom-mode-lbl,
+   #pom-prog, #pom-btn, #pd0..#pd3) : interrogeait toutes les 10s un timer
+   dont l'état (mode, temps restant, en cours ou non) était géré côté
+   serveur par l'app Pomodoro séparée (/pomodoro/, non couverte par ce
+   fichier). Le bouton play/pause envoyait une commande au serveur. Les
+   valeurs actuellement figées dans le HTML ("25:00", "FOCUS", 1ᵉʳ point
+   actif) sont de simples placeholders visuels, pas un vrai décompte.
+══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   TODOS / RAPPELS — code retiré
+   ──────────────────────────────────────────
+   6 listes fixes : Quotidien, Dashboard, Courses, Moyen terme, Long terme,
+   La Parisienne. Navigation entre listes via #todo-prev / #todo-next
+   (#todo-list-name affiche le nom de la liste courante), #todo-items
+   recevait les items de la liste active. Le bouton #todo-expand-btn
+   ouvrait une modale (#todos-modal, déjà présente dans le HTML) montrant
+   toutes les listes à la fois, en grille (#todos-modal-grid).
+   Les données venaient d'un fichier JSON alimenté par un Raccourci iOS qui
+   lisait l'app Rappels du téléphone et envoyait son contenu périodiquement
+   à un script serveur — une synchronisation unidirectionnelle et
+   périodique, pas un vrai bridge temps réel bidirectionnel.
+   Cocher un item (case à cocher, classes .todo-check / .todo-check.done
+   déjà stylées) le faisait disparaître avec un petit fondu, et
+   persistait l'état auprès du serveur.
+══════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════
+   CURSEUR — spotlight + tilt cartes
+══════════════════════════════════════════ */
+(function(){
+  var spot   = document.getElementById('spotlight');
+  var cards  = document.querySelectorAll('.card');
+  var raf    = null;
+  var mx = window.innerWidth/2, my = window.innerHeight/2;
+
+  /* Spotlight global */
+  if(spot){
+    spot.classList.add('on');
+    document.addEventListener('mousemove', function(e){
+      mx = e.clientX; my = e.clientY;
+      if(raf) return;
+      raf = requestAnimationFrame(function(){
+        raf = null;
+        spot.style.setProperty('--sx', mx+'px');
+        spot.style.setProperty('--sy', my+'px');
+      });
+    });
+    /* Disparaît quand la souris quitte la fenêtre */
+    document.addEventListener('mouseleave', function(){ spot.classList.remove('on'); });
+    document.addEventListener('mouseenter', function(){ spot.classList.add('on'); });
+  }
+
+  /* Tilt + reflet local par carte */
+  cards.forEach(function(card){
+    var tiltRaf = null;
+    card.addEventListener('mousemove', function(e){
+      if(tiltRaf) return;
+      tiltRaf = requestAnimationFrame(function(){
+        tiltRaf = null;
+        var rect = card.getBoundingClientRect();
+        var cx = e.clientX - rect.left;
+        var cy = e.clientY - rect.top;
+        var px = cx / rect.width;   /* 0..1 */
+        var py = cy / rect.height;
+        /* Tilt max 2.5° */
+        var ry =  (px - 0.5) * 5;
+        var rx = -(py - 0.5) * 5;
+        card.style.webkitTransform = 'perspective(900px) rotateX('+rx+'deg) rotateY('+ry+'deg)';
+        card.style.transform       = 'perspective(900px) rotateX('+rx+'deg) rotateY('+ry+'deg)';
+        /* Reflet local */
+        card.style.setProperty('--cx', cx+'px');
+        card.style.setProperty('--cy', cy+'px');
+      });
+    });
+    card.addEventListener('mouseleave', function(){
+      card.style.webkitTransform = 'perspective(900px) rotateX(0deg) rotateY(0deg)';
+      card.style.transform       = 'perspective(900px) rotateX(0deg) rotateY(0deg)';
+    });
+  });
+})();
+</script>
+
+<!-- ══════════════════════════════════════════
+     BOUTON DE REFRESH GLOBAL (caché) + NOTIFICATION iOS — retiré
+     ──────────────────────────────────────────
+     Un petit bouton quasi invisible (coin bas-droit) déclenchait en
+     parallèle le rafraîchissement de tous les widgets ci-dessus (météo,
+     calendrier, todos, actualités, fonds d'écran), puis affichait une
+     notification translucide façon iOS en haut de l'écran, listant ce qui
+     avait réussi (✓) ou échoué (✕). Sans données serveur à rafraîchir,
+     cette fonctionnalité n'a plus lieu d'être telle quelle sur une page
+     100% statique — à réimaginer si besoin (ex. simple bouton "recharger
+     la page").
+══════════════════════════════════════════ -->
+
 </body>
 </html>
