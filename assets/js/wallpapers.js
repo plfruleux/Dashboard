@@ -49,6 +49,14 @@
     });
   }
 
+  function shuffle(array){
+    for(let i = array.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
   function loadManifest(){
     const path = 'assets/wallpapers/wallpapers.json';
     fetch(path).then(r=>{
@@ -59,13 +67,12 @@
         // photos can be {id,url}
         const urls = j.photos.map(p=>p.url).filter(Boolean);
         if(urls.length===0) throw new Error('empty-manifest');
-        images = urls;
+        images = shuffle(urls);
         // choose a random starting wallpaper on page load
-        const offset = Math.floor(Math.random() * images.length);
-        setLayer(A, images[offset]);
+        setLayer(A, images[0]);
         A.style.opacity = 1;
         B.style.opacity = 0;
-        idx = offset + 1;
+        idx = 1;
         preload(images[idx % images.length]).finally(()=>{
           crossfadeNext();
           setInterval(crossfadeNext, INTERVAL_MS);
