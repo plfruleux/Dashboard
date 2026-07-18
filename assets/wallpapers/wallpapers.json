@@ -1,7 +1,8 @@
 {
   "version": 1,
   "photos": [
-    {"id":"wp01","url":"assets/wallpapers/wp01.jpg"},
-    {"id":"wp02","url":"assets/wallpapers/wp02.jpg"}
+    {"id":"wp01","url":"https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=2000&q=80"},
+    {"id":"wp02","url":"https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2000&q=80"},
+    {"id":"wp03","url":"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2000&q=80"}
   ]
 }
