@@ -62,13 +62,18 @@
       if(Array.isArray(j.photos) && j.photos.length>0){
         // photos can be {id,url}
         const urls = j.photos.map(p=>p.url).filter(Boolean);
-        // preload them
+        if(urls.length===0) throw new Error('empty-manifest');
+        images = urls;
+        // immediately show the first wallpaper while the remaining images preload
+        setLayer(A, images[0]);
+        A.style.opacity = 1;
+        B.style.opacity = 0;
         Promise.all(urls.map(preload)).then(()=>{
-          images = urls;
           crossfadeNext();
           setInterval(crossfadeNext, INTERVAL_MS);
         }).catch(()=>{
-          images = urls; crossfadeNext(); setInterval(crossfadeNext, INTERVAL_MS);
+          crossfadeNext();
+          setInterval(crossfadeNext, INTERVAL_MS);
         });
       } else {
         throw new Error('empty-manifest');
@@ -80,6 +85,9 @@
         'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=2000&q=80',
         'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2000&q=80'
       ];
+      setLayer(A, images[0]);
+      A.style.opacity = 1;
+      B.style.opacity = 0;
       // preload then start
       Promise.all(images.map(preload)).then(()=>{ crossfadeNext(); setInterval(crossfadeNext, INTERVAL_MS); }).catch(()=>{ crossfadeNext(); setInterval(crossfadeNext, INTERVAL_MS); });
     });
