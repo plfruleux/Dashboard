@@ -1787,6 +1787,61 @@ setInterval(updateClock,1000);
    var ytPlaying = true;
    var ytMuted = true;
    var ytVolume = 80;
+   var ytPlayers = [null, null, null];
+   var ytPlayerReady = [false, false, false];
+   var ytApiLoaded = false;
+
+   function loadYouTubeIframeApi(){
+     if(window.YT && window.YT.Player){
+       ytApiLoaded = true;
+       createAllYtPlayers();
+       return;
+     }
+     var tag = document.createElement('script');
+     tag.src = 'https://www.youtube.com/iframe_api';
+     var firstScript = document.getElementsByTagName('script')[0];
+     firstScript.parentNode.insertBefore(tag, firstScript);
+   }
+
+   window.onYouTubeIframeAPIReady = function(){
+     ytApiLoaded = true;
+     createAllYtPlayers();
+   };
+
+   function createAllYtPlayers(){
+     ytFrames.forEach(function(frame, index){
+       ensureYtFrame(index);
+       createYtPlayer(index);
+     });
+   }
+
+   function createYtPlayer(index){
+     if(!window.YT || !YT.Player) return;
+     if(ytPlayers[index]) return;
+     var frame = ytFrames[index];
+     if(!frame || !frame.id) return;
+     ytPlayers[index] = new YT.Player(frame.id, {
+       events: {
+         onReady: function(){
+           ytPlayerReady[index] = true;
+           if(index === ytActive){
+             var player = ytPlayers[index];
+             if(player){
+               if(ytMuted){
+                 player.mute();
+               } else {
+                 player.unMute();
+               }
+               player.setVolume(ytVolume);
+               if(ytPlaying){
+                 player.playVideo();
+               }
+             }
+           }
+         }
+       }
+     });
+   }
 
    function updateMode(mode){
      modeButtons.forEach(function(button){
@@ -1812,6 +1867,16 @@ setInterval(updateClock,1000);
    });
 
    function sendYTCommand(frame, func, args){
+     var index = ytFrames.indexOf(frame);
+     if(index >= 0 && ytPlayers[index] && ytPlayerReady[index]){
+       var player = ytPlayers[index];
+       if(player && typeof player[func] === 'function'){
+         try{
+           player[func].apply(player, args || []);
+           return;
+         }catch(e){}
+       }
+     }
      if(!frame || !frame.contentWindow) return;
      try{
        frame.contentWindow.postMessage(JSON.stringify({ event:'command', func:func, args:args||[] }), '*');
@@ -2079,6 +2144,7 @@ setInterval(updateClock,1000);
    if(ytFrames[0]){
      ensureYtFrame(0);
    }
+   loadYouTubeIframeApi();
    updateYtControls();
    updateLocalButtons();
    maybeLoadStaticLocalFiles();
