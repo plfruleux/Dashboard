@@ -29,18 +29,14 @@
     }
 
     const next = images[idx % images.length];
-    const other = images[(idx+1) % images.length];
-    // place next on top layer and fade
-    // we use A as visible when idx%2==0
-    if((idx % 2) === 0){
-      setLayer(A, next);
-      A.style.opacity = 1;
-      B.style.opacity = 0;
-    } else {
-      setLayer(B, next);
-      B.style.opacity = 1;
-      A.style.opacity = 0;
-    }
+    const showA = (idx % 2) === 0;
+    const topLayer = showA ? A : B;
+    const bottomLayer = showA ? B : A;
+    preload(next).finally(()=>{
+      setLayer(topLayer, next);
+      topLayer.style.opacity = 1;
+      bottomLayer.style.opacity = 0;
+    });
     idx++;
   }
 
@@ -64,14 +60,12 @@
         const urls = j.photos.map(p=>p.url).filter(Boolean);
         if(urls.length===0) throw new Error('empty-manifest');
         images = urls;
-        // immediately show the first wallpaper while the remaining images preload
+        // immediately show the first wallpaper while the next one preloads
         setLayer(A, images[0]);
         A.style.opacity = 1;
         B.style.opacity = 0;
-        Promise.all(urls.map(preload)).then(()=>{
-          crossfadeNext();
-          setInterval(crossfadeNext, INTERVAL_MS);
-        }).catch(()=>{
+        idx = 1;
+        preload(images[1 % images.length]).finally(()=>{
           crossfadeNext();
           setInterval(crossfadeNext, INTERVAL_MS);
         });
@@ -88,8 +82,8 @@
       setLayer(A, images[0]);
       A.style.opacity = 1;
       B.style.opacity = 0;
-      // preload then start
-      Promise.all(images.map(preload)).then(()=>{ crossfadeNext(); setInterval(crossfadeNext, INTERVAL_MS); }).catch(()=>{ crossfadeNext(); setInterval(crossfadeNext, INTERVAL_MS); });
+      idx = 1;
+      preload(images[1 % images.length]).finally(()=>{ crossfadeNext(); setInterval(crossfadeNext, INTERVAL_MS); });
     });
   }
 
