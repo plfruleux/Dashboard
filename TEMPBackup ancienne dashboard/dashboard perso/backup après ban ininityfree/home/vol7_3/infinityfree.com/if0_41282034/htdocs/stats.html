@@ -1,0 +1,43 @@
+<style>
+    .stats-card {
+        background: white; border-radius: 15px; padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); font-family: sans-serif;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th { text-align: left; color: #888; font-size: 0.8rem; padding-bottom: 10px; }
+    td { padding: 10px 0; border-top: 1px solid #eee; }
+    .highlight { font-size: 1.5rem; font-weight: bold; color: #2c3e50; }
+</style>
+
+<div class="stats-card">
+    <div style="display:flex; justify-content: space-between;">
+        <div>
+            <div class="highlight" id="total-hours">0</div>
+            <div style="font-size:0.7rem; color:#888;">HEURES TOTALES</div>
+        </div>
+        <div>
+            <div class="highlight" id="session-count">0</div>
+            <div style="font-size:0.7rem; color:#888;">SESSIONS</div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>DATE</th><th>DURÉE</th></tr>
+        </thead>
+        <tbody id="stats-body"></tbody>
+    </table>
+</div>
+
+<script>
+    fetch('stats.json').then(r => r.json()).then(data => {
+        let total = 0;
+        const body = document.getElementById('stats-body');
+        data.reverse().slice(0, 5).forEach(s => {
+            total += s.duration;
+            body.innerHTML += `<tr><td>${new Date(s.date).toLocaleDateString()}</td><td>${s.duration} min</td></tr>`;
+        });
+        document.getElementById('total-hours').textContent = (total / 60).toFixed(1);
+        document.getElementById('session-count').textContent = data.length;
+    });
+</script>

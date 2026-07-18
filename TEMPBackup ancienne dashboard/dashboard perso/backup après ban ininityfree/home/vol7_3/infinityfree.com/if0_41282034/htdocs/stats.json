@@ -1,0 +1,12 @@
+<?php
+$data = json_decode(file_get_contents('php://input'), true);
+if ($data) {
+    $file = 'stats.json';
+    $current = json_decode(file_get_contents($file), true) ?: [];
+    $current[] = [
+        'date' => $data['date'],
+        'duration' => $data['duration']
+    ];
+    file_put_contents($file, json_encode($current));
+}
+?>

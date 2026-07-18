@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objet Trouvé</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1a1a1a;
+            --accent-color: #555555;
+            --secondary-color: #888888;
+        }
+
+        body {
+            font-family: '-apple-system', BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 1rem;
+            color: var(--accent-color);
+            margin-bottom: 2.5rem;
+        }
+
+        .contact-info {
+            border-top: 1px solid #eeeeee;
+            padding-top: 2rem;
+        }
+
+        .contact-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--secondary-color);
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .value {
+            font-size: 1.1rem;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .btn-call {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 12px 24px;
+            background-color: var(--text-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-call:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Bonjour</h1>
+    <p>Si vous avez accès à cette page c'est que vous vous trouvez en possession d'un de mes objets, probablement perdu</p>
+
+    <div class="contact-info">
+        <div class="contact-item">
+            <span class="label">Propriétaire</span>
+            <span class="value">Pierre-Louis Fruleux</span>
+        </div>
+        
+        <div class="contact-item">
+            <span class="label">Téléphone</span>
+            <a href="tel:+33782719886" class="value">+33 7 82 71 98 86</a>
+        </div>
+
+        <div class="contact-item">
+            <span class="label">Email</span>
+            <a href="mailto:pierrelouisfruleux@laposte.net" class="value">pierrelouisfruleux@laposte.net</a>
+        </div>
+    </div>
+    
+    <a href="tel:+33782719886" class="btn-call">M'appeler</a>
+</div>
+
+</body>
+</html>

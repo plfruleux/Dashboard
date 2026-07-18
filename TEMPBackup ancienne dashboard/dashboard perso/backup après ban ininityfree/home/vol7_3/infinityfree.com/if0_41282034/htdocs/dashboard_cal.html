@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Hebdo</title>
+    <style>
+        :root {
+            --bg: #ffffff; --text: #3c4043; --border: #dadce0;
+            --accent: #CC73E1; --today-bg: #f1f3f4;
+        }
+        body { font-family: 'Roboto', Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; height: 100vh; }
+
+        /* Header Navigation */
+        header { display: flex; align-items: center; padding: 10px 20px; border-bottom: 1px solid var(--border); gap: 20px; }
+        .nav-btn { cursor: pointer; padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px; background: white; }
+        .nav-btn:hover { background: #f1f3f4; }
+        #current-month { font-size: 1.2em; font-weight: 500; min-width: 150px; }
+
+        /* Grille Calendrier */
+        .calendar-grid { display: grid; grid-template-columns: 60px repeat(7, 1fr); flex-grow: 1; overflow-y: auto; }
+        .grid-header { display: contents; }
+        .day-label { text-align: center; padding: 10px; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); font-size: 0.8em; text-transform: uppercase; }
+        .time-col { border-bottom: 1px solid var(--border); position: relative; }
+        .time-slot { height: 60px; font-size: 0.7em; color: #70757a; text-align: center; border-bottom: 1px solid #f1f3f4; }
+
+        /* Zones de jours */
+        .day-column { border-left: 1px solid var(--border); position: relative; background-size: 100% 60px; background-image: linear-gradient(to bottom, #f1f3f4 1px, transparent 1px); }
+        .is-today { background-color: var(--today-bg); }
+
+        /* Événements */
+        .event {
+            position: absolute; left: 2px; right: 2px;
+            background: var(--accent); color: white;
+            padding: 4px; border-radius: 4px; font-size: 0.75em;
+            overflow: hidden; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .event.past { opacity: 0.6; filter: grayscale(0.5); }
+    </style>
+</head>
+<body>
+
+<header>
+    <button class="nav-btn" onclick="changeWeek(-1)">◀</button>
+    <button class="nav-btn" onclick="changeWeek(1)">▶</button>
+    <button class="nav-btn" onclick="goToToday()">Aujourd'hui</button>
+    <div id="current-month">Chargement...</div>
+</header>
+
+<div class="calendar-grid">
+    <div class="time-col"></div> <div id="grid-header-days" class="grid-header"></div> <div id="time-labels" class="time-col"></div> <div id="columns-container" style="display: contents;"></div> </div>
+
+<script>
+    let currentMonday = getMonday(new Date());
+    let allEvents = [];
+
+    function getMonday(d) {
+        d = new Date(d);
+        let day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
+        return new Date(d.setDate(diff));
+    }
+
+    async function loadData() {
+        try {
+            const res = await fetch('data.json?t=' + Date.now());
+            const json = await res.json();
+            allEvents = json.data;
+            render();
+        } catch (e) { console.error("Erreur data.json"); }
+    }
+
+    function render() {
+        const header = document.getElementById('grid-header-days');
+        const container = document.getElementById('columns-container');
+        const timeLabels = document.getElementById('time-labels');
+        
+        header.innerHTML = ''; container.innerHTML = ''; timeLabels.innerHTML = '';
+        const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        const now = new Date();
+
+        // Affichage mois/année
+        document.getElementById('current-month').innerText = currentMonday.toLocaleDateString('fr-FR', {month: 'long', year: 'numeric'});
+
+        // Générer labels heures
+        for(let i=0; i<24; i++) timeLabels.innerHTML += `<div class="time-slot">${i}:00</div>`;
+
+        for (let i = 0; i < 7; i++) {
+            let dayDate = new Date(currentMonday);
+            dayDate.setDate(dayDate.getDate() + i);
+            let isToday = dayDate.toDateString() === now.toDateString();
+
+            header.innerHTML += `<div class="day-label ${isToday?'is-today':''}"><b>${dayDate.getDate()}</b><br>${days[i]}</div>`;
+            
+            let col = document.createElement('div');
+            col.className = `day-column ${isToday?'is-today':''}`;
+            
+            // Filtrer les événements pour ce jour précis
+            const dayEvents = allEvents.filter(ev => {
+                let evDate = new Date(ev.timestamp * 1000);
+                return evDate.toDateString() === dayDate.toDateString();
+            });
+
+            dayEvents.forEach(ev => {
+                let d = new Date(ev.timestamp * 1000);
+                let startMins = d.getHours() * 60 + d.getMinutes();
+                let div = document.createElement('div');
+                div.className = 'event' + (ev.timestamp < Date.now()/1000 ? ' past' : '');
+                div.style.top = startMins + 'px';
+                div.style.height = '50px'; // Taille fixe ou à calculer selon durée
+                div.innerHTML = `<b>${ev.titre}</b>`;
+                div.onclick = () => alert(`${ev.titre}\n${ev.date_formattee}`);
+                col.appendChild(div);
+            });
+            container.appendChild(col);
+        }
+    }
+
+    function changeWeek(dir) { currentMonday.setDate(currentMonday.getDate() + (dir * 7)); render(); }
+    function goToToday() { currentMonday = getMonday(new Date()); render(); }
+
+    loadData();
+    setInterval(loadData, 900000); // Sync toutes les 15 min
+</script>
+</body>
+</html>

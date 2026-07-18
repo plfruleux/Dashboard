@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Vérification des Données Calendrier</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .stats { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: #eee; }
+        .timestamp { color: #888; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+
+    <h1>Outil de vérification de l'extraction</h1>
+    
+    <div id="stats-box" class="stats">Chargement des données...</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date et Heure</th>
+                <th>Titre de l'événement</th>
+                <th>Valeur brute (Timestamp)</th>
+            </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+
+    <script>
+        async function checkData() {
+            const res = await fetch('api_calendrier.php');
+            const json = await res.json();
+
+            // Affichage des métadonnées
+            document.getElementById('stats-box').innerHTML = `
+                <strong>Statut :</strong> Données extraites avec succès<br>
+                <strong>Intervalle :</strong> du ${json.metadata.bornes.debut} au ${json.metadata.bornes.fin}<br>
+                <strong>Nombre d'événements :</strong> ${json.metadata.compte_total}<br>
+                <strong>Dernière synchronisation :</strong> ${json.metadata.derniere_maj}
+            `;
+
+            // Affichage du tableau
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = json.data.map(ev => `
+                <tr>
+                    <td><b>${ev.date_formattee}</b></td>
+                    <td>${ev.titre}</td>
+                    <td class="timestamp">${ev.timestamp}</td>
+                </tr>
+            `).join('');
+        }
+
+        checkData();
+    </script>
+</body>
+</html>

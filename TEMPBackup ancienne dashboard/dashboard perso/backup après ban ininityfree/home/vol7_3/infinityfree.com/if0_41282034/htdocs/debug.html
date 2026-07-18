@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Debug — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07080b;--glass:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.09);
+  --accent:#d4a853;--adim:rgba(212,168,83,0.12);
+  --t1:rgba(240,236,228,0.95);--t2:rgba(240,236,228,0.6);--t3:rgba(240,236,228,0.3);
+  --green:#4caf7d;--red:#e05c5c;--yellow:#f0b429;--blue:#5b9fd4;
+  --fm:'DM Mono',monospace;--fb:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--t1);font-family:var(--fb);font-weight:300;min-height:100vh;}
+body{padding:28px 32px 60px;}
+
+/* ── Onglets ── */
+.tab-nav{
+  display:flex;gap:0;border-bottom:1px solid var(--border);
+  margin-bottom:28px;
+}
+.tab-btn{
+  font-family:var(--fm);font-size:8px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--t3);background:none;border:none;border-bottom:2px solid transparent;
+  padding:8px 18px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;
+  margin-bottom:-1px;
+}
+.tab-btn:hover{color:var(--t2);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+
+h2{font-family:var(--fm);font-size:8px;letter-spacing:.25em;text-transform:uppercase;color:var(--t3);margin:28px 0 12px;}
+h2:first-of-type{margin-top:0;}
+
+/* ── File nav ── */
+.file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.file-card{
+  background:var(--glass);border:1px solid var(--border);border-radius:8px;
+  padding:10px 12px;text-decoration:none;transition:all .2s;
+  display:flex;flex-direction:column;gap:3px;
+}
+.file-card:hover{border-color:var(--accent);background:var(--adim);}
+.fc-name{font-family:var(--fm);font-size:9px;color:var(--accent);}
+.fc-desc{font-family:var(--fm);font-size:7.5px;color:var(--t3);line-height:1.5;}
+
+/* ── Status table ── */
+.status-table{width:100%;border-collapse:collapse;}
+.status-table th{
+  font-family:var(--fm);font-size:7px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--t3);text-align:left;padding:6px 10px;border-bottom:1px solid var(--border);
+}
+.status-table td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,0.04);font-family:var(--fm);font-size:8px;color:var(--t2);vertical-align:middle;}
+.status-table tr:hover td{background:rgba(255,255,255,0.02);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-size:7px;font-family:var(--fm);}
+.badge.ok{background:rgba(76,175,125,0.15);color:var(--green);border:1px solid rgba(76,175,125,0.3);}
+.badge.err{background:rgba(224,92,92,0.15);color:var(--red);border:1px solid rgba(224,92,92,0.3);}
+.badge.wait{background:rgba(240,180,41,0.12);color:var(--yellow);border:1px solid rgba(240,180,41,0.25);}
+.badge.info{background:rgba(91,159,212,0.12);color:var(--blue);border:1px solid rgba(91,159,212,0.25);}
+.td-detail{font-size:7px;color:var(--t3);margin-top:2px;}
+
+/* ── Explainer ── */
+.explainer{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.exp-card{background:var(--glass);border:1px solid var(--border);border-radius:8px;padding:13px 15px;}
+.exp-file{font-family:var(--fm);font-size:8px;color:var(--accent);margin-bottom:5px;}
+.exp-role{font-size:8.5px;color:var(--t2);line-height:1.65;}
+.exp-role strong{color:var(--t1);font-weight:400;}
+
+/* ── Wallpapers preview ── */
+.wp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:6px;margin-top:8px;}
+.wp-thumb{border-radius:5px;overflow:hidden;aspect-ratio:16/9;position:relative;background:var(--glass);border:1px solid var(--border);}
+.wp-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.wp-thumb .wp-lbl{position:absolute;bottom:0;left:0;right:0;font-family:var(--fm);font-size:6px;color:rgba(255,255,255,.7);background:rgba(0,0,0,.5);padding:2px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wp-thumb.missing{display:flex;align-items:center;justify-content:center;font-size:18px;}
+
+/* ── Refresh btn ── */
+#btn-refresh{
+  font-family:var(--fm);font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+  background:none;border:1px solid var(--border);color:var(--t2);padding:6px 14px;
+  border-radius:6px;cursor:pointer;transition:all .2s;margin-bottom:12px;
+}
+#btn-refresh:hover{border-color:var(--accent);color:var(--accent);background:var(--adim);}
+#last-check{font-family:var(--fm);font-size:7px;color:var(--t3);margin-left:10px;}
+
+/* ══ EXPLORATEUR DE FICHIERS ══ */
+.fex-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.fex-btn{
+  font-family:var(--fm);font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+  background:none;border:1px solid var(--border);color:var(--t2);padding:5px 12px;
+  border-radius:6px;cursor:pointer;transition:all .2s;
+}
+.fex-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--adim);}
+.fex-btn.danger:hover{border-color:var(--red);color:var(--red);background:rgba(224,92,92,0.1);}
+.fex-btn.primary{border-color:var(--accent);color:var(--accent);}
+.fex-count{font-family:var(--fm);font-size:7px;color:var(--t3);}
+
+/* Zone de dépôt générique */
+.drop-zone-x{
+  border:1px dashed var(--border);border-radius:8px;
+  padding:14px;text-align:center;cursor:pointer;
+  transition:all .2s;margin-bottom:10px;
+  font-family:var(--fm);font-size:8px;color:var(--t3);letter-spacing:.05em;
+}
+.drop-zone-x:hover,.drop-zone-x.drag-over{border-color:var(--accent);color:var(--accent);background:var(--adim);}
+/* Grille fex générique */
+.fex-grid-x{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:4px;margin-bottom:24px;}
+
+/* Grille de fichiers */
+#fex-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:6px;}
+.fex-thumb{
+  border-radius:6px;overflow:hidden;aspect-ratio:16/9;
+  position:relative;background:var(--glass);border:1px solid var(--border);
+  cursor:default;transition:border-color .15s;
+}
+.fex-thumb:hover{border-color:rgba(255,255,255,0.22);}
+.fex-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.fex-lbl{
+  position:absolute;bottom:0;left:0;right:0;
+  font-family:var(--fm);font-size:6px;color:rgba(255,255,255,.8);
+  background:rgba(0,0,0,.65);padding:2px 5px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.fex-del{
+  background:none;border:none;color:rgba(224,92,92,.7);
+  font-size:9px;cursor:pointer;padding:0 1px;line-height:1;transition:color .15s;flex-shrink:0;
+}
+.fex-del:hover{color:var(--red);}
+.fex-indexed{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--green);}
+.fex-not-indexed{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:rgba(240,180,41,.8);}
+.fex-uploading{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:7px;color:var(--accent);}
+/* Badge rôle pomodoro */
+.fex-pom{
+  position:absolute;top:3px;left:3px;
+  font-family:var(--fm);font-size:5.5px;letter-spacing:.05em;
+  padding:1px 4px;border-radius:3px;line-height:1.4;
+}
+.fex-pom.work{background:rgba(76,175,125,.8);color:#fff;}
+.fex-pom.brk{background:rgba(91,159,212,.8);color:#fff;}
+
+/* Toast notification */
+#fex-toast{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  font-family:var(--fm);font-size:8px;letter-spacing:.06em;
+  padding:8px 16px;border-radius:7px;
+  background:var(--green);color:#07080b;
+  opacity:0;transition:opacity .25s;pointer-events:none;
+}
+#fex-toast.show{opacity:1;}
+#fex-toast.err{background:var(--red);color:#fff;}
+
+</style>
+</head>
+<body>
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+  <span style="font-family:var(--fm);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);">⚙ Debug</span>
+  <a style="font-family:var(--fm);font-size:9px;color:var(--t3);text-decoration:none;border:1px solid var(--border);padding:5px 12px;border-radius:6px;transition:all .2s;" href="/index.html">← Dashboard</a>
+</div>
+
+<!-- ══ ONGLETS ══ -->
+<nav class="tab-nav">
+  <button class="tab-btn active" data-tab="tab-dashboard">📊 Dashboard</button>
+  <button class="tab-btn" data-tab="tab-pomo-work">⏱ Pomo — Travail</button>
+  <button class="tab-btn" data-tab="tab-pomo-break">☕ Pomo — Pause</button>
+</nav>
+
+<!-- ════════════════════════════════
+     ONGLET 1 : DASHBOARD
+════════════════════════════════ -->
+<div class="tab-pane active" id="tab-dashboard">
+
+<!-- ══ NAVIGATION FICHIERS ══ -->
+<h2>Fichiers du site</h2>
+<div class="file-grid">
+  <a class="file-card" href="/index.html">
+    <span class="fc-name">index.html</span>
+    <span class="fc-desc">Dashboard principal</span>
+  </a>
+  <a class="file-card" href="/data.json" target="_blank">
+    <span class="fc-name">data.json</span>
+    <span class="fc-desc">Cache des événements iCloud</span>
+  </a>
+  <a class="file-card" href="/api_calendrier.php" target="_blank">
+    <span class="fc-name">api_calendrier.php</span>
+    <span class="fc-desc">Cliquer pour forcer un refresh du calendrier</span>
+  </a>
+  <a class="file-card" href="/wallpapers.json" target="_blank">
+    <span class="fc-name">wallpapers.json</span>
+    <span class="fc-desc">Index des fonds dashboard</span>
+  </a>
+</div>
+
+<!-- ══ STATUT COMPOSANTS ══ -->
+<h2>Statut des composants</h2>
+<button id="btn-refresh">↻ Relancer les tests</button>
+<span id="last-check"></span>
+<table class="status-table" id="status-table">
+  <thead><tr><th>Composant</th><th>Cible</th><th>Statut</th><th>Détail</th></tr></thead>
+  <tbody id="status-body">
+    <tr><td colspan="4" style="color:var(--t3);font-family:var(--fm);font-size:8px;padding:14px 10px;">En attente…</td></tr>
+  </tbody>
+</table>
+
+<!-- Explorateur dashboard injecté ici par makeExplorer() -->
+<div id="tab-dashboard-fex"></div>
+
+</div><!-- /tab-dashboard -->
+
+<!-- ════════════════════════════════
+     ONGLET 2 : POMO TRAVAIL
+════════════════════════════════ -->
+<div class="tab-pane" id="tab-pomo-work">
+<!-- injecté par makeExplorer() -->
+</div>
+
+<!-- ════════════════════════════════
+     ONGLET 3 : POMO PAUSE
+════════════════════════════════ -->
+<div class="tab-pane" id="tab-pomo-break">
+<!-- injecté par makeExplorer() -->
+</div>
+
+<!-- Toast global -->
+<div id="fex-toast"></div>
+
+<!-- ══ EXPLICATION ARCHITECTURE (dans tab dashboard) ══ -->
+<div id="tab-arch" style="display:none;">
+<h2>Architecture du site</h2>
+<div class="explainer">
+  <div class="exp-card">
+    <div class="exp-file">index.html</div>
+    <div class="exp-role">
+      <strong>Dashboard principal.</strong> Page HTML auto-suffisante servie statiquement. Charge toutes les données via <code>fetch()</code> côté client. Ne nécessite aucun traitement serveur à l'affichage.
+      Modules intégrés : horloge Hanoï/Paris, météo Open-Meteo, AQI, musique SC+YT, RSS Le Monde, calendrier 4J.
+    </div>
+  </div>
+  <div class="exp-card">
+    <div class="exp-file">api_calendrier.php</div>
+    <div class="exp-role">
+      <strong>Moteur PHP de synchronisation iCloud.</strong> Récupère le flux <code>webcal://</code> iCloud via HTTPS, effectue l'<em>unfolding</em> des lignes longues, filtre J-7 à J+21, gère les récurrences <code>FREQ=WEEKLY</code>, et écrit <code>data.json</code>. Appelé en tâche de fond par le dashboard toutes les heures.
+    </div>
+  </div>
+  <div class="exp-card">
+    <div class="exp-file">data.json</div>
+    <div class="exp-role">
+      <strong>Cache des événements.</strong> Fichier plat JSON régénéré à chaque appel à <code>api_calendrier.php</code>. Structure : <code>metadata</code> (date synchro, bornes, compteur) + tableau <code>data[]</code> trié par timestamp. Format date : <code>DD/MM/YYYY HH:MM</code>.
+    </div>
+  </div>
+  <div class="exp-card">
+    <div class="exp-file">api_wallpapers.php</div>
+    <div class="exp-role">
+      <strong>API de gestion des fonds d'écran.</strong> Endpoints : <code>list</code> (liste les fichiers dans /wallpapers/), <code>upload</code> (multipart POST, nommage auto wp51…), <code>delete?file=</code>, <code>reindex</code> (régénère wallpapers.json depuis le disque). Appelée depuis l'explorateur dans debug.html.
+    </div>
+  </div>
+  <div class="exp-card">
+    <div class="exp-file">wallpapers.json</div>
+    <div class="exp-role">
+      <strong>Index des fonds d'écran.</strong> Source de vérité pour le dashboard <em>et</em> le pomodoro. Chargé dynamiquement au démarrage par <code>initPhotos()</code> dans index.html et par pomodoro.html. Régénéré automatiquement par api_wallpapers.php lors des uploads/suppressions/réindexation.
+    </div>
+  </div>
+  <div class="exp-card">
+    <div class="exp-file">/wallpapers/wp01…wp30.jpg</div>
+    <div class="exp-role">
+      <strong>Photos locales.</strong> Hébergées sur le serveur. 5 absentes (wp08, wp18, wp20, wp27, wp28) car InfinityFree a refusé leurs téléchargements Unsplash. Pour les ajouter manuellement : nommer le fichier exactement <code>wp08.jpg</code> etc. et l'uploader dans <code>/htdocs/wallpapers/</code>, puis ajouter l'entrée dans <code>wallpapers.json</code>.
+    </div>
+  </div>
+  <div class="exp-card">
+    <div class="exp-file">APIs externes</div>
+    <div class="exp-role">
+      <strong>Open-Meteo</strong> (météo + AQI) — gratuit, sans clé.<br>
+      <strong>allorigins.win</strong> — proxy CORS pour le flux RSS Le Monde.<br>
+      <strong>SoundCloud Widget API</strong> — <code>w.soundcloud.com/player/api.js</code>.<br>
+      <strong>Google Fonts</strong> — DM Mono, DM Sans, Syne.<br>
+      Toutes ces APIs sont appelées côté client.
+    </div>
+  </div>
+</div><!-- /tab-arch -->
+
+<script>
+/* ══ Onglets ══ */
+document.querySelectorAll('.tab-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+    btn.classList.add('active');
+    var pane = document.getElementById(btn.dataset.tab);
+    if (pane) pane.classList.add('active');
+    /* Initialisation paresseuse des explorateurs pomodoro */
+    if (btn.dataset.tab === 'tab-pomo-work' && !pomoInit['tab-pomo-work']) {
+      pomoInit['tab-pomo-work'] = true;
+      makeExplorer({ dir:'pomo-work',  containerId:'tab-pomo-work',  label:'Fonds d\'écran — Pomodoro Travail', path:'/pomodoro/assets/bg/work/',  reindex:false });
+    }
+    if (btn.dataset.tab === 'tab-pomo-break' && !pomoInit['tab-pomo-break']) {
+      pomoInit['tab-pomo-break'] = true;
+      makeExplorer({ dir:'pomo-break', containerId:'tab-pomo-break', label:'Fonds d\'écran — Pomodoro Pause',   path:'/pomodoro/assets/bg/break/', reindex:false });
+    }
+  });
+});
+
+/* ══ Tests de statut ══ */
+var checks = [
+  {
+    name: 'data.json',
+    target: '/data.json',
+    type: 'json',
+    validate: function(d) {
+      if (!d.metadata || !d.data) return 'Structure inattendue';
+      return '✓ ' + d.data.length + ' événements · Synchro : ' + (d.metadata.derniere_maj||'?');
+    }
+  },
+  {
+    name: 'api_calendrier.php',
+    target: '/api_calendrier.php',
+    type: 'text',
+    validate: function(t) {
+      return t.length > 10 ? '✓ Réponse reçue (' + t.length + ' octets)' : '⚠ Réponse vide';
+    }
+  },
+  {
+    name: 'wallpapers.json',
+    target: '/wallpapers.json',
+    type: 'json',
+    validate: function(d) {
+      return '✓ ' + (d.photos||[]).length + ' photos déclarées';
+    }
+  },
+  {
+    name: 'api_wallpapers.php',
+    target: '/api_wallpapers.php?action=list',
+    type: 'json',
+    validate: function(d) {
+      return d.success ? '✓ ' + d.count + ' fichiers dans /wallpapers/' : '⚠ ' + (d.error||'erreur');
+    }
+  },
+  {
+    name: 'Météo Open-Meteo',
+    target: 'https://api.open-meteo.com/v1/forecast?latitude=21.02&longitude=105.85&current=temperature_2m&forecast_days=1',
+    type: 'json',
+    validate: function(d) {
+      return d.current ? '✓ ' + Math.round(d.current.temperature_2m) + '°C actuellement' : '⚠ Structure inattendue';
+    }
+  },
+  {
+    name: 'AQI Open-Meteo',
+    target: 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=21.02&longitude=105.85&current=us_aqi',
+    type: 'json',
+    validate: function(d) {
+      return d.current ? '✓ AQI = ' + d.current.us_aqi : '⚠ Structure inattendue';
+    }
+  },
+  {
+    name: 'RSS Le Monde (proxy)',
+    target: 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.lemonde.fr/rss/une.xml'),
+    type: 'text',
+    validate: function(t) {
+      var count = (t.match(/<item>/g)||[]).length;
+      return count > 0 ? '✓ ' + count + ' articles disponibles' : '⚠ Aucun article trouvé';
+    }
+  }
+];
+
+function runChecks() {
+  var tbody = document.getElementById('status-body');
+  tbody.innerHTML = '';
+  document.getElementById('last-check').textContent =
+    'Dernier test : ' + new Date().toLocaleTimeString('fr-FR');
+
+  checks.forEach(function(chk) {
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>' + chk.name + '</td>' +
+      '<td style="font-size:7px;color:var(--t3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + chk.target + '</td>' +
+      '<td><span class="badge wait">⏳ Test…</span></td>' +
+      '<td></td>';
+    tbody.appendChild(tr);
+
+    (function(row, c) {
+      var badgeCell = row.cells[2];
+      var detailCell = row.cells[3];
+      var t0 = Date.now();
+      fetch(c.target + (c.target.indexOf('?') > -1 ? '&' : '?') + '_t=' + Date.now())
+        .then(function(r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return c.type === 'json' ? r.json() : r.text();
+        })
+        .then(function(data) {
+          var ms = Date.now() - t0;
+          var msg = c.validate(data);
+          badgeCell.innerHTML = '<span class="badge ok">✓ OK</span>';
+          detailCell.innerHTML = '<span style="color:var(--t2);font-size:8px;">' + msg + '</span><div class="td-detail">' + ms + ' ms</div>';
+        })
+        .catch(function(err) {
+          badgeCell.innerHTML = '<span class="badge err">✗ Erreur</span>';
+          detailCell.innerHTML = '<span style="color:var(--red);font-size:7.5px;">' + err.message + '</span>';
+        });
+    })(tr, chk);
+  });
+}
+
+document.getElementById('btn-refresh').addEventListener('click', runChecks);
+runChecks();
+
+/* ══════════════════════════════════════════════════════════
+   EXPLORATEUR GÉNÉRIQUE — appelé pour chaque bibliothèque
+   cfg = { dir, containerId, label, path, reindex }
+══════════════════════════════════════════════════════════ */
+var fexToast = document.getElementById('fex-toast');
+var toastTmr = null;
+function showToast(msg, isErr){
+  clearTimeout(toastTmr);
+  fexToast.textContent = msg;
+  fexToast.className = 'show' + (isErr?' err':'');
+  toastTmr = setTimeout(function(){ fexToast.className=''; }, 3200);
+}
+
+function makeExplorer(cfg) {
+  var API      = '/api_wallpapers.php';
+  var container = document.getElementById(cfg.containerId);
+  if (!container) return;
+
+  /* ── Injection du HTML de l'explorateur dans le conteneur ── */
+  var uid = cfg.dir; /* sert de suffixe pour les IDs */
+  container.innerHTML =
+    '<h2 style="margin-bottom:6px;">' + cfg.label +
+      ' <span id="cnt-'+uid+'" style="color:var(--t3);font-size:7px;"></span></h2>' +
+    '<p style="font-family:var(--fm);font-size:7.5px;color:var(--t3);margin:0 0 12px;">' +
+      '<code>' + cfg.path + '</code></p>' +
+    '<div id="dz-'+uid+'" class="drop-zone-x">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:block;margin:0 auto 5px;opacity:.4;">' +
+        '<polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>' +
+        '<path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>' +
+      'Glissez-déposez ou <strong style="color:var(--accent)">cliquez</strong>' +
+      '<br><span style="font-size:6px;color:var(--t3);margin-top:2px;display:block;">JPG · PNG · WEBP</span>' +
+      '<input type="file" id="fi-'+uid+'" accept="image/jpeg,image/png,image/webp" multiple style="display:none;">' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">' +
+      (cfg.reindex ? '<button class="fex-btn primary" id="ri-'+uid+'">⟳ Réindexer JSON</button>' : '') +
+      '<button class="fex-btn" id="rf-'+uid+'">↻ Actualiser</button>' +
+    '</div>' +
+    '<div id="gr-'+uid+'" class="fex-grid-x"></div>';
+
+  var dropZone  = document.getElementById('dz-' + uid);
+  var fileInput = document.getElementById('fi-' + uid);
+  var gridEl    = document.getElementById('gr-' + uid);
+  var cntLbl    = document.getElementById('cnt-' + uid);
+
+  /* ── Chargement de la grille ── */
+  function loadGrid() {
+    gridEl.innerHTML = '<span style="color:var(--t3);font-family:var(--fm);font-size:8px;">Chargement…</span>';
+    fetch(API + '?action=list&dir=' + cfg.dir + '&_=' + Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (!data.success){ gridEl.innerHTML='<span style="color:var(--red);font-size:8px;">'+data.error+'</span>'; return; }
+        var files   = data.files   || [];
+        var indexed = data.indexed || [];
+        cntLbl.textContent = '— ' + files.length + ' fichier' + (files.length!==1?'s':'');
+        gridEl.innerHTML = '';
+        if (!files.length) {
+          gridEl.innerHTML = '<div style="color:var(--t3);font-family:var(--fm);font-size:8px;padding:8px;">Dossier vide</div>';
+          return;
+        }
+        files.forEach(function(f){
+          var isIdx = cfg.dir === 'dashboard' && indexed.indexOf(f.name) >= 0;
+          var dot   = cfg.dir === 'dashboard'
+            ? '<span class="'+(isIdx?'fex-indexed':'fex-not-indexed')+'" title="'+(isIdx?'Indexé':'Non indexé')+'"></span>'
+            : '';
+          var div = document.createElement('div');
+          div.className = 'fex-thumb';
+          div.innerHTML =
+            '<img src="'+f.url+'" loading="lazy" alt="'+f.name+'" onerror="this.style.opacity=\'.15\'">' +
+            dot +
+            '<div class="fex-lbl">' +
+              '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+f.name+'</span>' +
+              '<button class="fex-del" data-name="'+f.name+'" title="Supprimer">✕</button>' +
+            '</div>';
+          gridEl.appendChild(div);
+        });
+        gridEl.querySelectorAll('.fex-del').forEach(function(btn){
+          btn.addEventListener('click', function(){
+            var name = this.dataset.name;
+            if (!confirm('Supprimer "'+name+'" ?')) return;
+            var thumb = this.closest('.fex-thumb');
+            if (thumb){ var u=document.createElement('div');u.className='fex-uploading';u.textContent='…';thumb.appendChild(u); }
+            fetch(API+'?action=delete&dir='+cfg.dir+'&file='+encodeURIComponent(name)+'&_='+Date.now())
+              .then(function(r){ return r.json(); })
+              .then(function(d){ if(d.success){showToast('✓ Supprimé : '+name);loadGrid();}else showToast('Erreur : '+(d.error||'?'),true); })
+              .catch(function(){ showToast('Erreur réseau',true); });
+          });
+        });
+      })
+      .catch(function(){ gridEl.innerHTML='<span style="color:var(--red);font-size:8px;">api_wallpapers.php inaccessible</span>'; });
+  }
+
+  /* ── Réindexer ── */
+  if (cfg.reindex) {
+    document.getElementById('ri-'+uid).addEventListener('click', function(){
+      var btn=this; btn.disabled=true; btn.textContent='…';
+      fetch(API+'?action=reindex&dir='+cfg.dir+'&_='+Date.now())
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          btn.disabled=false; btn.textContent='⟳ Réindexer JSON';
+          if(d.success) showToast('✓ wallpapers.json — '+d.count+' photos');
+          else showToast('Erreur : '+(d.error||'?'),true);
+          loadGrid();
+        })
+        .catch(function(){ btn.disabled=false; btn.textContent='⟳ Réindexer JSON'; showToast('Erreur réseau',true); });
+    });
+  }
+  document.getElementById('rf-'+uid).addEventListener('click', loadGrid);
+
+  /* ── Upload ── */
+  function uploadFiles(files){
+    var pending=files.length, ok=0;
+    for(var i=0;i<files.length;i++){
+      (function(file){
+        var fd=new FormData(); fd.append('file',file);
+        fetch(API+'?action=upload&dir='+cfg.dir, {method:'POST',body:fd})
+          .then(function(r){ return r.json(); })
+          .then(function(d){ if(d.success)ok++; else showToast('Erreur upload: '+(d.error||'?'),true); })
+          .catch(function(){ showToast('Erreur réseau',true); })
+          .finally(function(){
+            pending--;
+            if(pending===0){
+              if(ok>0) showToast('✓ '+ok+' image'+(ok>1?'s':'')+' uploadée'+(ok>1?'s':''));
+              loadGrid();
+            }
+          });
+      })(files[i]);
+    }
+  }
+
+  dropZone.addEventListener('click', function(e){ if(e.target!==fileInput) fileInput.click(); });
+  fileInput.addEventListener('change', function(){ if(this.files.length) uploadFiles(this.files); this.value=''; });
+  dropZone.addEventListener('dragover',  function(e){ e.preventDefault(); this.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', function(){ this.classList.remove('drag-over'); });
+  dropZone.addEventListener('drop', function(e){ e.preventDefault(); this.classList.remove('drag-over'); if(e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files); });
+
+  loadGrid();
+}
+
+/* ══ Instanciation des 3 explorateurs ══ */
+var pomoInit = { 'tab-pomo-work': false, 'tab-pomo-break': false };
+/* Dashboard — chargé immédiatement */
+makeExplorer({
+  dir:         'dashboard',
+  containerId: 'tab-dashboard-fex',
+  label:       'Fonds d\'écran Dashboard',
+  path:        '/wallpapers/',
+  reindex:     true
+});
+</script>
+</body>
+</html>

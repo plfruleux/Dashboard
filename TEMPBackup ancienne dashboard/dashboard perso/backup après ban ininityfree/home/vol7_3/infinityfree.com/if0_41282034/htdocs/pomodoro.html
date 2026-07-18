@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Focus Sanctuary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --work-color: #2c1e14; /* Brun profond */
+            --break-color: #1a2a2a; /* Vert forêt sombre */
+            --accent: #d4a373; /* Or terni */
+            --glass: rgba(0, 0, 0, 0.75);
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', sans-serif; height: 100vh;
+            display: flex; transition: background 1.5s ease;
+            background: var(--work-color); color: #fdfaf7; overflow: hidden;
+        }
+
+        #bg-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; background-size: cover; background-position: center;
+            transition: opacity 1s ease, filter 1s ease; opacity: 0.6;
+        }
+
+        .main-content {
+            flex-grow: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 1;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        #status-label { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.5rem; letter-spacing: 3px; }
+        #timer-display { font-size: 12rem; font-weight: 500; margin: -10px 0; font-variant-numeric: tabular-nums; }
+
+        /* --- Boutons Stylisés --- */
+        .btn {
+            background: var(--accent); color: white; border: none;
+            padding: 18px 60px; border-radius: 5px; font-weight: bold;
+            cursor: pointer; transition: all 0.3s; font-family: 'Inter'; letter-spacing: 2px;
+        }
+        .btn:hover { background: #e9c46a; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+
+        /* --- Sidebar & Blur --- */
+        .sidebar {
+            position: fixed; top: 0; right: 0; width: 350px; height: 100%;
+            background: var(--glass); backdrop-filter: blur(25px);
+            padding: 40px; border-left: 1px solid rgba(255,255,255,0.1);
+            z-index: 10; transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar.open { transform: translateX(0); }
+        .sidebar h3 { font-family: 'Playfair Display', serif; color: var(--accent); margin-top: 30px; }
+
+        /* --- Contrôles --- */
+        select, .option-row { width: 100%; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 4px; margin-bottom: 15px; }
+        .toggle-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+
+        .open-sidebar-btn { position: fixed; top: 30px; right: 30px; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; z-index: 11; opacity: 0.7; }
+        
+        iframe { border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body id="main-body">
+
+<div id="bg-overlay"></div>
+
+<div class="main-content">
+    <div id="status-label">Deep Work</div>
+    <div id="timer-display">25:00</div>
+    <button class="btn" id="start-btn" onclick="toggleTimer()">CONCENTRATION</button>
+    <button class="btn" id="skip-btn" style="display:none; margin-top:20px; background:transparent; border:1px solid white;" onclick="skipBreak()">REPRENDRE LE TRAVAIL</button>
+</div>
+
+<button class="open-sidebar-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">MENU ☰</button>
+
+<div class="sidebar" id="sidebar">
+    <h3>Atmosphère</h3>
+    <div class="toggle-container">
+        <span>Afficher les images</span>
+        <input type="checkbox" id="img-toggle" checked onchange="updateView()">
+    </div>
+    
+    <label>Bruit de fond</label>
+    <div class="option-row">
+        <div>🌧️ Pluie <input type="range" min="0" max="1" step="0.1" value="0" oninput="adjustVolume('rain', this.value)"></div>
+        <div style="margin-top:10px;">🔥 Cheminée <input type="range" min="0" max="1" step="0.1" value="0" oninput="adjustVolume('fire', this.value)"></div>
+    </div>
+
+    <h3>Musique</h3>
+    <select id="music-select" onchange="loadYoutube()">
+        <option value="https://www.youtube.com/embed/videoseries?list=PLb9p_XF3hF6jF-J5YI6YI6Z">Dark Academia Radio</option>
+        <option value="https://www.youtube.com/embed/videoseries?list=PL4fGSI1pDJn6jxwQ_Y6I4N">Ancienne Bibliothèque (Classique)</option>
+        <option value="https://www.youtube.com/embed/5qap5aO4i9A">Lofi Hip Hop / Relax</option>
+    </select>
+    <div id="player-container"></div>
+
+    <h3>Sessions</h3>
+    <select id="work-duration" onchange="resetTimer()"><option value="25">25 min</option><option value="50">50 min</option></select>
+    <select id="break-duration"><option value="5">5 min</option><option value="15">15 min</option><option value="30">30 min</option></select>
+</div>
+
+<audio id="audio-rain" loop src="https://www.soundjay.com/nature/rain-01.mp3"></audio>
+<audio id="audio-fire" loop src="https://www.soundjay.com/nature/fire-crackling-01.mp3"></audio>
+
+<script>
+    let timeLeft, timerId, isWork = true, isPaused = true;
+    
+    // Images chargées depuis wallpapers.json
+    let workImages = [];
+    let breakImages = [];
+
+    // Charger les wallpapers depuis wallpapers.json
+    fetch('/wallpapers.json?_=' + Date.now())
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var photos = (data.photos || []).map(function(p){ return p.url; });
+        // Distribution : moitié travail / moitié pause (alternance)
+        for(var i=0; i<photos.length; i++){
+          if(i%2===0) workImages.push(photos[i]);
+          else breakImages.push(photos[i]);
+        }
+        if(!workImages.length) workImages = photos;
+        if(!breakImages.length) breakImages = photos;
+        updateView();
+      })
+      .catch(function(){
+        // Fallback dégradé si wallpapers.json indisponible
+        updateView();
+      });
+
+    function updateView() {
+        const showImg = document.getElementById('img-toggle').checked;
+        const bg = document.getElementById('bg-overlay');
+        if (showImg) {
+            bg.style.opacity = "0.6";
+            const pool = isWork ? workImages : breakImages;
+            bg.style.backgroundImage = `url(${pool[Math.floor(Math.random() * pool.length)]})`;
+        } else {
+            bg.style.opacity = "0";
+            document.body.style.background = isWork ? "var(--work-color)" : "var(--break-color)";
+        }
+    }
+
+    function loadYoutube() {
+        const url = document.getElementById('music-select').value;
+        const origin = window.location.origin;
+        document.getElementById('player-container').innerHTML = `<iframe width="100%" height="150" src="${url}&enablejsapi=1&origin=${origin}" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
+    }
+
+    function adjustVolume(type, vol) {
+        const audio = document.getElementById('audio-' + type);
+        audio.volume = vol;
+        if (vol > 0 && audio.paused) audio.play();
+        if (vol == 0) audio.pause();
+    }
+
+    function toggleTimer() {
+        if (isPaused) {
+            isPaused = false;
+            document.getElementById('start-btn').textContent = "PAUSE";
+            timerId = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    completeSession();
+                }
+            }, 1000);
+        } else {
+            clearInterval(timerId);
+            isPaused = true;
+            document.getElementById('start-btn').textContent = "REPRENDRE";
+        }
+    }
+
+    function completeSession() {
+        if (isWork) {
+            saveSession();
+            isWork = false;
+            timeLeft = document.getElementById('break-duration').value * 60;
+            document.getElementById('status-label').textContent = "Repos mérité";
+            document.getElementById('skip-btn').style.display = "block";
+        } else {
+            isWork = true;
+            timeLeft = document.getElementById('work-duration').value * 60;
+            document.getElementById('status-label').textContent = "Deep Work";
+            document.getElementById('skip-btn').style.display = "none";
+        }
+        isPaused = true;
+        document.getElementById('start-btn').textContent = "COMMENCER";
+        updateView();
+        updateTimerDisplay();
+    }
+
+    function skipBreak() {
+        clearInterval(timerId);
+        isWork = true;
+        timeLeft = document.getElementById('work-duration').value * 60;
+        completeSession();
+    }
+
+    function resetTimer() {
+        clearInterval(timerId);
+        isWork = true;
+        timeLeft = document.getElementById('work-duration').value * 60;
+        isPaused = true;
+        updateTimerDisplay();
+        updateView();
+    }
+
+    function updateTimerDisplay() {
+        const m = Math.floor(timeLeft / 60);
+        const s = timeLeft % 60;
+        document.getElementById('timer-display').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function saveSession() {
+        const dur = document.getElementById('work-duration').value;
+        fetch('save_stats.php', { method: 'POST', body: JSON.stringify({ duration: parseInt(dur), date: new Date().toISOString() })});
+    }
+
+    // Init
+    resetTimer();
+    loadYoutube();
+</script>
+</body>
+</html>

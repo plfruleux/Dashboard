@@ -1,0 +1,12 @@
+{
+    "mode": "work",
+    "dur": 3000,
+    "start": null,
+    "rem": 3000,
+    "running": false,
+    "sessions": 0,
+    "pos": 0,
+    "wsize": "long",
+    "bsize": "short",
+    "done_at": null
+}
