@@ -472,6 +472,39 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   margin-top:4px;
 }
 #pomo-full-btn:hover{background:rgba(212,168,83,.22);-webkit-transform:scale(1.06);transform:scale(1.06);}
+
+/* Widget « lecture en cours », style iOS : pilule de verre compacte, centrée */
+#pomo-music-widget{
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:8px;max-width:min(70vw,260px);
+  margin-top:6px;padding:7px 8px 7px 14px;border-radius:22px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  -webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);
+  box-shadow:0 6px 18px rgba(0,0,0,.28);
+}
+#pomo-music-note{
+  font-size:12px;color:rgba(240,236,228,.55);flex-shrink:0;
+  transition:color .2s;
+}
+#pomo-music-widget.is-playing #pomo-music-note{color:var(--accent);}
+#pomo-music-title{
+  font-family:var(--fb);font-size:10.5px;color:var(--t1);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  min-width:0;-webkit-box-flex:1;-ms-flex:1;flex:1;
+}
+#pomo-music-playbtn{
+  flex-shrink:0;width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);
+  color:var(--t1);cursor:pointer;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:background .15s,-webkit-transform .1s;transition:background .15s,transform .1s;
+}
+#pomo-music-playbtn:hover{background:rgba(255,255,255,.2);-webkit-transform:scale(1.08);transform:scale(1.08);}
+#pomo-music-playbtn svg{display:block;}
+
 #pomo-full-clock{
   position:absolute;bottom:22px;left:0;right:0;text-align:center;
   font-family:var(--fm);font-size:10px;letter-spacing:.12em;color:var(--t3);
@@ -479,128 +512,178 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 
 /* ══════════════════════════════════════════════
    MUSIQUE — carrousel 3 pages (en ligne / locale / podcast).
-   Fond = miniature/vidéo du morceau joué (au lieu du fond d'écran),
-   floutée et assombrie ; repli sur une icône musicale générique.
+   Fond = miniature du morceau joué (au lieu du fond d'écran), floutée
+   comme les autres cartes ; repli sur une illustration générique.
 ══════════════════════════════════════════════ */
 #card-music{background:transparent;flex-shrink:0;overflow:hidden;position:relative;}
 #card-music .ci{padding:0;position:relative;z-index:2;}
 
 #music-bg{position:absolute;inset:0;z-index:0;overflow:hidden;background:#0d0f14;}
 #music-bg-fallback{
-  position:absolute;inset:0;z-index:0;
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  font-size:52px;color:rgba(212,168,83,.16);
-  background:radial-gradient(ellipse at 40% 30%, rgba(212,168,83,0.10) 0%, transparent 60%), linear-gradient(160deg, #14171f 0%, #05060a 100%);
+  position:absolute;inset:-16px;z-index:0;
+  background-image:url('assets/img/music-fallback.png');
+  background-size:cover;background-position:center;
+  -webkit-filter:blur(8px) saturate(1.1) brightness(.68);
+  filter:blur(8px) saturate(1.1) brightness(.68);
 }
 #music-bg-img{
-  position:absolute;top:-16px;right:-16px;bottom:-16px;left:-16px;z-index:1;
+  position:absolute;inset:-16px;z-index:1;
   width:auto;height:auto;max-width:none;
   object-fit:cover;opacity:0;transition:opacity .5s ease;
-  -webkit-filter:blur(16px) saturate(1.1) brightness(.6);
-  filter:blur(16px) saturate(1.1) brightness(.6);
+  -webkit-filter:blur(8px) saturate(1.15) brightness(.68);
+  filter:blur(8px) saturate(1.15) brightness(.68);
 }
 #music-bg-img.loaded{opacity:1;}
 #music-bg-scrim{
   position:absolute;inset:0;z-index:2;
-  background:linear-gradient(180deg,rgba(7,8,11,0.30) 0%,rgba(7,8,11,0.55) 100%);
+  background:linear-gradient(180deg,rgba(7,8,11,0.22) 0%,rgba(7,8,11,0.48) 100%);
 }
 
-/* Flèches latérales de navigation entre pages */
+/* Flèches de navigation — blocs flottants en verre */
 .music-arrow{
   position:absolute;top:50%;-webkit-transform:translateY(-50%);transform:translateY(-50%);
-  z-index:3;background:rgba(8,10,17,0.35);border:1px solid rgba(255,255,255,.10);
-  color:rgba(240,236,228,.7);width:20px;height:28px;
+  z-index:4;background:rgba(15,17,23,0.55);border:1px solid rgba(255,255,255,.12);
+  color:rgba(240,236,228,.75);width:22px;height:34px;border-radius:9px;
   cursor:pointer;font-size:13px;line-height:1;
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
-  transition:color .15s,background .15s;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  box-shadow:0 4px 14px rgba(0,0,0,.35);
+  transition:color .15s,background .15s,-webkit-transform .15s;transition:color .15s,background .15s,transform .15s;
 }
-.music-arrow:hover{color:var(--accent);background:rgba(8,10,17,0.55);}
-.music-arrow-left{left:0;border-radius:0 6px 6px 0;border-left:none;}
-.music-arrow-right{right:0;border-radius:6px 0 0 6px;border-right:none;}
+.music-arrow:hover{color:var(--accent);background:rgba(15,17,23,0.75);-webkit-transform:translateY(-50%) scale(1.06);transform:translateY(-50%) scale(1.06);}
+.music-arrow-left{left:7px;}
+.music-arrow-right{right:7px;}
 
-/* Pages */
-#music-pages{position:relative;min-height:118px;}
+/* Viewport de glissement : chaque page occupe 100% de la largeur visible,
+   le conteneur interne fait 300% et glisse via transform (transition douce). */
+.music-pages-viewport{overflow:hidden;position:relative;}
+#music-pages{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  width:300%;
+  transition:-webkit-transform .42s cubic-bezier(.4,0,.2,1);
+  transition:transform .42s cubic-bezier(.4,0,.2,1);
+}
 .music-page{
-  display:none;padding:10px 26px 12px;
+  -webkit-box-flex:0;-ms-flex:0 0 33.3333%;flex:0 0 33.3333%;width:33.3333%;
+  padding:12px 34px 14px;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
-  flex-direction:column;gap:7px;
+  -ms-flex-direction:column;flex-direction:column;gap:9px;
+  box-sizing:border-box;
 }
-.music-page.visible{display:-webkit-box;display:-ms-flexbox;display:flex;}
 
+/* Sélection de source — pastilles en verre, pas du texte nu */
 .music-track-tabs{
-  display:-webkit-box;display:-ms-flexbox;display:flex;gap:10px;
-  padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,.09);
+  display:-webkit-box;display:-ms-flexbox;display:flex;gap:6px;
 }
 .music-tab{
-  background:none;border:none;color:rgba(240,236,228,.45);
-  font-family:var(--fm);font-size:6.5px;letter-spacing:.06em;
-  padding:2px 0;cursor:pointer;border-bottom:1px solid transparent;
-  transition:color .15s,border-color .15s;
+  background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);
+  color:rgba(240,236,228,.55);border-radius:20px;
+  font-family:var(--fm);font-size:6.5px;letter-spacing:.05em;
+  padding:4px 9px;cursor:pointer;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  transition:color .15s,background .15s,border-color .15s;
 }
-.music-tab.active{color:var(--t1);border-color:var(--accent);}
-.music-tab:hover:not(.active){color:rgba(240,236,228,.7);}
+.music-tab.active{color:var(--t1);background:rgba(212,168,83,.16);border-color:rgba(212,168,83,.38);}
+.music-tab:hover:not(.active){color:rgba(240,236,228,.8);background:rgba(255,255,255,.09);}
 .music-tab-static{
   font-family:var(--fm);font-size:6.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:rgba(240,236,228,.45);
+  color:rgba(240,236,228,.5);
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+  border-radius:20px;padding:4px 9px;
 }
 
 .music-title{
-  font-family:var(--fb);font-size:12px;color:var(--t1);
+  font-family:var(--fb);font-size:12px;font-weight:500;color:var(--t1);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 6px rgba(0,0,0,.4);
 }
 
-.music-controls-row{
+/* Panneau flottant regroupant barres + boutons — verre net, ombre marquée */
+.music-panel{
+  background:rgba(20,22,28,.42);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:13px;
+  padding:11px 13px 10px;
+  -webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);
+  box-shadow:0 8px 22px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.05);
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;gap:11px;
+  margin-top:auto;
+}
+
+.music-bars-row{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:9px;
+  gap:10px;
+}
+.music-prog-wrap{
+  -webkit-box-flex:2;-ms-flex:2;flex:2;height:4px;border-radius:3px;
+  background:rgba(255,255,255,.14);cursor:pointer;overflow:hidden;position:relative;
+}
+.music-prog-bar{height:100%;width:0%;background:var(--accent);border-radius:3px;transition:width .3s linear;}
+.music-vol-wrap{-webkit-box-flex:1;-ms-flex:1;flex:1;min-width:0;}
+.music-vol{
+  width:100%;-webkit-appearance:none;appearance:none;
+  height:4px;border-radius:3px;outline:none;cursor:pointer;
+  background:linear-gradient(90deg, var(--accent) 0%, var(--accent) var(--vol-pct,80%), rgba(255,255,255,.14) var(--vol-pct,80%), rgba(255,255,255,.14) 100%);
+}
+.music-vol::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:10px;height:10px;border-radius:50%;background:var(--t1);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.4);transition:-webkit-transform .12s;transition:transform .12s;}
+.music-vol::-webkit-slider-thumb:hover{-webkit-transform:scale(1.2);transform:scale(1.2);}
+.music-vol::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--t1);border:none;cursor:pointer;}
+.music-vol::-moz-range-progress{background:var(--accent);height:4px;border-radius:3px;}
+
+/* Pastille "en direct" — remplace la barre de progression si le flux est live */
+.music-live-badge{
+  display:none;-webkit-box-flex:2;-ms-flex:2;flex:2;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  gap:5px;height:16px;border-radius:8px;
+  background:rgba(224,92,92,.14);border:1px solid rgba(224,92,92,.35);
+  font-family:var(--fm);font-size:6.5px;letter-spacing:.14em;color:#e07a7a;
+}
+.music-live-badge.show{display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;}
+.music-live-dot{
+  width:5px;height:5px;border-radius:50%;background:var(--red);
+  box-shadow:0 0 5px var(--red);
+  -webkit-animation:music-live-pulse 1.6s ease-in-out infinite;animation:music-live-pulse 1.6s ease-in-out infinite;
+}
+@-webkit-keyframes music-live-pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+@keyframes music-live-pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+.music-buttons-row{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  gap:12px;
 }
 .music-play-btn{
-  width:28px;height:28px;border-radius:50%;flex-shrink:0;
-  background:rgba(212,168,83,.14);border:1px solid rgba(212,168,83,.32);
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  background:rgba(212,168,83,.18);border:1px solid rgba(212,168,83,.4);
   color:var(--accent);cursor:pointer;
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.3);
   transition:background .18s,border-color .18s,-webkit-transform .1s;transition:background .18s,border-color .18s,transform .1s;
 }
-.music-play-btn:hover{background:rgba(212,168,83,.24);-webkit-transform:scale(1.08);transform:scale(1.08);}
+.music-play-btn:hover{background:rgba(212,168,83,.28);-webkit-transform:scale(1.08);transform:scale(1.08);}
 .music-play-btn svg{display:block;}
 
-.music-bars{
-  -webkit-box-flex:1;-ms-flex:1;flex:1;min-width:0;
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:8px;
-}
-.music-prog-wrap{
-  -webkit-box-flex:2;-ms-flex:2;flex:2;height:3px;border-radius:2px;
-  background:rgba(255,255,255,.14);cursor:pointer;overflow:hidden;position:relative;
-}
-.music-prog-bar{height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .3s linear;}
-.music-vol-wrap{-webkit-box-flex:1;-ms-flex:1;flex:1;min-width:0;}
-.music-vol{
-  width:100%;-webkit-appearance:none;appearance:none;
-  height:3px;border-radius:2px;background:rgba(255,255,255,.14);outline:none;cursor:pointer;
-}
-.music-vol::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:8px;height:8px;border-radius:50%;background:rgba(240,236,228,.85);cursor:pointer;transition:background .15s,-webkit-transform .1s;transition:background .15s,transform .1s;}
-.music-vol::-webkit-slider-thumb:hover{background:var(--accent);-webkit-transform:scale(1.25);transform:scale(1.25);}
-.music-vol::-moz-range-thumb{width:8px;height:8px;border-radius:50%;background:rgba(240,236,228,.85);border:none;cursor:pointer;}
-
 .music-loop-btn{
-  flex-shrink:0;background:none;border:1px solid rgba(255,255,255,.14);color:rgba(240,236,228,.5);
-  width:22px;height:22px;border-radius:50%;font-size:11px;cursor:pointer;
+  flex-shrink:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:rgba(240,236,228,.6);
+  width:24px;height:24px;border-radius:50%;font-size:11px;cursor:pointer;
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  transition:color .15s,border-color .15s;
+  box-shadow:0 3px 8px rgba(0,0,0,.25);
+  transition:color .15s,border-color .15s,background .15s;
 }
-.music-loop-btn.active{color:var(--accent);border-color:rgba(212,168,83,.4);}
-.music-loop-btn:hover:not(.active){color:rgba(240,236,228,.8);}
+.music-loop-btn.active{color:var(--accent);border-color:rgba(212,168,83,.45);background:rgba(212,168,83,.14);}
+.music-loop-btn:hover:not(.active){color:rgba(240,236,228,.9);}
 
 #music-online-mount{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;top:0;left:0;}
 
@@ -1158,7 +1241,7 @@ body{ animation:appFadeIn .6s ease both; }
     <!-- MUSIQUE — carrousel 3 pages : en ligne / locale / podcast -->
     <div class="card" id="card-music" style="animation-delay:.08s">
       <div id="music-bg">
-        <div id="music-bg-fallback">♫</div>
+        <div id="music-bg-fallback"></div>
         <img id="music-bg-img" alt="">
         <div id="music-bg-scrim"></div>
       </div>
@@ -1167,65 +1250,74 @@ body{ animation:appFadeIn .6s ease both; }
       <button class="music-arrow music-arrow-right" id="music-next-page" aria-label="Page suivante">&#8250;</button>
 
       <div class="ci" id="music-ci">
-        <div id="music-pages">
+        <div class="music-pages-viewport">
+          <div id="music-pages">
 
-          <!-- PAGE 1 : MUSIQUE EN LIGNE (fonctionnelle) -->
-          <div class="music-page visible" data-page="0">
-            <div class="music-track-tabs" id="music-online-tabs">
-              <button class="music-tab active" data-idx="0">Médiéval</button>
-              <button class="music-tab" data-idx="1">Chill Lofi</button>
-              <button class="music-tab" data-idx="2">Chill Classique</button>
-            </div>
-            <div class="music-title" id="music-online-title">—</div>
-            <div class="music-controls-row">
-              <button class="music-play-btn" id="music-online-play" title="Play / Pause">
-                <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <div class="music-bars">
-                <div class="music-prog-wrap" id="music-online-prog-wrap"><div class="music-prog-bar" id="music-online-prog"></div></div>
-                <div class="music-vol-wrap"><input type="range" class="music-vol" id="music-online-vol" min="0" max="100" value="80"></div>
+            <!-- PAGE 1 : MUSIQUE EN LIGNE (fonctionnelle) -->
+            <div class="music-page" data-page="0">
+              <div class="music-track-tabs" id="music-online-tabs">
+                <button class="music-tab active" data-idx="0">Médiéval</button>
+                <button class="music-tab" data-idx="1">Chill Lofi</button>
+                <button class="music-tab" data-idx="2">Chill Classique</button>
               </div>
-              <button class="music-loop-btn" id="music-online-loop" title="Boucle / Aléatoire">&#8734;</button>
-            </div>
-            <div id="music-online-mount"></div>
-          </div>
-
-          <!-- PAGE 2 : MUSIQUE LOCALE (UI seulement pour l'instant) -->
-          <div class="music-page" data-page="1">
-            <div class="music-track-tabs">
-              <span class="music-tab-static">Fichiers locaux</span>
-            </div>
-            <div class="music-title">Aucun morceau</div>
-            <div class="music-controls-row">
-              <button class="music-play-btn" title="Play / Pause">
-                <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <div class="music-bars">
-                <div class="music-prog-wrap"><div class="music-prog-bar"></div></div>
-                <div class="music-vol-wrap"><input type="range" class="music-vol" min="0" max="100" value="80"></div>
+              <div class="music-title" id="music-online-title">—</div>
+              <div class="music-panel">
+                <div class="music-bars-row">
+                  <div class="music-prog-wrap" id="music-online-prog-wrap"><div class="music-prog-bar" id="music-online-prog"></div></div>
+                  <div class="music-live-badge" id="music-online-live"><span class="music-live-dot"></span>LIVE</div>
+                  <div class="music-vol-wrap"><input type="range" class="music-vol" id="music-online-vol" min="0" max="100" value="80"></div>
+                </div>
+                <div class="music-buttons-row">
+                  <button class="music-play-btn" id="music-online-play" title="Play / Pause">
+                    <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
+                  </button>
+                  <button class="music-loop-btn" id="music-online-loop" title="Boucle / Aléatoire">&#8734;</button>
+                </div>
               </div>
-              <button class="music-loop-btn" title="Boucle / Aléatoire">&#8734;</button>
+              <div id="music-online-mount"></div>
             </div>
-          </div>
 
-          <!-- PAGE 3 : PODCAST (UI seulement pour l'instant) -->
-          <div class="music-page" data-page="2">
-            <div class="music-track-tabs">
-              <span class="music-tab-static">Podcast</span>
-            </div>
-            <div class="music-title">Aucun épisode</div>
-            <div class="music-controls-row">
-              <button class="music-play-btn" title="Play / Pause">
-                <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
-              </button>
-              <div class="music-bars">
-                <div class="music-prog-wrap"><div class="music-prog-bar"></div></div>
-                <div class="music-vol-wrap"><input type="range" class="music-vol" min="0" max="100" value="80"></div>
+            <!-- PAGE 2 : MUSIQUE LOCALE (UI seulement pour l'instant) -->
+            <div class="music-page" data-page="1">
+              <div class="music-track-tabs">
+                <span class="music-tab-static">Fichiers locaux</span>
               </div>
-              <button class="music-loop-btn" title="Boucle / Aléatoire">&#8734;</button>
+              <div class="music-title">Aucun morceau</div>
+              <div class="music-panel">
+                <div class="music-bars-row">
+                  <div class="music-prog-wrap"><div class="music-prog-bar"></div></div>
+                  <div class="music-vol-wrap"><input type="range" class="music-vol" min="0" max="100" value="80"></div>
+                </div>
+                <div class="music-buttons-row">
+                  <button class="music-play-btn" title="Play / Pause">
+                    <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
+                  </button>
+                  <button class="music-loop-btn" title="Boucle / Aléatoire">&#8734;</button>
+                </div>
+              </div>
             </div>
-          </div>
 
+            <!-- PAGE 3 : PODCAST (UI seulement pour l'instant) -->
+            <div class="music-page" data-page="2">
+              <div class="music-track-tabs">
+                <span class="music-tab-static">Podcast</span>
+              </div>
+              <div class="music-title">Aucun épisode</div>
+              <div class="music-panel">
+                <div class="music-bars-row">
+                  <div class="music-prog-wrap"><div class="music-prog-bar"></div></div>
+                  <div class="music-vol-wrap"><input type="range" class="music-vol" min="0" max="100" value="80"></div>
+                </div>
+                <div class="music-buttons-row">
+                  <button class="music-play-btn" title="Play / Pause">
+                    <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
+                  </button>
+                  <button class="music-loop-btn" title="Boucle / Aléatoire">&#8734;</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
 
         <div class="music-dots" id="music-dots">
@@ -1310,6 +1402,16 @@ body{ animation:appFadeIn .6s ease both; }
       <polygon points="2,1 9,5 2,9"/>
     </svg>
   </button>
+
+  <!-- Widget « en cours de lecture », style iOS : minimaliste, centré -->
+  <div id="pomo-music-widget">
+    <span id="pomo-music-note">♫</span>
+    <span id="pomo-music-title">—</span>
+    <button id="pomo-music-playbtn" title="Play / Pause" aria-label="Play / Pause">
+      <svg width="11" height="11" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
+    </button>
+  </div>
+
   <div id="pomo-full-clock">--:--</div>
 </div>
 
@@ -1607,7 +1709,7 @@ setInterval(updateClock,1000);
 
   function showPage(idx){
     pageIdx = (idx + pages.length) % pages.length;
-    pages.forEach(function(p, i){ p.classList.toggle('visible', i === pageIdx); });
+    if(pagesWrap) pagesWrap.style.transform = 'translateX(-' + (pageIdx * (100/pages.length)) + '%)';
     dots.forEach(function(d, i){ d.classList.toggle('active', i === pageIdx); });
   }
   if(prevBtn) prevBtn.addEventListener('click', function(){ showPage(pageIdx - 1); });
@@ -1642,21 +1744,51 @@ setInterval(updateClock,1000);
   var ytPlayBtn = document.getElementById('music-online-play');
   var ytProgWrap = document.getElementById('music-online-prog-wrap');
   var ytProgBar = document.getElementById('music-online-prog');
+  var ytLiveBadge = document.getElementById('music-online-live');
   var ytVolSlider = document.getElementById('music-online-vol');
   var ytLoopBtn = document.getElementById('music-online-loop');
   var ytMount = document.getElementById('music-online-mount');
 
   function updateTitle(){
     if(ytTitleEl) ytTitleEl.textContent = YT_TRACKS[ytActive].label;
+    var widgetTitle = document.getElementById('pomo-music-title');
+    if(widgetTitle) widgetTitle.textContent = YT_TRACKS[ytActive].label;
     setBackgroundThumb(YT_TRACKS[ytActive].id);
   }
   updateTitle();
 
   function updatePlayIcon(){
-    if(!ytPlayBtn) return;
-    ytPlayBtn.innerHTML = ytPlaying
-      ? '<svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><rect x="2" y="1" width="2" height="8"/><rect x="6" y="1" width="2" height="8"/></svg>'
-      : '<svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>';
+    var svgOn = '<svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><rect x="2" y="1" width="2" height="8"/><rect x="6" y="1" width="2" height="8"/></svg>';
+    var svgOff = '<svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>';
+    if(ytPlayBtn) ytPlayBtn.innerHTML = ytPlaying ? svgOn : svgOff;
+    // Widget « en cours de lecture » du plein écran pomodoro (style iOS)
+    var widgetBtn = document.getElementById('pomo-music-playbtn');
+    if(widgetBtn) widgetBtn.innerHTML = ytPlaying ? svgOn : svgOff;
+    var widget = document.getElementById('pomo-music-widget');
+    if(widget) widget.classList.toggle('is-playing', ytPlaying);
+  }
+
+  function setLiveBadge(isLive){
+    if(ytProgWrap) ytProgWrap.style.display = isLive ? 'none' : 'block';
+    if(ytLiveBadge) ytLiveBadge.classList.toggle('show', isLive);
+  }
+
+  function toggleYtPlayPause(){
+    loadYouTubeIframeApi();
+    if(!ytPlayer || !ytReady){
+      var tries = 0;
+      var t = setInterval(function(){
+        tries++;
+        if(ytPlayer && ytReady){
+          clearInterval(t);
+          ytPlayer.playVideo();
+        } else if(tries > 40){
+          clearInterval(t);
+        }
+      }, 150);
+      return;
+    }
+    if(ytPlaying){ ytPlayer.pauseVideo(); } else { ytPlayer.playVideo(); }
   }
 
   function loadYouTubeIframeApi(){
@@ -1686,7 +1818,7 @@ setInterval(updateClock,1000);
           onReady:function(e){
             ytReady = true;
             try{
-              e.target.setVolume(ytVolSlider ? parseInt(ytVolSlider.value,10) : 80);
+              applyVolumeFromSlider();
               e.target.setPlaybackQuality('tiny'); // 144p
             }catch(err){}
           },
@@ -1722,6 +1854,7 @@ setInterval(updateClock,1000);
     ytActive = idx;
     updateTitle();
     if(ytProgBar) ytProgBar.style.width = '0%';
+    setLiveBadge(false);
     if(!ytPlayer || !ytReady) return;
     try{
       ytPlayer.loadVideoById({ videoId: YT_TRACKS[idx].id });
@@ -1738,32 +1871,27 @@ setInterval(updateClock,1000);
   });
 
   if(ytPlayBtn){
-    ytPlayBtn.addEventListener('click', function(){
-      loadYouTubeIframeApi();
-      if(!ytPlayer || !ytReady){
-        // L'API se charge encore : on retentera dès qu'elle est prête.
-        var tries = 0;
-        var t = setInterval(function(){
-          tries++;
-          if(ytPlayer && ytReady){
-            clearInterval(t);
-            ytPlayer.playVideo();
-          } else if(tries > 40){
-            clearInterval(t);
-          }
-        }, 150);
-        return;
-      }
-      if(ytPlaying){ ytPlayer.pauseVideo(); } else { ytPlayer.playVideo(); }
-    });
+    ytPlayBtn.addEventListener('click', toggleYtPlayPause);
   }
+  var widgetPlayBtn0 = document.getElementById('pomo-music-playbtn');
+  if(widgetPlayBtn0){ widgetPlayBtn0.addEventListener('click', toggleYtPlayPause); }
 
+  // Volume perçu plus progressif : la position du curseur (0-100) est mappée
+  // sur une courbe quadratique avant d'être appliquée au lecteur, pour que les
+  // petits ajustements en bas d'échelle restent audibles/graduels (l'oreille
+  // perçoit le volume de façon logarithmique, pas linéaire).
+  function applyVolumeFromSlider(){
+    if(!ytVolSlider) return;
+    var raw = parseInt(ytVolSlider.value, 10);
+    ytVolSlider.style.setProperty('--vol-pct', raw + '%');
+    var perceptual = Math.round(100 * Math.pow(raw / 100, 2));
+    if(ytPlayer && ytReady){
+      try{ ytPlayer.setVolume(perceptual); }catch(err){}
+    }
+  }
   if(ytVolSlider){
-    ytVolSlider.addEventListener('input', function(){
-      if(ytPlayer && ytReady){
-        try{ ytPlayer.setVolume(parseInt(this.value,10)); }catch(err){}
-      }
-    });
+    ytVolSlider.style.setProperty('--vol-pct', ytVolSlider.value + '%');
+    ytVolSlider.addEventListener('input', applyVolumeFromSlider);
   }
 
   if(ytLoopBtn){
@@ -1782,10 +1910,10 @@ setInterval(updateClock,1000);
       try{
         var dur = ytPlayer.getDuration();
         var cur = ytPlayer.getCurrentTime();
-        if(dur && isFinite(dur) && dur > 0){
+        var isLive = !dur || !isFinite(dur) || dur <= 0;
+        setLiveBadge(isLive);
+        if(!isLive){
           ytProgBar.style.width = Math.min(100, (cur/dur)*100) + '%';
-        } else {
-          ytProgBar.style.width = '0%'; // flux en direct : pas de durée exploitable
         }
       }catch(err){}
     }, 1000);
