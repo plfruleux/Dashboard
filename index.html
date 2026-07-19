@@ -404,7 +404,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
    Le fond est une capture figée du fond d'écran au moment de l'ouverture
    (#pomo-full-bg), floutée et assombrie — le diaporama de fond continue de
    tourner derrière, mais n'est plus visible tant que ce mode est ouvert ;
-   il réapparaît normalement à la fermeture. */
+   il réapparaît normalement à la fermeture. Un dégradé sombre de secours
+   garantit un rendu toujours sombre/transparent même si la capture échoue. */
 #pomo-full{
   position:fixed;inset:0;z-index:500;overflow:hidden;
   display:-webkit-box;display:-ms-flexbox;display:flex;
@@ -412,7 +413,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   -ms-flex-direction:column;flex-direction:column;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  gap:26px;
+  gap:20px;
   opacity:0;visibility:hidden;pointer-events:none;
   -webkit-transform:scale(.9);transform:scale(.9);
   -webkit-transform-origin:92% 8%;transform-origin:92% 8%;
@@ -425,13 +426,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   position:absolute;top:-40px;right:-40px;bottom:-40px;left:-40px;z-index:0;
   background-size:cover;background-position:center;
   background-color:#0a0b0e;
+  background-image:radial-gradient(ellipse at 30% 20%, rgba(212,168,83,0.12) 0%, transparent 55%), linear-gradient(160deg, #10131a 0%, #05060a 100%);
   -webkit-filter:blur(22px) saturate(1.05) brightness(.55);
   filter:blur(22px) saturate(1.05) brightness(.55);
 }
 #pomo-full-bg::after{
   content:'';position:absolute;inset:0;background:rgba(4,5,9,0.30);
 }
-#pomo-full > *{ position:relative;z-index:1; }
+#pomo-full > *:not(#pomo-full-bg){ position:relative;z-index:1; }
 #pomo-full.open{
   opacity:1;visibility:visible;pointer-events:auto;
   -webkit-transform:scale(1);transform:scale(1);
@@ -451,12 +453,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   color:var(--t1);line-height:1;letter-spacing:-.02em;
   font-variant-numeric:tabular-nums;
   -webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;
-  transition:color .3s;
+  transition:color .3s;text-align:center;
 }
 #pomo-full .pom-prog-track{position:static;width:min(60vw,320px);height:2px;background:rgba(255,255,255,.09);}
-#pomo-full .pom-dots{gap:8px;}
+#pomo-full .pom-dots{gap:8px;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;}
 #pomo-full .pom-dot{width:6px;height:6px;}
 #pomo-full .pom-dot.active{width:18px;}
+#pomo-full #pom-session-count-full,
+#pomo-full .pom-mini-lbl{ text-align:center;font-size:7px; }
 #pomo-full-btn{
   width:64px;height:64px;border-radius:50%;
   background:var(--adim);border:1px solid rgba(212,168,83,.35);
@@ -465,6 +469,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
   transition:background .18s,border-color .18s,-webkit-transform .1s;transition:background .18s,border-color .18s,transform .1s;
+  margin-top:4px;
 }
 #pomo-full-btn:hover{background:rgba(212,168,83,.22);-webkit-transform:scale(1.06);transform:scale(1.06);}
 #pomo-full-clock{
@@ -498,8 +503,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 
 /* Bande horaire 8h–20h — 3x plus épaisse, avec courbe de température lissée */
 .w-hourly-wrap{padding-top:9px;flex-shrink:0;}
-.w-hourly-track{
-  position:relative;height:66px;border-radius:10px;overflow:hidden;
+.w-hourly-track{position:relative;height:66px;}
+.w-hourly-inner{
+  position:absolute;inset:0;border-radius:10px;overflow:hidden;
   background:rgba(255,255,255,.03);border:1px solid var(--border);
 }
 .w-hseg{position:absolute;top:0;bottom:0;transition:opacity .3s;cursor:default;}
@@ -511,6 +517,22 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   background:var(--red);box-shadow:0 0 5px var(--red);
   z-index:3;display:none;
 }
+/* Température au croisement heure actuelle / courbe — décalée pour se superposer au point */
+#w-now-on-curve{
+  position:absolute;z-index:4;display:none;
+  font-family:var(--fm);font-size:7px;color:var(--t1);
+  background:rgba(8,10,17,0.85);border:1px solid rgba(255,255,255,.14);border-radius:5px;
+  padding:1px 5px;-webkit-transform:translate(-50%,-135%);transform:translate(-50%,-135%);
+  white-space:nowrap;pointer-events:none;
+}
+/* Repères température min / max du jour, épinglés sur la courbe */
+.w-minmax-lbl{
+  position:absolute;z-index:4;
+  font-family:var(--fm);font-size:6.5px;color:var(--t2);
+  white-space:nowrap;pointer-events:none;
+}
+.w-minmax-lbl.is-max{-webkit-transform:translate(-50%,-160%);transform:translate(-50%,-160%);color:rgba(240,180,41,.85);}
+.w-minmax-lbl.is-min{-webkit-transform:translate(-50%,45%);transform:translate(-50%,45%);color:rgba(91,159,212,.85);}
 #w-tooltip{
   position:absolute;bottom:calc(100% + 7px);left:0;z-index:5;
   background:rgba(8,10,17,0.92);border:1px solid var(--bds);border-radius:7px;
@@ -974,8 +996,11 @@ body{ animation:appFadeIn .6s ease both; }
         <!-- Bande horaire 8h–20h : segments colorés par condition + courbe de température -->
         <div class="w-hourly-wrap">
           <div class="w-hourly-track" id="w-hourly-track">
-            <svg id="w-temp-curve" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
-            <div id="w-hourly-now"></div>
+            <div class="w-hourly-inner" id="w-hourly-inner">
+              <svg id="w-temp-curve" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
+              <div id="w-hourly-now"></div>
+            </div>
+            <div id="w-now-on-curve"></div>
             <div id="w-tooltip"></div>
           </div>
           <div class="w-hourly-labels"><span>8h</span><span>14h</span><span>20h</span></div>
@@ -1367,8 +1392,10 @@ setInterval(updateClock,1000);
   var elUv = document.getElementById('w-uv');
   var elForecast = document.getElementById('w-forecast');
   var elTrack = document.getElementById('w-hourly-track');
+  var elInner = document.getElementById('w-hourly-inner');
   var elNowMarker = document.getElementById('w-hourly-now');
   var elCurve = document.getElementById('w-temp-curve');
+  var elNowOnCurve = document.getElementById('w-now-on-curve');
   var elTooltip = document.getElementById('w-tooltip');
   if(!elNowTemp || !elTrack) return;
 
@@ -1462,8 +1489,9 @@ setInterval(updateClock,1000);
   function hideTooltip(){ if(elTooltip) elTooltip.classList.remove('show'); }
 
   function renderHourly(data){
-    if(!elTrack || !data.hourly) return;
-    elTrack.querySelectorAll('.w-hseg').forEach(function(el){ el.remove(); });
+    if(!elTrack || !elInner || !data.hourly) return;
+    elInner.querySelectorAll('.w-hseg').forEach(function(el){ el.remove(); });
+    elTrack.querySelectorAll('.w-minmax-lbl').forEach(function(el){ el.remove(); });
 
     var codes = [], temps = [];
     for(var h = 8; h <= 19; h++){
@@ -1496,23 +1524,25 @@ setInterval(updateClock,1000);
         ' · ' + hStart + 'h–' + hEnd + 'h';
       div.addEventListener('mouseenter', function(){ showTooltip(tooltipHtml, leftPct + widthPct/2); });
       div.addEventListener('mouseleave', hideTooltip);
-      elTrack.insertBefore(div, elNowMarker);
+      elInner.insertBefore(div, elNowMarker);
     });
 
     // Courbe de température lissée (aucun angle brutal : quadratique par points)
+    var vw = 300, vh = 100;
+    var trackH = elTrack.clientHeight || 66;
+    var pxScale = trackH / vh;
+    var pts = [];
+    var validTemps = temps.filter(function(t){ return t !== null; });
+    var tMin = validTemps.length ? Math.min.apply(null, validTemps) : 0;
+    var tMax = validTemps.length ? Math.max.apply(null, validTemps) : 1;
+    var range = (tMax - tMin) || 1;
+    for(var p = 0; p < temps.length; p++){
+      var t = temps[p] === null ? tMin : temps[p];
+      var x = (p / (temps.length - 1)) * vw;
+      var y = 74 - ((t - tMin) / range) * 44; // reste dans la partie haute de la bande
+      pts.push({ x:x, y:y, t:t });
+    }
     if(elCurve){
-      var vw = 300, vh = 100;
-      var validTemps = temps.filter(function(t){ return t !== null; });
-      var tMin = Math.min.apply(null, validTemps);
-      var tMax = Math.max.apply(null, validTemps);
-      var range = (tMax - tMin) || 1;
-      var pts = [];
-      for(var p = 0; p < temps.length; p++){
-        var t = temps[p] === null ? tMin : temps[p];
-        var x = (p / (temps.length - 1)) * vw;
-        var y = 74 - ((t - tMin) / range) * 44; // reste dans la partie haute de la bande
-        pts.push({ x:x, y:y });
-      }
       var linePath = pts.length ? ('M ' + pts[0].x.toFixed(1) + ' ' + pts[0].y.toFixed(1)) : '';
       for(var k = 0; k < pts.length - 1; k++){
         var a = pts[k], b = pts[k+1];
@@ -1529,15 +1559,55 @@ setInterval(updateClock,1000);
         '<path class="w-temp-line" d="' + linePath + '"></path>';
     }
 
-    // Marqueur rouge de l'heure actuelle (visible seulement entre 8h et 20h)
-    if(elNowMarker){
-      var localHour = getLocalHour(data.utc_offset_seconds || 0);
-      if(localHour >= 8 && localHour <= 20){
-        var pct = ((localHour - 8) / 12) * 100;
-        elNowMarker.style.left = pct + '%';
-        elNowMarker.style.display = 'block';
-      } else {
-        elNowMarker.style.display = 'none';
+    // Repères min / max du jour, épinglés sur la courbe à l'heure où ils surviennent
+    if(pts.length){
+      var minIdx = 0, maxIdx = 0;
+      pts.forEach(function(pt, idx){
+        if(pt.t < pts[minIdx].t) minIdx = idx;
+        if(pt.t > pts[maxIdx].t) maxIdx = idx;
+      });
+      [{ idx:maxIdx, cls:'is-max' }, { idx:minIdx, cls:'is-min' }].forEach(function(m){
+        var pt = pts[m.idx];
+        var lbl = document.createElement('div');
+        lbl.className = 'w-minmax-lbl ' + m.cls;
+        lbl.style.left = ((pt.x / vw) * 100) + '%';
+        lbl.style.top = (pt.y * pxScale) + 'px';
+        lbl.textContent = Math.round(pt.t) + '°';
+        elTrack.appendChild(lbl);
+      });
+    }
+
+    // Marqueur rouge de l'heure actuelle + température au point de croisement
+    // avec la courbe (interpolée, légèrement décalée pour se superposer au trait).
+    var localHour = getLocalHour(data.utc_offset_seconds || 0);
+    if(elNowMarker || elNowOnCurve){
+      var inRange = localHour >= 8 && localHour <= 20;
+      if(elNowMarker){
+        if(inRange){
+          var pct = ((localHour - 8) / 12) * 100;
+          elNowMarker.style.left = pct + '%';
+          elNowMarker.style.display = 'block';
+        } else {
+          elNowMarker.style.display = 'none';
+        }
+      }
+      if(elNowOnCurve){
+        if(inRange && pts.length > 1){
+          var wf = (localHour - 8) / 12;
+          var pFloatIdx = wf * (pts.length - 1);
+          var i0 = Math.max(0, Math.min(pts.length - 1, Math.floor(pFloatIdx)));
+          var i1 = Math.min(pts.length - 1, i0 + 1);
+          var frac = pFloatIdx - i0;
+          var interpT = pts[i0].t + (pts[i1].t - pts[i0].t) * frac;
+          var interpY = pts[i0].y + (pts[i1].y - pts[i0].y) * frac;
+          var pctNow = ((localHour - 8) / 12) * 100;
+          elNowOnCurve.style.left = pctNow + '%';
+          elNowOnCurve.style.top = (interpY * pxScale) + 'px';
+          elNowOnCurve.textContent = Math.round(interpT) + '°';
+          elNowOnCurve.style.display = 'block';
+        } else {
+          elNowOnCurve.style.display = 'none';
+        }
       }
     }
   }
