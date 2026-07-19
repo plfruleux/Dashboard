@@ -318,28 +318,57 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   transition:color .2s,-webkit-transform .15s;transition:color .2s,transform .15s;
 }
 #pom-fullscreen-btn:hover{color:var(--accent);-webkit-transform:scale(1.15);transform:scale(1.15);}
+
+/* Barre fine : préréglage de rythme + compteur de séances */
+.pom-topbar{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
+  padding:5px 22px 0 8px;flex-shrink:0;
+}
+.pom-mini-btn{
+  background:none;border:1px solid var(--border);color:var(--t3);
+  font-family:var(--fm);font-size:6px;letter-spacing:.06em;
+  border-radius:4px;padding:2px 5px;cursor:pointer;
+  transition:color .15s,border-color .15s;
+}
+.pom-mini-btn:hover{color:var(--accent);border-color:rgba(212,168,83,.4);}
+.pom-mini-lbl{
+  font-family:var(--fm);font-size:6px;letter-spacing:.1em;color:var(--t3);
+  text-transform:uppercase;
+}
+.pom-mini-lbl b{color:var(--t2);font-weight:400;}
+
+/* Corps : temps et contrôles juxtaposés, occupent tout l'espace disponible */
 .pom-body{
   -webkit-box-flex:1;-ms-flex:1;flex:1;
   display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-orient:vertical;-webkit-box-direction:normal;
-  -ms-flex-direction:column;flex-direction:column;
+  -webkit-box-orient:horizontal;-webkit-box-direction:normal;
+  -ms-flex-direction:row;flex-direction:row;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  padding:8px 10px;gap:5px;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:space-evenly;
+  padding:4px 10px;gap:8px;position:relative;
 }
 #pom-time{
-  font-family:var(--fd);font-size:30px;font-weight:800;
+  font-family:var(--fd);font-size:36px;font-weight:800;
   letter-spacing:-.02em;line-height:1;color:var(--t1);
   transition:color .3s;
   font-variant-numeric:tabular-nums;
   -webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;
 }
 #pom-time.pom-urgent{color:rgba(200,90,70,.9);}
-.pom-prog-track{width:80%;height:1px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden;} 
+.pom-prog-track{
+  position:absolute;left:0;right:0;bottom:0;width:auto;
+  height:2px;background:rgba(255,255,255,.07);border-radius:0;overflow:hidden;
+}
 .pom-prog-bar{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width 1s linear,background .3s;}
-.pom-controls{display:-webkit-box;display:-ms-flexbox;display:flex;gap:7px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}
+.pom-controls{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;
+  gap:8px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;
+}
 #pom-btn{
-  width:28px;height:28px;border-radius:50%;
+  width:30px;height:30px;border-radius:50%;
   background:var(--adim);
   border:1px solid rgba(212,168,83,0.35);
   color:var(--accent);
@@ -356,6 +385,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .pom-dot.done{background:rgba(240,236,228,.35);} 
 .pom-dot.active{background:var(--accent);width:10px;border-radius:2px;}
 
+
 /* Couleur d'accent selon la phase (travail / pause / grande pause) */
 #card-clock.pom-mode-break #pom-time,
 #pomo-full.pom-mode-break #pomo-full-time{color:var(--blue);}
@@ -371,20 +401,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #pomo-full.pom-mode-long .pom-dot.active{background:var(--green);}
 
 /* ══ POMODORO PLEIN ÉCRAN ══
-   Le fond reste le fond d'écran (#bg-a/#bg-b), simplement assombri et
-   flouté davantage via backdrop-filter, pour rester cohérent avec le
-   reste du dashboard sans dupliquer d'image. */
+   Le fond est une capture figée du fond d'écran au moment de l'ouverture
+   (#pomo-full-bg), floutée et assombrie — le diaporama de fond continue de
+   tourner derrière, mais n'est plus visible tant que ce mode est ouvert ;
+   il réapparaît normalement à la fermeture. */
 #pomo-full{
-  position:fixed;inset:0;z-index:500;
+  position:fixed;inset:0;z-index:500;overflow:hidden;
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
   -ms-flex-direction:column;flex-direction:column;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
   gap:26px;
-  background:rgba(4,5,9,0.42);
-  -webkit-backdrop-filter:blur(20px) saturate(1.1) brightness(.85);
-  backdrop-filter:blur(20px) saturate(1.1) brightness(.85);
   opacity:0;visibility:hidden;pointer-events:none;
   -webkit-transform:scale(.9);transform:scale(.9);
   -webkit-transform-origin:92% 8%;transform-origin:92% 8%;
@@ -393,6 +421,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   transition:opacity .4s cubic-bezier(.22,.68,0,1.15),
              transform .4s cubic-bezier(.22,.68,0,1.15);
 }
+#pomo-full-bg{
+  position:absolute;top:-40px;right:-40px;bottom:-40px;left:-40px;z-index:0;
+  background-size:cover;background-position:center;
+  background-color:#0a0b0e;
+  -webkit-filter:blur(22px) saturate(1.05) brightness(.55);
+  filter:blur(22px) saturate(1.05) brightness(.55);
+}
+#pomo-full-bg::after{
+  content:'';position:absolute;inset:0;background:rgba(4,5,9,0.30);
+}
+#pomo-full > *{ position:relative;z-index:1; }
 #pomo-full.open{
   opacity:1;visibility:visible;pointer-events:auto;
   -webkit-transform:scale(1);transform:scale(1);
@@ -414,7 +453,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   -webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;
   transition:color .3s;
 }
-#pomo-full .pom-prog-track{width:min(60vw,320px);height:2px;background:rgba(255,255,255,.09);}
+#pomo-full .pom-prog-track{position:static;width:min(60vw,320px);height:2px;background:rgba(255,255,255,.09);}
 #pomo-full .pom-dots{gap:8px;}
 #pomo-full .pom-dot{width:6px;height:6px;}
 #pomo-full .pom-dot.active{width:18px;}
@@ -437,7 +476,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
    MÉTÉO — widget minimaliste, glass, sans appel serveur
    (Open-Meteo, aucune clé API requise). Voir le script en bas de page.
 ══════════════════════════════════════════════ */
-#card-weather{background:rgba(8,10,17,0.55);flex-shrink:0;overflow:hidden;}
+#card-weather{flex-shrink:0;overflow:hidden;} /* même transparence que .card, pas d'override */
 #card-weather .ci{overflow:hidden;}
 
 /* Ressenti + UV */
@@ -457,10 +496,42 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .w-now-lbl{font-family:var(--fm);font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);min-width:34px;}
 .w-now-row span:last-child{font-family:var(--fm);font-size:10px;color:var(--t2);}
 
-/* Prévisions 4 jours */
+/* Bande horaire 8h–20h — 3x plus épaisse, avec courbe de température lissée */
+.w-hourly-wrap{padding-top:9px;flex-shrink:0;}
+.w-hourly-track{
+  position:relative;height:66px;border-radius:10px;overflow:hidden;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+}
+.w-hseg{position:absolute;top:0;bottom:0;transition:opacity .3s;cursor:default;}
+#w-temp-curve{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;}
+#w-temp-curve path.w-temp-fill{fill:rgba(240,236,228,0.07);stroke:none;}
+#w-temp-curve path.w-temp-line{fill:none;stroke:rgba(240,236,228,0.55);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+#w-hourly-now{
+  position:absolute;top:-3px;bottom:-3px;width:2px;
+  background:var(--red);box-shadow:0 0 5px var(--red);
+  z-index:3;display:none;
+}
+#w-tooltip{
+  position:absolute;bottom:calc(100% + 7px);left:0;z-index:5;
+  background:rgba(8,10,17,0.92);border:1px solid var(--bds);border-radius:7px;
+  padding:5px 8px;font-family:var(--fm);font-size:7px;color:var(--t1);
+  white-space:nowrap;pointer-events:none;opacity:0;
+  -webkit-transform:translateY(3px);transform:translateY(3px);
+  transition:opacity .12s,-webkit-transform .12s;transition:opacity .12s,transform .12s;
+  box-shadow:0 6px 20px rgba(0,0,0,.5);
+}
+#w-tooltip.show{opacity:1;-webkit-transform:translateY(0);transform:translateY(0);}
+#w-tooltip .w-tt-temp{color:var(--accent);font-weight:400;}
+.w-hourly-labels{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
+  margin-top:4px;font-family:var(--fm);font-size:6.5px;color:var(--t3);letter-spacing:.06em;
+}
+
+/* Prévisions 4 jours — sous la bande horaire */
 .w-forecast{
   display:grid;grid-template-columns:repeat(4,1fr);gap:4px;
-  padding:8px 0;border-bottom:1px solid var(--border);flex-shrink:0;
+  padding-top:8px;margin-top:8px;border-top:1px solid var(--border);flex-shrink:0;
 }
 .w-fc-day{
   display:-webkit-box;display:-ms-flexbox;display:flex;
@@ -473,24 +544,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .w-fc-day .w-fc-icon{font-size:16px;line-height:1.1;}
 .w-fc-day .w-fc-temp{font-family:var(--fd);font-size:14px;font-weight:800;color:var(--t1);
   font-variant-numeric:tabular-nums;-webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;}
-
-/* Bande horaire 8h–20h */
-.w-hourly-wrap{padding-top:8px;flex-shrink:0;}
-.w-hourly-track{
-  position:relative;height:22px;border-radius:6px;overflow:hidden;
-  background:rgba(255,255,255,.03);border:1px solid var(--border);
-}
-.w-hseg{position:absolute;top:0;bottom:0;transition:opacity .3s;}
-#w-hourly-now{
-  position:absolute;top:-2px;bottom:-2px;width:2px;
-  background:var(--red);box-shadow:0 0 5px var(--red);
-  z-index:2;display:none;
-}
-.w-hourly-labels{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
-  margin-top:4px;font-family:var(--fm);font-size:6.5px;color:var(--t3);letter-spacing:.06em;
-}
 
 /* ══ HOVER — effets réactifs globaux ══ */
 .card{ transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease; }
@@ -875,6 +928,10 @@ body{ animation:appFadeIn .6s ease both; }
           <!-- Droite : pomodoro -->
           <div class="ck-right">
             <button id="pom-fullscreen-btn" title="Plein écran" aria-label="Plein écran">⤢</button>
+            <div class="pom-topbar">
+              <button id="pom-preset-btn" class="pom-mini-btn" title="Rythme travail / pause">25/5</button>
+              <span class="pom-mini-lbl">Séance <b id="pom-session-count">0</b></span>
+            </div>
             <div class="pom-body">
               <div id="pom-time">25:00</div>
               <div class="pom-prog-track">
@@ -903,7 +960,7 @@ body{ animation:appFadeIn .6s ease both; }
     <!-- MÉTÉO -->
     <div class="card" id="card-weather" style="animation-delay:.06s">
       <div class="ci">
-        <div class="chip">Météo — <span id="w-city">Hà Nội</span></div>
+        <div class="chip">Météo — <span id="w-city">…</span></div>
 
         <!-- Ressenti + UV -->
         <div class="w-now">
@@ -914,20 +971,22 @@ body{ animation:appFadeIn .6s ease both; }
           </div>
         </div>
 
+        <!-- Bande horaire 8h–20h : segments colorés par condition + courbe de température -->
+        <div class="w-hourly-wrap">
+          <div class="w-hourly-track" id="w-hourly-track">
+            <svg id="w-temp-curve" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
+            <div id="w-hourly-now"></div>
+            <div id="w-tooltip"></div>
+          </div>
+          <div class="w-hourly-labels"><span>8h</span><span>14h</span><span>20h</span></div>
+        </div>
+
         <!-- Prévisions 4 jours : icône dominante + température moyenne -->
         <div class="w-forecast" id="w-forecast">
           <div class="w-fc-day"><span class="loading">…</span></div>
           <div class="w-fc-day"><span class="loading">…</span></div>
           <div class="w-fc-day"><span class="loading">…</span></div>
           <div class="w-fc-day"><span class="loading">…</span></div>
-        </div>
-
-        <!-- Bande horaire 8h–20h, segmentée par condition météo -->
-        <div class="w-hourly-wrap">
-          <div class="w-hourly-track" id="w-hourly-track">
-            <div id="w-hourly-now"></div>
-          </div>
-          <div class="w-hourly-labels"><span>8h</span><span>14h</span><span>20h</span></div>
         </div>
       </div>
     </div>
@@ -995,6 +1054,7 @@ body{ animation:appFadeIn .6s ease both; }
 
 <!-- ══ POMODORO PLEIN ÉCRAN ══ -->
 <div id="pomo-full" aria-hidden="true">
+  <div id="pomo-full-bg"></div>
   <button id="pomo-full-close" title="Fermer" aria-label="Fermer">&#10005;</button>
   <div id="pomo-full-time">25:00</div>
   <div class="pom-prog-track"><div class="pom-prog-bar" id="pomo-full-prog"></div></div>
@@ -1004,6 +1064,7 @@ body{ animation:appFadeIn .6s ease both; }
     <div class="pom-dot" id="pfd2"></div>
     <div class="pom-dot" id="pfd3"></div>
   </div>
+  <span class="pom-mini-lbl">Séance <b id="pom-session-count-full">0</b></span>
   <button id="pomo-full-btn" title="Play / Pause">
     <svg id="pomo-full-icon" width="20" height="20" viewBox="0 0 10 10" fill="currentColor">
       <polygon points="2,1 9,5 2,9"/>
@@ -1061,15 +1122,21 @@ setInterval(updateClock,1000);
    l'API Web Audio (pas de fichier audio à héberger sur GitHub Pages).
 ══════════════════════════════════════════ */
 (function(){
-  var POM_WORK = 25*60;
-  var POM_BREAK = 5*60;
+  var PRESETS = [
+    { work:25*60, brk:5*60,  label:'25/5' },
+    { work:50*60, brk:10*60, label:'50/10' }
+  ];
+  var presetIdx = 0;
   var POM_LONG = 30*60;
   var POM_LONG_EVERY = 4;
 
   var pomCardClock = document.getElementById('card-clock');
   var pomFull = document.getElementById('pomo-full');
+  var pomFullBg = document.getElementById('pomo-full-bg');
   var pomFullscreenBtn = document.getElementById('pom-fullscreen-btn');
   var pomFullCloseBtn = document.getElementById('pomo-full-close');
+  var pomPresetBtn = document.getElementById('pom-preset-btn');
+  var pomSessionEls = [document.getElementById('pom-session-count'), document.getElementById('pom-session-count-full')];
 
   var pomTimeEls = [document.getElementById('pom-time'), document.getElementById('pomo-full-time')];
   var pomProgEls = [document.getElementById('pom-prog'), document.getElementById('pomo-full-prog')];
@@ -1082,16 +1149,16 @@ setInterval(updateClock,1000);
 
   var state = {
     mode: 'work',      // 'work' | 'break' | 'long'
-    remaining: POM_WORK,
+    remaining: PRESETS[presetIdx].work,
     running: false
   };
-  var workCount = 0;    // sessions de travail terminées (mod 4 pour les points)
+  var workCount = 0;    // séances de travail terminées (compteur global, jamais remis à zéro)
   var pomInterval = null;
   var audioCtx = null;
 
   function pomDuration(mode){
-    if(mode === 'work') return POM_WORK;
-    if(mode === 'break') return POM_BREAK;
+    if(mode === 'work') return PRESETS[presetIdx].work;
+    if(mode === 'break') return PRESETS[presetIdx].brk;
     return POM_LONG;
   }
 
@@ -1176,6 +1243,8 @@ setInterval(updateClock,1000);
         ? '<rect x="2" y="1" width="2" height="8"/><rect x="6" y="1" width="2" height="8"/>'
         : '<polygon points="2,1 9,5 2,9"/>';
     });
+    pomSessionEls.forEach(function(el){ if(el) el.textContent = workCount; });
+    if(pomPresetBtn) pomPresetBtn.textContent = PRESETS[presetIdx].label;
     setModeClasses(state.mode);
     renderDots();
   }
@@ -1224,8 +1293,39 @@ setInterval(updateClock,1000);
     btn.addEventListener('click', toggleRunning);
   });
 
+  // Réglage du rythme travail/pause (25/5 ↔ 50/10). La séance en cours est
+  // recalée sur la nouvelle durée ; la grande pause (30 min) ne change pas.
+  if(pomPresetBtn){
+    pomPresetBtn.addEventListener('click', function(){
+      presetIdx = (presetIdx + 1) % PRESETS.length;
+      if(state.mode !== 'long'){
+        state.remaining = pomDuration(state.mode);
+      }
+      render();
+    });
+  }
+
+  // Capture une image figée du fond d'écran courant (diaporama en cours),
+  // pour que le fond du plein écran pomodoro ne change plus tant qu'il est
+  // ouvert — le diaporama continue derrière et reprend normalement à la
+  // fermeture, sans avoir été interrompu.
+  function freezeWallpaper(){
+    if(!pomFullBg) return;
+    var bgA = document.getElementById('bg-a');
+    var bgB = document.getElementById('bg-b');
+    var pick = bgA;
+    try{
+      var opA = bgA ? parseFloat(getComputedStyle(bgA).opacity) : 0;
+      var opB = bgB ? parseFloat(getComputedStyle(bgB).opacity) : 0;
+      pick = (opB > opA) ? bgB : bgA;
+    }catch(e){}
+    var img = pick ? getComputedStyle(pick).backgroundImage : '';
+    pomFullBg.style.backgroundImage = img && img !== 'none' ? img : '';
+  }
+
   if(pomFullscreenBtn && pomFull){
     pomFullscreenBtn.addEventListener('click', function(){
+      freezeWallpaper();
       pomFull.classList.add('open');
       pomFull.setAttribute('aria-hidden','false');
       render();
@@ -1253,41 +1353,60 @@ setInterval(updateClock,1000);
 
 /* ══════════════════════════════════════════
    MÉTÉO — Open-Meteo (api.open-meteo.com), aucune clé requise.
-   Coordonnées : Hà Nội (21.0285, 105.8542).
+   Position : géolocalisation du navigateur ; repli sur Paris si refusée
+   ou indisponible. Le fuseau horaire local vient directement de la
+   réponse de l'API (utc_offset_seconds), donc valable pour n'importe
+   quelle position.
 ══════════════════════════════════════════ */
 (function(){
-  var LAT = 21.0285, LON = 105.8542;
-  var TZ = 'Asia/Ho_Chi_Minh';
+  var PARIS = { lat:48.8566, lon:2.3522, label:'Paris' };
 
+  var elCity = document.getElementById('w-city');
   var elNowTemp = document.getElementById('w-now-temp');
   var elFeels = document.getElementById('w-feels');
   var elUv = document.getElementById('w-uv');
   var elForecast = document.getElementById('w-forecast');
   var elTrack = document.getElementById('w-hourly-track');
   var elNowMarker = document.getElementById('w-hourly-now');
+  var elCurve = document.getElementById('w-temp-curve');
+  var elTooltip = document.getElementById('w-tooltip');
   if(!elNowTemp || !elTrack) return;
 
-  // Regroupe les codes météo WMO (open-meteo) en catégories simples,
-  // chacune avec une icône et une teinte (verre teinté, faible opacité).
-  function weatherCategory(code){
-    if(code === 0) return { icon:'☀️', color:'rgba(212,168,83,.30)' };
-    if(code === 1 || code === 2) return { icon:'⛅', color:'rgba(150,155,165,.22)' };
-    if(code === 3) return { icon:'☁️', color:'rgba(150,155,165,.30)' };
-    if(code === 45 || code === 48) return { icon:'🌫️', color:'rgba(150,155,165,.16)' };
-    if([51,53,55,56,57,61,63,65,66,67,80,81,82].indexOf(code) !== -1) return { icon:'🌧️', color:'rgba(91,159,212,.30)' };
-    if([71,73,75,77,85,86].indexOf(code) !== -1) return { icon:'❄️', color:'rgba(220,230,240,.30)' };
-    if(code === 95 || code === 96 || code === 99) return { icon:'⛈️', color:'rgba(172,130,220,.32)' };
-    return { icon:'—', color:'rgba(150,155,165,.16)' };
+  // Catégorisation des codes météo WMO (Open-Meteo) : icône, teinte
+  // (verre teinté, faible opacité) et libellé pour l'infobulle.
+  function weatherInfo(code){
+    var table = [
+      { codes:[0],           icon:'☀️', color:'rgba(240,180,41,.38)',  label:'Ciel dégagé' },
+      { codes:[1],           icon:'🌤️', color:'rgba(240,180,41,.24)',  label:'Plutôt dégagé' },
+      { codes:[2],           icon:'⛅',  color:'rgba(180,180,175,.26)', label:'Partiellement nuageux' },
+      { codes:[3],           icon:'☁️',  color:'rgba(150,155,165,.32)', label:'Couvert' },
+      { codes:[45,48],       icon:'🌫️', color:'rgba(150,155,165,.18)', label:'Brouillard' },
+      { codes:[51,53,55,56,57], icon:'🌦️', color:'rgba(140,190,230,.26)', label:'Bruine' },
+      { codes:[61,63,66,67], icon:'🌧️', color:'rgba(91,159,212,.34)',  label:'Pluie' },
+      { codes:[65,82],       icon:'🌧️', color:'rgba(55,110,170,.44)',  label:'Forte pluie' },
+      { codes:[80,81],       icon:'🌦️', color:'rgba(91,159,212,.30)',  label:'Averses' },
+      { codes:[71,73,75,77,85,86], icon:'❄️', color:'rgba(220,230,240,.36)', label:'Neige' },
+      { codes:[95,96,99],    icon:'⛈️', color:'rgba(172,130,220,.38)', label:'Orage' }
+    ];
+    for(var i=0;i<table.length;i++){ if(table[i].codes.indexOf(code) !== -1) return table[i]; }
+    return { icon:'—', color:'rgba(150,155,165,.16)', label:'—' };
   }
 
-  function buildUrl(){
+  function buildUrl(lat, lon){
     return 'https://api.open-meteo.com/v1/forecast'
-      + '?latitude=' + LAT + '&longitude=' + LON
+      + '?latitude=' + lat + '&longitude=' + lon
       + '&current=temperature_2m,apparent_temperature,weather_code'
-      + '&hourly=weather_code,uv_index'
+      + '&hourly=weather_code,uv_index,temperature_2m'
       + '&daily=weather_code,temperature_2m_max,temperature_2m_min'
-      + '&timezone=' + encodeURIComponent(TZ)
+      + '&timezone=auto'
       + '&forecast_days=4';
+  }
+
+  function getLocalHour(utcOffsetSeconds){
+    var nowMs = Date.now();
+    var localMs = nowMs + (utcOffsetSeconds * 1000);
+    var d = new Date(localMs);
+    return d.getUTCHours() + d.getUTCMinutes() / 60;
   }
 
   function renderNow(data){
@@ -1295,15 +1414,13 @@ setInterval(updateClock,1000);
     if(!cur) return;
     elNowTemp.textContent = Math.round(cur.temperature_2m) + '°';
     if(elFeels) elFeels.textContent = Math.round(cur.apparent_temperature) + '°';
-    // UV "maintenant" : valeur horaire la plus proche de l'heure actuelle
     if(elUv && data.hourly && data.hourly.time){
       var nowIdx = data.hourly.time.indexOf(cur.time);
       if(nowIdx === -1){
-        // fallback : cherche l'heure la plus proche
-        var nowMs = new Date(cur.time).getTime();
+        var nowMsUv = new Date(cur.time).getTime();
         var best = 0, bestDiff = Infinity;
         data.hourly.time.forEach(function(t, i){
-          var diff = Math.abs(new Date(t).getTime() - nowMs);
+          var diff = Math.abs(new Date(t).getTime() - nowMsUv);
           if(diff < bestDiff){ bestDiff = diff; best = i; }
         });
         nowIdx = best;
@@ -1316,61 +1433,105 @@ setInterval(updateClock,1000);
   function renderForecast(data){
     if(!elForecast || !data.daily) return;
     var d = data.daily;
-    var cols = elForecast.querySelectorAll('.w-fc-day, .todo-empty');
     elForecast.innerHTML = '';
     for(var i = 0; i < 4 && i < d.time.length; i++){
       var date = new Date(d.time[i] + 'T00:00:00');
       var lbl = date.toLocaleDateString('fr-FR', { weekday:'short' });
-      var cat = weatherCategory(d.weather_code[i]);
+      var info = weatherInfo(d.weather_code[i]);
       var avg = Math.round((d.temperature_2m_max[i] + d.temperature_2m_min[i]) / 2);
       var col = document.createElement('div');
       col.className = 'w-fc-day';
       col.innerHTML =
         '<span class="w-fc-lbl">' + lbl.replace('.','') + '</span>' +
-        '<span class="w-fc-icon">' + cat.icon + '</span>' +
+        '<span class="w-fc-icon">' + info.icon + '</span>' +
         '<span class="w-fc-temp">' + avg + '°</span>';
       elForecast.appendChild(col);
     }
   }
 
+  function showTooltip(html, centerPct){
+    if(!elTooltip) return;
+    elTooltip.innerHTML = html;
+    elTooltip.classList.add('show');
+    var trackW = elTrack.clientWidth;
+    var ttW = elTooltip.offsetWidth;
+    var left = (centerPct/100) * trackW - ttW/2;
+    left = Math.max(2, Math.min(trackW - ttW - 2, left));
+    elTooltip.style.left = left + 'px';
+  }
+  function hideTooltip(){ if(elTooltip) elTooltip.classList.remove('show'); }
+
   function renderHourly(data){
     if(!elTrack || !data.hourly) return;
-    // Nettoie les anciens segments (garde le marqueur d'heure actuelle)
     elTrack.querySelectorAll('.w-hseg').forEach(function(el){ el.remove(); });
 
-    var codes = [];
+    var codes = [], temps = [];
     for(var h = 8; h <= 19; h++){
       codes.push(data.hourly.weather_code[h] !== undefined ? data.hourly.weather_code[h] : 0);
+      temps.push(data.hourly.temperature_2m[h] !== undefined ? data.hourly.temperature_2m[h] : null);
     }
-    // Regroupe les heures consécutives de même catégorie en un seul segment
+    // Regroupe les heures consécutives de même condition en un seul segment
     var segs = [];
     var startIdx = 0;
     for(var i = 1; i <= codes.length; i++){
-      var changed = (i === codes.length) || (weatherCategory(codes[i]).color !== weatherCategory(codes[startIdx]).color);
+      var changed = (i === codes.length) || (weatherInfo(codes[i]).color !== weatherInfo(codes[startIdx]).color);
       if(changed){
-        segs.push({ start:startIdx, end:i, cat:weatherCategory(codes[startIdx]) });
+        segs.push({ start:startIdx, end:i, info:weatherInfo(codes[startIdx]) });
         startIdx = i;
       }
     }
     segs.forEach(function(seg){
       var leftPct = (seg.start / 12) * 100;
       var widthPct = ((seg.end - seg.start) / 12) * 100;
+      var segTemps = temps.slice(seg.start, seg.end).filter(function(t){ return t !== null; });
+      var avgT = segTemps.length ? Math.round(segTemps.reduce(function(a,b){return a+b;},0)/segTemps.length) : null;
       var div = document.createElement('div');
       div.className = 'w-hseg';
       div.style.left = leftPct + '%';
       div.style.width = widthPct + '%';
-      div.style.background = seg.cat.color;
-      div.title = seg.cat.icon;
+      div.style.background = seg.info.color;
+      var hStart = 8 + seg.start, hEnd = 8 + seg.end;
+      var tooltipHtml = seg.info.label +
+        (avgT !== null ? ' · <span class="w-tt-temp">' + avgT + '°</span>' : '') +
+        ' · ' + hStart + 'h–' + hEnd + 'h';
+      div.addEventListener('mouseenter', function(){ showTooltip(tooltipHtml, leftPct + widthPct/2); });
+      div.addEventListener('mouseleave', hideTooltip);
       elTrack.insertBefore(div, elNowMarker);
     });
 
+    // Courbe de température lissée (aucun angle brutal : quadratique par points)
+    if(elCurve){
+      var vw = 300, vh = 100;
+      var validTemps = temps.filter(function(t){ return t !== null; });
+      var tMin = Math.min.apply(null, validTemps);
+      var tMax = Math.max.apply(null, validTemps);
+      var range = (tMax - tMin) || 1;
+      var pts = [];
+      for(var p = 0; p < temps.length; p++){
+        var t = temps[p] === null ? tMin : temps[p];
+        var x = (p / (temps.length - 1)) * vw;
+        var y = 74 - ((t - tMin) / range) * 44; // reste dans la partie haute de la bande
+        pts.push({ x:x, y:y });
+      }
+      var linePath = pts.length ? ('M ' + pts[0].x.toFixed(1) + ' ' + pts[0].y.toFixed(1)) : '';
+      for(var k = 0; k < pts.length - 1; k++){
+        var a = pts[k], b = pts[k+1];
+        var midX = (a.x+b.x)/2, midY = (a.y+b.y)/2;
+        linePath += (k === 0 ? ' L ' : ' Q ' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) + ' ') + midX.toFixed(1) + ' ' + midY.toFixed(1);
+      }
+      if(pts.length > 1){
+        var last = pts[pts.length-1], prev = pts[pts.length-2];
+        linePath += ' Q ' + prev.x.toFixed(1) + ' ' + prev.y.toFixed(1) + ' ' + last.x.toFixed(1) + ' ' + last.y.toFixed(1);
+      }
+      var fillPath = linePath + ' L ' + vw + ' ' + vh + ' L 0 ' + vh + ' Z';
+      elCurve.innerHTML =
+        '<path class="w-temp-fill" d="' + fillPath + '"></path>' +
+        '<path class="w-temp-line" d="' + linePath + '"></path>';
+    }
+
     // Marqueur rouge de l'heure actuelle (visible seulement entre 8h et 20h)
     if(elNowMarker){
-      var now = new Date();
-      var localHour;
-      try{
-        localHour = parseFloat(now.toLocaleTimeString('en-GB', { timeZone:TZ, hour:'2-digit', minute:'2-digit', hour12:false }).replace(':','.'));
-      }catch(e){ localHour = now.getHours() + now.getMinutes()/60; }
+      var localHour = getLocalHour(data.utc_offset_seconds || 0);
       if(localHour >= 8 && localHour <= 20){
         var pct = ((localHour - 8) / 12) * 100;
         elNowMarker.style.left = pct + '%';
@@ -1381,16 +1542,33 @@ setInterval(updateClock,1000);
     }
   }
 
-  fetch(buildUrl())
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      renderNow(data);
-      renderForecast(data);
-      renderHourly(data);
-    })
-    .catch(function(){
-      elNowTemp.innerHTML = '<span class="err-txt">Météo indisponible</span>';
-    });
+  function loadWeather(lat, lon, label){
+    if(elCity) elCity.textContent = label;
+    fetch(buildUrl(lat, lon))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        renderNow(data);
+        renderForecast(data);
+        renderHourly(data);
+      })
+      .catch(function(){
+        elNowTemp.innerHTML = '<span class="err-txt">Météo indisponible</span>';
+      });
+  }
+
+  function useFallback(){ loadWeather(PARIS.lat, PARIS.lon, PARIS.label); }
+
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      function(pos){
+        loadWeather(pos.coords.latitude, pos.coords.longitude, 'Ma position');
+      },
+      function(){ useFallback(); },
+      { timeout: 6000, maximumAge: 10*60*1000 }
+    );
+  } else {
+    useFallback();
+  }
 })();
 
 /* ══════════════════════════════════════════
