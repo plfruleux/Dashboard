@@ -386,304 +386,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .pom-dot.active{background:var(--accent);width:10px;border-radius:2px;}
 
 
-<<<<<<< HEAD
-/* ══ MUSIQUE / PODCAST — carte fractionnée ══ */
-#card-music{
-  flex-shrink:0;
-  overflow:hidden;
-  /* Hauteur réduite à 66.7% (réduction de 1/3) — hauteur seulement */
-  height:66.67%;
-  max-height:66.67%;
-  display:flex;
-  flex-direction:column;
-}
-
-/* Ajustements internes pour la tuile musique réduite */
-#card-music .ci{padding:4px;height:auto;overflow:hidden;}
-#card-music .amt-btn{font-size:6px;padding:3px 7px;}
-#card-music .sc-tab{font-size:10px;padding:4px 8px;}
-#card-music #vol-row{padding:6px;gap:6px;align-items:center;}
-#card-music #yt-play-btn{width:20px;height:20px;}
-#card-music #pod-vol-sl{width:36px;height:2px;}
-#card-music #pod-time,#card-music #pod-status,#card-music #pod-vol-icon{font-size:6px;}
-#card-music #todo-list-name{font-size:7px;}
-#card-music .todo-nav-btn{font-size:16px;padding:0 4px;}
-#card-music .sc-frame{width:100%;height:calc(100% - 70px);max-height:100%;display:block;border:0;}
-#card-music #sc-stack{overflow:hidden;}
-#card-music iframe{max-width:100%;}
-#card-music .ci > *{box-sizing:border-box;}
-#card-music .ci > .scrollable{overflow:auto;}
- 
-#card-music .ci{padding:0;height:auto;} 
-
-/* ── Toggle 2 modes (MUSIQUE / PODCAST) ── */
-#audio-mode-toggle{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:5px;padding:5px 8px;border-bottom:1px solid var(--border);
-}
-.amt-btn{
-  flex:0 1 auto;padding:4px 9px;border-radius:5px;
-  background:transparent;border:1px solid transparent;
-  color:var(--t3);font-family:var(--fm);font-size:7px;letter-spacing:.14em;
-  cursor:pointer;transition:color .2s,background .2s,border-color .2s;
-  -webkit-tap-highlight-color:transparent;white-space:nowrap;
-}
-.amt-btn.active{
-  color:var(--accent);background:rgba(212,168,83,.10);
-  border-color:rgba(212,168,83,.25);
-}
-.amt-btn:hover:not(.active){color:var(--t2);} 
-#amt-matin-dot{
-  -webkit-box-flex:1;-ms-flex:1;flex:1;
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-}
-#amt-matin-dot.on::before{
-  content:'';display:inline-block;width:5px;height:5px;
-  border-radius:50%;background:#f0b429;
-  box-shadow:0 0 6px rgba(240,180,41,0.6);
-  -webkit-animation:pulse-matin 2.4s ease-in-out infinite;
-  animation:pulse-matin 2.4s ease-in-out infinite;
-}
-@-webkit-keyframes pulse-matin{0%,100%{opacity:.5;}50%{opacity:1;}}
-@keyframes pulse-matin{0%,100%{opacity:.5;}50%{opacity:1;}}
-/* ── Vues mutuellement exclusives ── */
-.audio-mode{display:none;} 
-.audio-mode.visible{display:block;} 
-
-/* Section YouTube */
-#sc-tabs{
-  display:flex;gap:0;border-bottom:1px solid var(--border);
-  overflow-x:auto;scrollbar-width:none;
-}
-#sc-tabs::-webkit-scrollbar{display:none;}
-.sc-tab{
-  flex:1;padding:5px 6px;
-  font-family:var(--fm);font-size:7px;letter-spacing:.03em;
-  color:var(--t3);background:none;border:none;border-right:1px solid var(--border);
-  cursor:pointer;transition:color .15s,background .15s;
-  -webkit-tap-highlight-color:transparent;white-space:nowrap;text-align:center;
-}
-.sc-tab:last-child{border-right:none;}
-.sc-tab.active{color:var(--accent);background:rgba(212,168,83,.06);} 
-.sc-tab:hover:not(.active){color:var(--t2);} 
-/* Iframes cachées — audio seulement */
-#sc-stack{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;top:0;left:0;} 
-.sc-frame{display:none;width:1px;height:1px;border:none;} 
-.sc-frame.active{display:block;} 
-/* Volume row */
-#vol-row{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:8px;padding:5px 10px;border-top:1px solid var(--border);
-}
-#vol-icon{font-size:11px;color:var(--t3);flex-shrink:0;cursor:pointer;-webkit-user-select:none;user-select:none;}
-#vol-slider{
-  -webkit-box-flex:1;-ms-flex:1;flex:1;
-  -webkit-appearance:none;appearance:none;
-  height:2px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;
-}
-#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:10px;height:10px;border-radius:50%;background:var(--accent);cursor:pointer;transition:-webkit-transform .1s;transition:transform .1s;}
-#vol-slider::-webkit-slider-thumb:hover{-webkit-transform:scale(1.3);transform:scale(1.3);} 
-#vol-slider::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;} 
-#vol-pct{font-family:var(--fm);font-size:7px;color:var(--t3);min-width:24px;text-align:right;} 
-#sc-credit{
-  padding:3px 10px 4px;font-size:7.5px;color:var(--t3);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--fm);
-}
-#sc-credit a{color:var(--t3);text-decoration:none;} 
-#sc-credit a:hover{color:var(--accent);} 
-
-#local-playlist{display:flex;flex-direction:column;gap:6px;padding-top:6px;max-height:130px;overflow:auto;padding-right:6px}
-#local-playlist .local-track{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:transparent;border:none;color:var(--t2);font-family:var(--fm);font-size:9px;text-align:left;cursor:pointer;transition:background .12s,color .12s,transform .12s}
-#local-playlist .local-track:hover{background:rgba(255,255,255,0.02);color:var(--t1);transform:translateY(-1px)}
-#local-playlist .local-track.active{background:rgba(212,168,83,0.12);color:var(--t1);font-weight:600}
-#local-playlist .local-track .track-meta{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-#local-playlist::-webkit-scrollbar{height:6px;width:6px}
-#local-playlist::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:6px}
-#local-playlist::-webkit-scrollbar-track{background:transparent}
-.local-track{
-  cursor:pointer;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.04);
-  font-family:var(--fm);font-size:9px;color:var(--t2);background:transparent;display:flex;align-items:center;gap:8px;justify-content:space-between;
-  transition:background .12s,border-color .12s,color .12s,transform .12s;
-}
-.local-track:hover{background:rgba(255,255,255,.03);border-color:rgba(212,168,83,.14);color:var(--t1);transform:translateY(-2px)}
-.local-track.active{background:rgba(212,168,83,.10);border-color:rgba(212,168,83,.28);color:var(--t1);}
-#local-controls{display:flex;align-items:center;gap:10px;}
-#local-controls .amt-btn{width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;padding:0;border:1px solid rgba(255,255,255,.04);background:var(--adim);color:var(--t2);font-size:14px}
-#local-controls .amt-btn:hover{background:rgba(212,168,83,.14);color:var(--t1);transform:translateY(-2px)}
-#local-play-btn{width:46px;height:46px;font-size:18px}
-#local-current-title{font-family:var(--fb);font-size:12px;color:var(--t1)}
-#local-loop-btn.active,#local-shuffle-btn.active{color:var(--accent);background:rgba(212,168,83,.12);border-color:rgba(212,168,83,.25)}
-#local-playlist::-webkit-scrollbar{height:6px;width:6px}
-#local-playlist::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:6px}
-
-
-/* Section Podcast */
-#pod-section{position:relative;} 
-#pod-tabs{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  gap:0;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;
-}
-#pod-tabs::-webkit-scrollbar{display:none;}
-#pod-info{
-  padding:4px 10px 3px;font-family:var(--fm);font-size:7px;color:var(--t2);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:16px;
-}
-#pod-info a{color:var(--t2);text-decoration:none;} 
-#pod-info a:hover{color:var(--accent);} 
-#pod-controls{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:7px;padding:4px 10px 5px;
-}
-#pod-play-btn{
-  flex-shrink:0;
-  width:28px;height:28px;border-radius:50%;
-  background:var(--adim);border:1px solid rgba(212,168,83,.30);
-  color:var(--acc);
-  cursor:pointer;transition:background .2s, border-color .2s, opacity .15s;
-  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  padding:0;
-}
-#pod-play-btn:hover{background:rgba(212,168,83,.22);border-color:rgba(212,168,83,.6);} 
-#pod-play-btn:active{-webkit-transform:scale(.93);transform:scale(.93);} 
-#pod-play-btn svg{display:block;} 
-#pod-prog-wrap{
-  -webkit-box-flex:1;-ms-flex:1;flex:1;
-  height:3px;background:var(--border);border-radius:2px;cursor:pointer;position:relative;overflow:hidden;
-}
-#pod-prog{height:100%;background:var(--accent);border-radius:2px;width:0;-webkit-transition:width .4s linear;transition:width .4s linear;} 
-#pod-time{font-family:var(--fm);font-size:6.5px;color:var(--t3);flex-shrink:0;min-width:50px;text-align:right;} 
-#pod-vol-icon{font-size:10px;color:var(--t3);cursor:pointer;flex-shrink:0;} 
-#pod-vol-sl{
-  flex-shrink:0;width:42px;-webkit-appearance:none;appearance:none;
-  height:2px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;
-}
-#pod-vol-sl::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:8px;height:8px;border-radius:50%;background:var(--t3);cursor:pointer;} 
-#pod-vol-sl::-moz-range-thumb{width:8px;height:8px;border-radius:50%;background:var(--t3);border:none;cursor:pointer;} 
-#pod-status{font-family:var(--fm);font-size:6.5px;color:var(--t3);padding:0 10px 4px;min-height:12px;} 
-#audio-mode{display:none}
-
-/* ══ TODO TILE ══ */
-#card-music{ /* min-height retiré : la carte s'adapte au contenu */
-  /* Hauteur réduite appliquée plus haut — règle conservée pour compatibilité */
-} 
-#view-todo{ display:none;flex-direction:column;height:100%;min-height:200px; } 
-#view-music{ display:block;position:relative; } 
-
-/* ── En-tête todo ── */
-#todo-header{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:4px;padding:7px 10px;border-bottom:1px solid var(--border);flex-shrink:0;
-}
-.todo-nav-btn{
-  background:none;border:none;color:var(--t3);cursor:pointer;
-  font-size:18px;line-height:1;padding:0 5px;flex-shrink:0;
-  transition:color .15s,transform .1s;
-}
-.todo-nav-btn:hover{ color:var(--accent);transform:scale(1.2); }
-#todo-list-name{
-  -webkit-box-flex:1;-ms-flex:1;flex:1;text-align:center;
-  font-family:var(--fm);font-size:7.5px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--accent);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.todo-hdr-btn{
-  background:none;border:1px solid var(--border);border-radius:4px;
-  color:var(--t3);cursor:pointer;font-size:11px;padding:4px 8px;
-  line-height:1;flex-shrink:0;transition:color .15s,border-color .15s;
-  font-family:var(--fm);min-width:26px;text-align:center;
-}
-.todo-hdr-btn:hover{ color:var(--accent);border-color:rgba(212,168,83,.38); }
-
-/* Liste items */
-#todo-items{
-  -webkit-box-flex:1;-ms-flex:1;flex:1;
-  overflow-y:auto;padding:4px 8px 6px;
-  scrollbar-width:none;
-}
-#todo-items::-webkit-scrollbar{ display:none; }
-.todo-item{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-align:flex-start;-ms-flex-align:flex-start;align-items:flex-start;
-  gap:7px;padding:4px 2px;
-  border-bottom:1px solid rgba(255,255,255,.03);
-  border-left:2px solid transparent;
-  transition:border-left-color .15s,background .15s,padding-left .15s;
-}
-.todo-item:last-child{ border-bottom:none; }
-.todo-item:hover{ border-left-color:var(--accent);background:rgba(255,255,255,.015);padding-left:3px; }
-.todo-check{
-  width:15px;height:15px;border-radius:50%;border:1px solid var(--t3);
-  flex-shrink:0;cursor:pointer;margin-top:1px;position:relative;
-  transition:background .15s,border-color .15s,transform .1s;
-}
-.todo-check:hover{ border-color:var(--accent);transform:scale(1.18); }
-.todo-check.checking{ background:rgba(212,168,83,.25);border-color:var(--accent); }
-.todo-check.done{ background:var(--accent);border-color:var(--accent); }
-.todo-check.done::after{
-  content:'✓';position:absolute;top:50%;left:50%;
-  -webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);
-  font-size:8px;color:#07080b;line-height:1;
-}
-.todo-text{ -webkit-box-flex:1;-ms-flex:1;flex:1;min-width:0; }
-.todo-title{
-  font-family:var(--fm);font-size:9px;color:var(--t2);
-  line-height:1.45;word-break:break-word;
-}
-.todo-title.done{ text-decoration:line-through;opacity:.3; }
-.todo-due{
-  font-family:var(--fm);font-size:7px;color:var(--t3);
-  white-space:nowrap;flex-shrink:0;margin-top:2px;
-}
-.todo-due.overdue{ color:#e05c5c; }
-.todo-empty{
-  font-family:var(--fm);font-size:8px;color:var(--t3);
-  text-align:center;padding:18px 0;
-}
-
-/* Barre décompte retour todo (5s) */
-#music-return-bar{
-  position:absolute;bottom:0;left:0;height:1px;
-  background:var(--accent);opacity:.45;width:0%;
-}
-
-/* ══ TODOS MODAL ══ */
-#todos-modal{
-  position:fixed;inset:0;z-index:900;
-  display:none;
-  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  padding:16px;
-}
-#todos-modal.open{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
-}
-#todos-modal-bg{
-  position:absolute;inset:0;
-  background:rgba(4,5,9,0.75);
-  -webkit-backdrop-filter:blur(14px) saturate(1.4);
-  backdrop-filter:blur(14px) saturate(1.4);
-  cursor:pointer;
-  animation:bgFadeIn .25s ease both;
-}
-@keyframes bgFadeIn{ from{opacity:0}to{opacity:1} }
-#todos-modal-panel{
-  position:relative;z-index:1;
-  width:min(98vw,1160px);
-  max-height:min(92vh,820px);
-  background:linear-gradient(145deg,rgba(14,16,26,0.98) 0%,rgba(9,11,18,0.99) 100%);
-  border:1px solid rgba(255,255,255,.11);
-  border-top:1px solid rgba(255,255,255,.20);
-  border-radius:14px;
-  overflow:hidden;
-=======
 /* Couleur d'accent selon la phase (travail / pause / grande pause) */
 #card-clock.pom-mode-break #pom-time,
 #pomo-full.pom-mode-break #pomo-full-time{color:var(--blue);}
@@ -706,7 +408,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
    garantit un rendu toujours sombre/transparent même si la capture échoue. */
 #pomo-full{
   position:fixed;inset:0;z-index:500;overflow:hidden;
->>>>>>> d778e7682095a5a55b9e833a24f6a8fb5e3137c5
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
   -ms-flex-direction:column;flex-direction:column;
@@ -738,9 +439,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   -webkit-transform:scale(1);transform:scale(1);
 }
 #pomo-full-close{
- position:absolute;top:18px;right:18px; /* réaligné bouton fermeture */
+  position:absolute;top:20px;right:22px;
   background:none;border:1px solid rgba(255,255,255,.12);
- color:var(--t3);width:34px;height:34px;border-radius:50%;cursor:pointer;
+  color:var(--t3);width:30px;height:30px;border-radius:50%;cursor:pointer;
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
@@ -753,7 +454,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   font-variant-numeric:tabular-nums;
   -webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;
   transition:color .3s;text-align:center;
-  margin-top:40px; /* descend l'heure dans la vue plein écran */
 }
 #pomo-full .pom-prog-track{position:static;width:min(60vw,320px);height:2px;background:rgba(255,255,255,.09);}
 #pomo-full .pom-dots{gap:8px;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;}
@@ -827,16 +527,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   position:absolute;inset:-16px;z-index:0;
   background-image:url('assets/img/music-fallback.png');
   background-size:cover;background-position:center;
-  /* Réduction du flou de la tuile musique → environ 20% de l'original (~2px) */
-  -webkit-filter:blur(2px) saturate(1.1) brightness(.68);
-  filter:blur(2px) saturate(1.1) brightness(.68);
+  -webkit-filter:blur(8px) saturate(1.1) brightness(.68);
+  filter:blur(8px) saturate(1.1) brightness(.68);
 }
 #music-bg-img{
   position:absolute;inset:-16px;z-index:1;
   width:auto;height:auto;max-width:none;
   object-fit:cover;opacity:0;transition:opacity .5s ease;
-  -webkit-filter:blur(2px) saturate(1.15) brightness(.68);
-  filter:blur(2px) saturate(1.15) brightness(.68);
+  -webkit-filter:blur(8px) saturate(1.15) brightness(.68);
+  filter:blur(8px) saturate(1.15) brightness(.68);
 }
 #music-bg-img.loaded{opacity:1;}
 #music-bg-scrim{
@@ -854,8 +553,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  /* réduire légèrement le flou pour la pastille */
-  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 4px 12px rgba(0,0,0,.35);
   transition:color .15s,background .15s,-webkit-transform .18s;transition:color .15s,background .15s,transform .18s;
 }
@@ -1521,9 +1219,6 @@ body{ animation:appFadeIn .6s ease both; }
                   <svg id="pom-btn-icon" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
                     <polygon points="2,1 9,5 2,9"/>
                   </svg>
-                </button>
-                <button id="skip-pause-btn" title="Skip Pause" aria-label="Skip Pause" style="margin-left:8px;">
-                  ⏭
                 </button>
                 <div class="pom-dots">
                   <div class="pom-dot active" id="pd0"></div>
@@ -2755,196 +2450,5 @@ setInterval(updateClock,1000);
      la page").
 ══════════════════════════════════════════ -->
 
-<!-- SETTINGS PANEL (hidden) + GitHub API helpers & calendar layout helpers -->
-<style>
-  /* Settings panel styles */
-  #settings-panel{
-    position:fixed;right:12px;bottom:12px;width:340px;background:linear-gradient(180deg,rgba(12,14,18,.96),rgba(8,9,11,.98));
-    border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;z-index:1200;display:none;box-shadow:0 8px 30px rgba(0,0,0,.6);
-  }
-  #settings-panel h3{margin:0 0 8px;font-family:var(--fm);font-size:12px;color:var(--t1)}
-  #settings-panel label{display:block;font-family:var(--fm);font-size:11px;color:var(--t3);margin-top:8px}
-  #settings-panel input[type=text],#settings-panel textarea,#settings-panel input[type=password]{width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,.04);background:transparent;color:var(--t1);box-sizing:border-box}
-  #settings-panel .row{display:flex;gap:8px;margin-top:8px}
-  #settings-panel .btn{margin-top:10px;padding:8px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.06);background:var(--adim);color:var(--t2);cursor:pointer}
-  #settings-toggle{position:fixed;right:12px;bottom:12px;width:40px;height:40px;border-radius:10px;z-index:1199;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer}
-
-  /* calendar event styles (iOS-like pill with left accent) */
-  .cal-event{
-    position:absolute;box-sizing:border-box;padding:6px 8px;border-radius:6px;background:rgba(212,168,83,0.16);color:var(--t1);font-family:var(--fm);font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
-  }
-  .cal-event .evt-left-accent{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:6px 0 0 6px;background:var(--accent);opacity:1}
-  .cal-allday-cell .cal-event{position:relative;margin-bottom:6px}
-</style>
-
-<div id="settings-toggle" title="Réglages (cache)">&#9881;</div>
-<div id="settings-panel" aria-hidden="true">
-  <h3>Réglages (cache)</h3>
-  <label>Liens calendrier (iCal URLs, 1 par ligne)</label>
-  <textarea id="settings-cal-links" rows="4" placeholder="https://..."></textarea>
-
-  <label>Couleur accent (hex)</label>
-  <input id="settings-accent" type="text" placeholder="#d4a853" />
-
-  <label>Token GitHub (optionnel — pour sauvegarde serveur)</label>
-  <input id="settings-github-token" type="password" placeholder="ghp_xxx — Ne pas committer" />
-
-  <div class="row">
-    <button id="settings-save" class="btn">Sauvegarder</button>
-    <button id="settings-close" class="btn">Fermer</button>
-  </div>
-  <div style="margin-top:8px;font-size:11px;color:var(--t3)">Note : le token n'est pas stocké dans le repo. Configurez un token avec droits repo (push) si vous voulez activer la sauvegarde serveur via l'API GitHub.</div>
-</div>
-
-<script>
-/* --- GitHub helper: read/update JSON file in repo ---
-   Requires: owner, repo, path, token (token handled by user via settings panel)
-   This is a minimal implementation using the REST API v3 (contents endpoint).
-*/
-const GH_OWNER = 'plfruleux';
-const GH_REPO = 'Dashboard';
-const GH_STATE_PATH = 'data/pomodoro_state.json';
-const GH_SETTINGS_PATH = 'data/settings.json';
-
-async function ghGetFile(path, token){
-  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`;
-  const res = await fetch(url, {headers: token ? {Authorization: 'token '+token} : {}});
-  if(!res.ok) throw new Error('ghGetFile: '+res.status+' '+await res.text());
-  return res.json();
-}
-
-async function ghPutFile(path, contentObj, message, token){
-  // get existing to retrieve sha (if exists)
-  let sha = null;
-  try{ const existing = await ghGetFile(path, token); sha = existing.sha; }catch(e){ /* file may not exist */ }
-  const payload = {
-    message: message || 'Update via Dashboard UI',
-    content: btoa(unescape(encodeURIComponent(JSON.stringify(contentObj, null, 2)))),
-  };
-  if(sha) payload.sha = sha;
-  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`;
-  const res = await fetch(url, {method:'PUT', headers: {Authorization: 'token '+token, 'Content-Type':'application/json'}, body: JSON.stringify(payload)});
-  if(!res.ok) throw new Error('ghPutFile: '+res.status+' '+await res.text());
-  return res.json();
-}
-
-/* --- Settings panel behaviour --- */
-document.getElementById('settings-toggle').addEventListener('click', function(){
-  const p = document.getElementById('settings-panel');
-  if(p.style.display === 'block'){ p.style.display='none'; p.setAttribute('aria-hidden','true'); }
-  else { p.style.display='block'; p.setAttribute('aria-hidden','false'); }
-});
-document.getElementById('settings-close').addEventListener('click', function(){
-  document.getElementById('settings-panel').style.display='none';
-});
-
-document.getElementById('settings-save').addEventListener('click', async function(){
-  const links = document.getElementById('settings-cal-links').value.trim().split(/\n+/).filter(Boolean);
-  const accent = document.getElementById('settings-accent').value.trim() || '#d4a853';
-  const token = document.getElementById('settings-github-token').value.trim();
-  const settings = {calendarLinks: links, accent: accent};
-
-  // Try to save to GitHub if token provided
-  if(token){
-    try{
-      await ghPutFile(GH_SETTINGS_PATH, settings, 'Update settings from dashboard UI', token);
-      alert('Settings sauvegardés dans le repo.');
-    }catch(e){
-      console.error(e); alert('Erreur sauvegarde serveur: '+e.message);
-    }
-  }else{
-    // fallback: localStorage
-    localStorage.setItem('dashboard_settings', JSON.stringify(settings));
-    alert('Settings sauvegardés localement (localStorage).');
-  }
-});
-
-/* --- Pomodoro server-backed helpers --- */
-async function loadPomodoroState(token){
-  try{
-    const data = await ghGetFile(GH_STATE_PATH, token);
-    const json = JSON.parse(decodeURIComponent(escape(atob(data.content))));
-    return json;
-  }catch(e){
-    // fallback default
-    return {remaining:1500,running:false,sessionCount:0};
-  }
-}
-async function savePomodoroState(state, token){
-  if(!token) { localStorage.setItem('pomo_state', JSON.stringify(state)); return; }
-  try{
-    await ghPutFile(GH_STATE_PATH, state, 'Update pomodoro state', token);
-  }catch(e){ console.error('savePomodoroState', e); throw e; }
-}
-
-/* --- Skip pause button handler --- */
-document.getElementById('skip-pause-btn').addEventListener('click', async function(){
-  // Minimal integration: call app's skip logic if present, otherwise update state on server
-  try{
-    if(typeof window.skipPomodoroPause === 'function'){ window.skipPomodoroPause(); return; }
-    const token = document.getElementById('settings-github-token').value.trim();
-    const st = await loadPomodoroState(token);
-    // naive: set running true and remaining to work duration (e.g., 25min)
-    st.running = true; st.remaining = 25*60; st.currentPhase = 'work';
-    if(typeof savePomodoroState === 'function') await savePomodoroState(st, token);
-    else await savePomodoroState(st, token);
-    alert('Pause passée.');
-  }catch(e){ console.error(e); alert('Erreur skip pause: '+e.message); }
-});
-
-/* --- Calendar layout helper: compute juxtaposed layout for overlapping events ---
-   events: array of {id,start, end, allDay, el}
-   container: element where events are absolutely positioned
-   This function assigns style left/width in % and top/height in px (caller responsible for top/height)
-*/
-function layoutEventsJuxtapose(events){
-  // sort by start
-  events.sort((a,b)=>a.start - b.start);
-  const groups = [];
-  events.forEach(ev=>{
-    let placed=false;
-    for(const g of groups){
-      // if ev starts after all events in group end -> not overlapping
-      if(ev.start >= g.maxEnd){
-        continue;
-      }
-      // if overlaps with group -> add
-      if(ev.start < g.maxEnd){ g.items.push(ev); g.maxEnd = Math.max(g.maxEnd, ev.end); placed=true; break; }
-    }
-    if(!placed) groups.push({items:[ev], maxEnd:ev.end});
-  });
-
-  // For each group, perform column layout
-  groups.forEach(group=>{
-    const cols = [];
-    group.items.forEach(ev=>{
-      // find first column where no overlap
-      let placed=false;
-      for(let i=0;i<cols.length;i++){
-        if(ev.start >= cols[i]){ // no overlap
-          cols[i]=ev.end; ev.col=i; placed=true; break;
-        }
-      }
-      if(!placed){ ev.col = cols.length; cols.push(ev.end); }
-      ev.totalCols = cols.length; // this will be approximate; adjust below
-    });
-    // fix totalCols for each event (max cols used)
-    const total = cols.length;
-    group.items.forEach(ev=> ev.totalCols = total);
-
-    // apply styles
-    group.items.forEach(ev=>{
-      const leftPct = (ev.col / ev.totalCols) * 100;
-      const widthPct = (1 / ev.totalCols) * 100;
-      if(ev.el){
-        ev.el.style.left = leftPct+'%';
-        ev.el.style.width = widthPct+'%';
-      }
-    });
-  });
-}
-
-/* --- Small note for the AI/human deployer: see in-file instructions below --- */
-</script>
-
+</body>
 </html>
