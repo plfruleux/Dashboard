@@ -160,8 +160,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   .left-col > .card{margin-bottom:8px;}
 }
 @media(max-height:700px){
-  #card-weather{max-height:200px;}
-  .w-curve-wrap{display:none;}
+  #card-weather{max-height:220px;}
+  .w-hourly-wrap{display:none;}
 }
 
 /* CARD */
@@ -212,11 +212,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #card-clock:hover #fr-time{ text-shadow:0 0 22px rgba(212,168,83,.4); }
 .divl{height:1px;background:rgba(255,255,255,0.10);margin:6px 0;flex-shrink:0;}
 
-/* ══ CLOCK + POMODORO EMBED ══ */
+/* ══ CLOCK + POMODORO — fonctionnel ══ */
 #card-clock{flex-shrink:0;overflow:hidden;}
 #card-clock .ci{padding:0;overflow:hidden;}
 
-/* Conteneur splitté côte à côte */
+/* Conteneur splitté côte à côte — les proportions changent quand le
+   pomodoro démarre (classe .pomo-active posée sur #card-clock). */
 .ck-split{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:horizontal;-webkit-box-direction:normal;
@@ -225,39 +226,49 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 
 /* ─ Moitié gauche : horloge ─ */
 .ck-left{
-  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1;min-width:0;
-  border-right:1px solid rgba(255,255,255,0.07);
+  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1 1 0;min-width:0;
+  border-right:1px solid rgba(255,255,255,0.11);
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
   -ms-flex-direction:column;flex-direction:column;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:flex .45s cubic-bezier(.4,0,.2,1);
 }
 .ck-main{
-  padding:13px 14px 10px;
+  padding:13px 14px;
   -webkit-box-flex:1;-ms-flex:1;flex:1;
-}
-.ck-city{
-  font-family:var(--fm);font-size:6px;letter-spacing:.32em;
-  text-transform:uppercase;color:var(--t3);
-  margin-bottom:5px;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:padding .45s cubic-bezier(.4,0,.2,1);
 }
 #fr-time{
   font-family:var(--fd);font-size:42px;font-weight:800;
   line-height:.95;letter-spacing:.005em;color:var(--t1);
   display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:horizontal;-webkit-box-direction:normal;
+  -ms-flex-direction:row;flex-direction:row;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:font-size .45s cubic-bezier(.4,0,.2,1),flex-direction 0s .2s;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;
 }
-.sep{color:var(--accent);margin:0 1px;animation:blink 1s step-end infinite;}
-@keyframes blink{0%,49%{opacity:.9}50%,100%{opacity:.15}}
+#fr-h,#fr-m{ min-width:1.1em;text-align:center; }
+.sep{color:var(--accent);margin:0 1px;} /* clignotement retiré */
 #fr-date{
   font-family:var(--fm);font-size:6px;
   color:var(--t3);letter-spacing:.07em;
   margin-top:6px;text-transform:capitalize;
+  transition:opacity .25s ease,max-height .3s ease;
 }
 .ck-vn{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:baseline;-ms-flex-align:baseline;align-items:baseline;
   gap:9px;padding:7px 14px 9px;
   border-top:1px solid rgba(255,255,255,0.06);
+  transition:opacity .25s ease,max-height .3s ease;
 }
 .ck-vn-lbl{
   font-family:var(--fm);font-size:5.5px;letter-spacing:.3em;
@@ -268,55 +279,96 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   font-family:var(--fd);font-size:15px;font-weight:600;
   color:rgba(240,236,228,0.6);letter-spacing:.01em;line-height:1;
   -webkit-box-flex:1;-ms-flex:1;flex:1;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;
 }
 #vn-diff{
   font-family:var(--fm);font-size:5.5px;color:var(--accent);
   letter-spacing:.06em;flex-shrink:0;
 }
+/* État pomodoro actif : l'horloge se réduit à la taille de son contenu
+   (pas de largeur fixe), l'heure passe en vertical (HH au-dessus de MM)
+   pour occuper le moins de place possible, avec le même espacement que
+   celui du bloc pomodoro voisin. */
+#card-clock.pomo-active .ck-left{ -webkit-box-flex:0;-ms-flex:0 0 auto;flex:0 0 auto; }
+#card-clock.pomo-active .ck-main{ padding:10px 14px; }
+#card-clock.pomo-active #fr-time{
+  font-size:15px;line-height:1.15;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;
+  gap:1px;
+}
+#card-clock.pomo-active #fr-time .sep{ display:none; }
+#card-clock.pomo-active #fr-date,
+#card-clock.pomo-active .ck-vn{ display:none; }
+#card-clock.pomo-active .ck-right{ -webkit-box-flex:2;-ms-flex:2 1 0;flex:2 1 0; }
 
-/* ─ Moitié droite : mini Pomodoro ─ */
+/* ─ Moitié droite : pomodoro ─ */
 .ck-right{
-  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1;min-width:0;
+  -webkit-box-flex:1;-ms-flex:1 1 0;flex:1 1 0;min-width:0;
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
   -ms-flex-direction:column;flex-direction:column;
-  position:relative;
+  position:relative;transition:flex .45s cubic-bezier(.4,0,.2,1);
 }
-.pom-header{
-  padding:7px 10px 6px;
+#pom-fullscreen-btn{
+  position:absolute;top:6px;right:7px;z-index:2;
+  background:none;border:none;cursor:pointer;
+  color:var(--t3);font-size:11px;padding:2px 4px;line-height:1;
+  transition:color .2s,-webkit-transform .15s;transition:color .2s,transform .15s;
+}
+#pom-fullscreen-btn:hover{color:var(--accent);-webkit-transform:scale(1.15);transform:scale(1.15);}
+
+/* Barre fine : préréglage de rythme + compteur de séances */
+.pom-topbar{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
-  border-bottom:1px solid rgba(255,255,255,0.07);
+  padding:5px 22px 0 8px;flex-shrink:0;
 }
-.pom-header-lbl{font-family:var(--fm);font-size:5.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--t3);} 
-#pom-fullscreen-btn{
-  background:none;border:none;cursor:pointer;
-  color:var(--t3);font-size:11px;padding:1px 3px;line-height:1;
-  text-decoration:none;display:block;
-  transition:color .2s;
+.pom-mini-btn{
+  background:none;border:1px solid var(--border);color:var(--t3);
+  font-family:var(--fm);font-size:6px;letter-spacing:.06em;
+  border-radius:4px;padding:2px 5px;cursor:pointer;
+  transition:color .15s,border-color .15s;
 }
-#pom-fullscreen-btn:hover{color:var(--accent);}
+.pom-mini-btn:hover{color:var(--accent);border-color:rgba(212,168,83,.4);}
+.pom-mini-lbl{
+  font-family:var(--fm);font-size:6px;letter-spacing:.1em;color:var(--t3);
+  text-transform:uppercase;
+}
+.pom-mini-lbl b{color:var(--t2);font-weight:400;}
+
+/* Corps : temps et contrôles juxtaposés, occupent tout l'espace disponible */
 .pom-body{
   -webkit-box-flex:1;-ms-flex:1;flex:1;
   display:-webkit-box;display:-ms-flexbox;display:flex;
-  -webkit-box-orient:vertical;-webkit-box-direction:normal;
-  -ms-flex-direction:column;flex-direction:column;
+  -webkit-box-orient:horizontal;-webkit-box-direction:normal;
+  -ms-flex-direction:row;flex-direction:row;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  padding:8px 10px;gap:5px;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:space-evenly;
+  padding:4px 10px;gap:8px;position:relative;
 }
-#pom-mode-lbl{font-family:var(--fm);font-size:5.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);opacity:.8;}
 #pom-time{
-  font-family:var(--fd);font-size:30px;font-weight:800;
+  font-family:var(--fd);font-size:36px;font-weight:800;
   letter-spacing:-.02em;line-height:1;color:var(--t1);
+  transition:color .3s;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;
 }
 #pom-time.pom-urgent{color:rgba(200,90,70,.9);}
-.pom-prog-track{width:80%;height:1px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden;} 
-.pom-prog-bar{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width 1s linear;}
-.pom-controls{display:-webkit-box;display:-ms-flexbox;display:flex;gap:7px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}
+.pom-prog-track{
+  position:absolute;left:0;right:0;bottom:0;width:auto;
+  height:2px;background:rgba(255,255,255,.07);border-radius:0;overflow:hidden;
+}
+.pom-prog-bar{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width 1s linear,background .3s;}
+.pom-controls{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;
+  gap:8px;-webkit-box-align:center;-ms-flex-align:center;align-items:center;
+}
 #pom-btn{
-  width:28px;height:28px;border-radius:50%;
+  width:30px;height:30px;border-radius:50%;
   background:var(--adim);
   border:1px solid rgba(212,168,83,0.35);
   color:var(--accent);
@@ -333,46 +385,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .pom-dot.done{background:rgba(240,236,228,.35);} 
 .pom-dot.active{background:var(--accent);width:10px;border-radius:2px;}
 
-/* ══ WEATHER ══ */
-#card-weather{background:rgba(8,10,17,0.65);flex-shrink:0;overflow:hidden;}
-#card-weather .ci{overflow:hidden;position:relative;z-index:1;}
-#weather-bg{
-  position:absolute;top:0;right:0;bottom:0;left:0;z-index:0;
-  opacity:.55;transition:background 2s ease;
-  pointer-events:none;
-}
-.w-cur{display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px solid var(--border);flex-shrink:0;}
-#w-icon{font-size:28px;line-height:1;}
-#w-temp{font-family:var(--fd);font-size:38px;font-weight:800;line-height:1;letter-spacing:.01em;color:var(--t1);} 
-.w-meta{flex:1;} 
-#w-desc{font-size:9.5px;color:var(--t2);margin-bottom:2px;text-transform:capitalize;} 
-.w-stats{display:flex;gap:8px;} 
-.ws .ws-l{font-family:var(--fm);font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);} 
-.ws .ws-v{font-family:var(--fm);font-size:9.5px;color:var(--t2);} 
-/* SVG courbe pleine largeur + fondu bord droit via mask (indépendant du fond) */
-.w-curve-wrap{flex-shrink:0;margin:4px -13px 2px;position:relative;} 
-.w-curve-wrap::after{ display:none; } 
-.w-curve-lbl{font-family:var(--fm);font-size:6.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin-bottom:3px;padding:0 13px;} 
-#temp-svg-wrap{ 
-  width:100%;overflow:hidden;display:block;
-  -webkit-mask-image:-webkit-linear-gradient(left, black 70%, transparent 100%);
-  mask-image:linear-gradient(to right, black 70%, transparent 100%);
-}
-.w-dl{font-family:var(--fm);font-size:6.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin:5px 0 4px;flex-shrink:0;} 
-.w-days{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;flex-shrink:0;} 
-.dc{background:var(--gl-light);border:1px solid var(--border);border-radius:7px;padding:4px;display:flex;flex-direction:column;align-items:center;gap:1px;} 
-.dc-n{font-family:var(--fm);font-size:6.5px;text-transform:uppercase;color:var(--t3);letter-spacing:.1em;} 
-.dc-i{font-size:18px;line-height:1.1;} 
-.dc-t{display:flex;gap:3px;align-items:baseline;} 
-.dc-mx{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--t1);} 
-.dc-mn{font-family:var(--fm);font-size:8.5px;color:var(--t3);} 
-.dc-r{font-family:var(--fm);font-size:7px;color:var(--blue);} 
-.aqi-row{display:flex;align-items:center;gap:6px;padding-top:5px;flex-shrink:0;} 
-.aqi-dot{width:7px;height:7px;border-radius:50%;background:var(--t3);flex-shrink:0;} 
-#aqi-val{font-family:var(--fd);font-size:14px;font-weight:800;color:var(--t1);} 
-#aqi-lbl{font-family:var(--fm);font-size:8px;color:var(--t2);} 
-.aqi-pm{font-family:var(--fm);font-size:7px;color:var(--t3);margin-left:auto;} 
 
+<<<<<<< HEAD
 /* ══ MUSIQUE / PODCAST — carte fractionnée ══ */
 #card-music{
   flex-shrink:0;
@@ -669,128 +683,447 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   border-top:1px solid rgba(255,255,255,.20);
   border-radius:14px;
   overflow:hidden;
+=======
+/* Couleur d'accent selon la phase (travail / pause / grande pause) */
+#card-clock.pom-mode-break #pom-time,
+#pomo-full.pom-mode-break #pomo-full-time{color:var(--blue);}
+#card-clock.pom-mode-break .pom-prog-bar,
+#pomo-full.pom-mode-break .pom-prog-bar{background:var(--blue);}
+#card-clock.pom-mode-break .pom-dot.active,
+#pomo-full.pom-mode-break .pom-dot.active{background:var(--blue);}
+#card-clock.pom-mode-long #pom-time,
+#pomo-full.pom-mode-long #pomo-full-time{color:var(--green);}
+#card-clock.pom-mode-long .pom-prog-bar,
+#pomo-full.pom-mode-long .pom-prog-bar{background:var(--green);}
+#card-clock.pom-mode-long .pom-dot.active,
+#pomo-full.pom-mode-long .pom-dot.active{background:var(--green);}
+
+/* ══ POMODORO PLEIN ÉCRAN ══
+   Le fond est une capture figée du fond d'écran au moment de l'ouverture
+   (#pomo-full-bg), floutée et assombrie — le diaporama de fond continue de
+   tourner derrière, mais n'est plus visible tant que ce mode est ouvert ;
+   il réapparaît normalement à la fermeture. Un dégradé sombre de secours
+   garantit un rendu toujours sombre/transparent même si la capture échoue. */
+#pomo-full{
+  position:fixed;inset:0;z-index:500;overflow:hidden;
+>>>>>>> d778e7682095a5a55b9e833a24f6a8fb5e3137c5
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
   -ms-flex-direction:column;flex-direction:column;
-  box-shadow:
-    0 32px 80px rgba(0,0,0,.75),
-    0 0 0 1px rgba(212,168,83,.06),
-    inset 0 1px 0 rgba(255,255,255,.06);
-  animation:modalIn .26s cubic-bezier(.22,.68,0,1.2) both;
-}
-@keyframes modalIn{
-  from{opacity:0;transform:translateY(18px) scale(.95);} 
-  to{opacity:1;transform:none;}
-}
-
-/* ── En-tête modal ── */
-#todos-modal-hdr{
-  display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:12px;
-  padding:14px 20px;
-  border-bottom:1px solid rgba(255,255,255,.07);
-  flex-shrink:0;
-  background:rgba(255,255,255,.015);
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  gap:20px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  -webkit-transform:scale(.9);transform:scale(.9);
+  -webkit-transform-origin:92% 8%;transform-origin:92% 8%;
+  transition:opacity .4s cubic-bezier(.22,.68,0,1.15),
+             -webkit-transform .4s cubic-bezier(.22,.68,0,1.15);
+  transition:opacity .4s cubic-bezier(.22,.68,0,1.15),
+             transform .4s cubic-bezier(.22,.68,0,1.15);
 }
-#todos-modal-icon{
-  font-size:16px;line-height:1;opacity:.9;
+#pomo-full-bg{
+  position:absolute;top:-40px;right:-40px;bottom:-40px;left:-40px;z-index:0;
+  background-size:cover;background-position:center;
+  background-color:#0a0b0e;
+  background-image:radial-gradient(ellipse at 30% 20%, rgba(212,168,83,0.12) 0%, transparent 55%), linear-gradient(160deg, #10131a 0%, #05060a 100%);
+  -webkit-filter:blur(22px) saturate(1.05) brightness(.55);
+  filter:blur(22px) saturate(1.05) brightness(.55);
 }
-#todos-modal-title{
-  font-family:var(--fm);font-size:9px;letter-spacing:.22em;
-  text-transform:uppercase;color:var(--t1);-webkit-box-flex:1;-ms-flex:1;flex:1;
+#pomo-full-bg::after{
+  content:'';position:absolute;inset:0;background:rgba(4,5,9,0.30);
 }
-#todos-modal-subtitle{
-  font-family:var(--fm);font-size:7px;color:var(--t3);
-  letter-spacing:.05em;
+#pomo-full > *:not(#pomo-full-bg){ position:relative;z-index:1; }
+#pomo-full.open{
+  opacity:1;visibility:visible;pointer-events:auto;
+  -webkit-transform:scale(1);transform:scale(1);
 }
-#todos-modal-close{
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.10);
-  color:var(--t3);cursor:pointer;
-  width:28px;height:28px;border-radius:50%;
+#pomo-full-close{
+ position:absolute;top:18px;right:18px; /* réaligné bouton fermeture */
+  background:none;border:1px solid rgba(255,255,255,.12);
+ color:var(--t3);width:34px;height:34px;border-radius:50%;cursor:pointer;
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  font-size:12px;
-  transition:background .15s,border-color .15s,color .15s,transform .1s;
-  flex-shrink:0;
+  font-size:13px;transition:color .15s,border-color .15s,-webkit-transform .15s;transition:color .15s,border-color .15s,transform .15s;
 }
-#todos-modal-close:hover{
-  background:rgba(212,168,83,.14);
-  border-color:rgba(212,168,83,.4);
-  color:var(--accent);
-  transform:rotate(90deg) scale(1.1);
+#pomo-full-close:hover{color:var(--accent);border-color:rgba(212,168,83,.4);-webkit-transform:rotate(90deg);transform:rotate(90deg);}
+#pomo-full-time{
+  font-family:var(--fd);font-size:min(24vw,220px);font-weight:800;
+  color:var(--t1);line-height:1;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;
+  transition:color .3s;text-align:center;
+  margin-top:40px; /* descend l'heure dans la vue plein écran */
+}
+#pomo-full .pom-prog-track{position:static;width:min(60vw,320px);height:2px;background:rgba(255,255,255,.09);}
+#pomo-full .pom-dots{gap:8px;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;}
+#pomo-full .pom-dot{width:6px;height:6px;}
+#pomo-full .pom-dot.active{width:18px;}
+#pomo-full #pom-session-count-full,
+#pomo-full .pom-mini-lbl{ text-align:center;font-size:7px; }
+#pomo-full-btn{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--adim);border:1px solid rgba(212,168,83,.35);
+  color:var(--accent);cursor:pointer;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:background .18s,border-color .18s,-webkit-transform .1s;transition:background .18s,border-color .18s,transform .1s;
+  margin-top:4px;
+}
+#pomo-full-btn:hover{background:rgba(212,168,83,.22);-webkit-transform:scale(1.06);transform:scale(1.06);}
+
+/* Widget « lecture en cours », style iOS : pilule de verre compacte, centrée */
+#pomo-music-widget{
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:8px;max-width:min(70vw,260px);
+  margin-top:6px;padding:7px 8px 7px 14px;border-radius:22px;
+  background:linear-gradient(155deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.14);
+  -webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 6px 18px rgba(0,0,0,.28);
+}
+#pomo-music-note{
+  font-size:12px;color:rgba(240,236,228,.55);flex-shrink:0;
+  transition:color .2s;
+}
+#pomo-music-widget.is-playing #pomo-music-note{color:var(--accent);}
+#pomo-music-title{
+  font-family:var(--fb);font-size:10.5px;color:var(--t1);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  min-width:0;-webkit-box-flex:1;-ms-flex:1;flex:1;
+}
+#pomo-music-playbtn{
+  flex-shrink:0;width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);
+  color:var(--t1);cursor:pointer;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:background .15s,-webkit-transform .1s;transition:background .15s,transform .1s;
+}
+#pomo-music-playbtn:hover{background:rgba(255,255,255,.2);-webkit-transform:scale(1.08);transform:scale(1.08);}
+#pomo-music-playbtn svg{display:block;}
+
+#pomo-full-clock{
+  position:absolute;bottom:22px;left:0;right:0;text-align:center;
+  font-family:var(--fm);font-size:10px;letter-spacing:.12em;color:var(--t3);
 }
 
-/* ── Grille colonnes ── */
-#todos-modal-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
-  gap:0;
-  background:rgba(255,255,255,.04);
-  overflow-y:auto;
-  -webkit-box-flex:1;-ms-flex:1;flex:1;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(255,255,255,.10) transparent;
-}
-#todos-modal-grid::-webkit-scrollbar{ width:4px; }
-#todos-modal-grid::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.10);border-radius:2px; }
 
-.modal-col{
-  background:rgba(9,11,18,0.96);
-  padding:14px 14px 16px;
-  border-right:1px solid rgba(255,255,255,.05);
-  overflow-y:auto;
-  min-height:160px;
-  position:relative;
-}
-.modal-col:last-child{ border-right:none; }
-.modal-col::-webkit-scrollbar{ width:2px; }
-.modal-col::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.08);border-radius:2px; }
+/* ══════════════════════════════════════════════
+   MUSIQUE — carrousel 3 pages (en ligne / locale / podcast).
+   Verre dépoli à la « lumière cohérente » (rim-light en haut, ombre douce
+   en dessous — même direction de lumière partout, comme sur les widgets
+   iOS/macOS) plutôt qu'un simple fond flou plat.
+   Fond de carte = miniature du morceau joué ; repli sur illustration.
+══════════════════════════════════════════════ */
+#card-music{background:transparent;flex-shrink:0;overflow:hidden;position:relative;}
+#card-music .ci{padding:0;position:relative;z-index:2;}
 
-/* Accent haut de colonne */
-.modal-col::before{
-  content:'';
-  position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--accent) 0%,transparent 100%);
-  opacity:0;transition:opacity .25s;
+#music-bg{position:absolute;inset:0;z-index:0;overflow:hidden;background:#0d0f14;}
+#music-bg-fallback{
+  position:absolute;inset:-16px;z-index:0;
+  background-image:url('assets/img/music-fallback.png');
+  background-size:cover;background-position:center;
+  /* Réduction du flou de la tuile musique → environ 20% de l'original (~2px) */
+  -webkit-filter:blur(2px) saturate(1.1) brightness(.68);
+  filter:blur(2px) saturate(1.1) brightness(.68);
 }
-.modal-col:hover::before{ opacity:.35; }
+#music-bg-img{
+  position:absolute;inset:-16px;z-index:1;
+  width:auto;height:auto;max-width:none;
+  object-fit:cover;opacity:0;transition:opacity .5s ease;
+  -webkit-filter:blur(2px) saturate(1.15) brightness(.68);
+  filter:blur(2px) saturate(1.15) brightness(.68);
+}
+#music-bg-img.loaded{opacity:1;}
+#music-bg-scrim{
+  position:absolute;inset:0;z-index:2;
+  background:linear-gradient(165deg,rgba(7,8,11,0.12) 0%,rgba(7,8,11,0.30) 45%,rgba(7,8,11,0.56) 100%);
+}
 
-.modal-col-hdr{
+/* Flèches de navigation — pastilles de verre circulaires, iOS-like */
+.music-arrow{
+  position:absolute;top:50%;-webkit-transform:translateY(-50%);transform:translateY(-50%);
+  z-index:4;width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.16);
+  color:rgba(255,255,255,.85);cursor:pointer;font-size:12px;line-height:1;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  /* réduire légèrement le flou pour la pastille */
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 4px 12px rgba(0,0,0,.35);
+  transition:color .15s,background .15s,-webkit-transform .18s;transition:color .15s,background .15s,transform .18s;
+}
+.music-arrow:hover{color:var(--accent);background:rgba(255,255,255,.16);-webkit-transform:translateY(-50%) scale(1.1);transform:translateY(-50%) scale(1.1);}
+.music-arrow:active{-webkit-transform:translateY(-50%) scale(.92);transform:translateY(-50%) scale(.92);}
+.music-arrow-left{left:9px;}
+.music-arrow-right{right:9px;}
+
+/* Viewport de glissement */
+.music-pages-viewport{overflow:hidden;position:relative;}
+#music-pages{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  width:300%;
+  transition:-webkit-transform .45s cubic-bezier(.32,.72,0,1);
+  transition:transform .45s cubic-bezier(.32,.72,0,1);
+}
+.music-page{
+  -webkit-box-flex:0;-ms-flex:0 0 33.3333%;flex:0 0 33.3333%;width:33.3333%;
+  padding:13px 38px 15px;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;gap:10px;
+  box-sizing:border-box;
+}
+
+/* Sélection de source — pastilles de verre */
+.music-track-tabs{display:-webkit-box;display:-ms-flexbox;display:flex;gap:6px;}
+.music-tab{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.55);border-radius:20px;
+  font-family:var(--fm);font-size:6.5px;letter-spacing:.05em;
+  padding:4px 10px;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:color .15s,background .15s,border-color .15s,-webkit-transform .12s;transition:color .15s,background .15s,border-color .15s,transform .12s;
+}
+.music-tab.active{color:#fff;background:rgba(212,168,83,.24);border-color:rgba(212,168,83,.5);}
+.music-tab:hover:not(.active){color:#fff;background:rgba(255,255,255,.12);}
+.music-tab:active{-webkit-transform:scale(.95);transform:scale(.95);}
+.music-tab-static{
+  font-family:var(--fm);font-size:6.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09);
+  border-radius:20px;padding:4px 10px;
+}
+
+/* Ligne titre : petit disque (miniature) + texte */
+.music-title-row{
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-  gap:6px;
-  padding-bottom:8px;
-  border-bottom:1px solid rgba(255,255,255,.06);
-  margin-bottom:8px;
+  gap:8px;min-width:0;
 }
-.modal-col-name{
-  font-family:var(--fm);font-size:7.5px;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--accent);
-  -webkit-box-flex:1;-ms-flex:1;flex:1;
+.music-avatar{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  background-size:cover;background-position:center;
+  background-color:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 2px 6px rgba(0,0,0,.3);
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  font-size:11px;color:rgba(255,255,255,.5);
 }
-.modal-col-count{
-  font-family:var(--fm);font-size:6.5px;color:var(--t3);
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:10px;padding:2px 7px;
-  transition:background .2s,color .2s;
-}
-.modal-col:hover .modal-col-count{ background:rgba(212,168,83,.10);color:var(--accent);border-color:rgba(212,168,83,.2); }
-
-/* Items dans le modal — réutilise .todo-item / .todo-check / .todo-title / .todo-due */
-.modal-items .todo-item{
-  padding:5px 2px;
-}
-.modal-items .todo-title{
-  font-size:8.5px;
+.music-title{
+  font-family:var(--fb);font-size:12.5px;font-weight:500;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+  text-shadow:0 1px 6px rgba(0,0,0,.45);
+  letter-spacing:.01em;
 }
 
+/* Panneau flottant — verre avec « lumière » cohérente (rim-light en haut) */
+.music-panel{
+  background:linear-gradient(155deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.04) 100%);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;
+  padding:12px 14px 11px;
+  -webkit-backdrop-filter:blur(12px) saturate(1.25);backdrop-filter:blur(12px) saturate(1.25);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 10px 26px rgba(0,0,0,.36);
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;
+  -ms-flex-direction:column;flex-direction:column;gap:12px;
+  margin-top:auto;
+}
+
+.music-bars-row{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:11px;
+}
+.music-prog-wrap{
+  -webkit-box-flex:2;-ms-flex:2;flex:2;height:4px;border-radius:3px;
+  background:rgba(0,0,0,.28);cursor:pointer;overflow:hidden;position:relative;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.4);
+}
+.music-prog-bar{height:100%;width:0%;background:linear-gradient(90deg, rgba(212,168,83,.75), var(--accent));border-radius:3px;transition:width .3s linear;}
+.music-vol-wrap{-webkit-box-flex:1;-ms-flex:1;flex:1;min-width:0;}
+.music-vol{
+  width:100%;-webkit-appearance:none;appearance:none;
+  height:4px;border-radius:3px;outline:none;cursor:pointer;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.4);
+  background:linear-gradient(90deg, var(--accent) 0%, var(--accent) var(--vol-pct,80%), rgba(0,0,0,.28) var(--vol-pct,80%), rgba(0,0,0,.28) 100%);
+}
+.music-vol::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:11px;height:11px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.5);transition:-webkit-transform .12s;transition:transform .12s;}
+.music-vol::-webkit-slider-thumb:hover{-webkit-transform:scale(1.2);transform:scale(1.2);}
+.music-vol::-moz-range-thumb{width:11px;height:11px;border-radius:50%;background:#fff;border:none;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.5);}
+.music-vol::-moz-range-progress{background:var(--accent);height:4px;border-radius:3px;}
+
+/* Pastille « en direct » — remplace la progression si le flux est live */
+.music-live-badge{
+  display:none;-webkit-box-flex:2;-ms-flex:2;flex:2;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  gap:5px;height:17px;border-radius:9px;
+  background:rgba(224,92,92,.18);border:1px solid rgba(224,92,92,.4);
+  box-shadow:0 0 10px rgba(224,92,92,.18), inset 0 1px 0 rgba(255,255,255,.08);
+  font-family:var(--fm);font-size:6.5px;letter-spacing:.16em;color:#f0a3a3;
+}
+.music-live-badge.show{display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;}
+.music-live-dot{
+  width:5px;height:5px;border-radius:50%;background:var(--red);
+  box-shadow:0 0 6px var(--red);
+  -webkit-animation:music-live-pulse 1.6s ease-in-out infinite;animation:music-live-pulse 1.6s ease-in-out infinite;
+}
+@-webkit-keyframes music-live-pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+@keyframes music-live-pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+.music-buttons-row{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  gap:14px;
+}
+.music-play-btn{
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(155deg, rgba(212,168,83,.32), rgba(212,168,83,.16));
+  border:1px solid rgba(212,168,83,.5);
+  color:#fff;cursor:pointer;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 4px 14px rgba(0,0,0,.4);
+  transition:background .18s,border-color .18s,-webkit-transform .12s;transition:background .18s,border-color .18s,transform .12s;
+}
+.music-play-btn:hover{background:linear-gradient(155deg, rgba(212,168,83,.44), rgba(212,168,83,.22));-webkit-transform:scale(1.08);transform:scale(1.08);}
+.music-play-btn:active{-webkit-transform:scale(.94);transform:scale(.94);}
+.music-play-btn svg{display:block;}
+
+.music-loop-btn{
+  flex-shrink:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.6);
+  width:26px;height:26px;border-radius:50%;font-size:11px;cursor:pointer;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), 0 3px 9px rgba(0,0,0,.3);
+  transition:color .15s,border-color .15s,background .15s,-webkit-transform .12s;transition:color .15s,border-color .15s,background .15s,transform .12s;
+}
+.music-loop-btn.active{color:var(--accent);border-color:rgba(212,168,83,.5);background:rgba(212,168,83,.18);}
+.music-loop-btn:hover:not(.active){color:#fff;}
+.music-loop-btn:active{-webkit-transform:scale(.92);transform:scale(.92);}
+
+#music-online-mount{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;top:0;left:0;}
+
+/* Points de pagination, centrés */
+.music-dots{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:6px;padding-bottom:10px;
+}
+.music-dot{
+  width:4.5px;height:4.5px;border-radius:50%;background:rgba(255,255,255,.28);
+  cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);
+}
+.music-dot:hover{background:rgba(255,255,255,.5);}
+.music-dot.active{background:var(--accent);width:14px;border-radius:3px;box-shadow:0 0 6px rgba(212,168,83,.5);}
+
+/* ══════════════════════════════════════════════
+   MÉTÉO — widget minimaliste, glass, sans appel serveur
+   (Open-Meteo, aucune clé API requise). Voir le script en bas de page.
+══════════════════════════════════════════════ */
+#card-weather{flex-shrink:0;overflow:hidden;} /* même transparence que .card, pas d'override */
+#card-weather .ci{overflow:hidden;}
+
+/* Ressenti + UV */
+.w-now{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:10px;padding-bottom:7px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.w-now-temp{
+  font-family:var(--fd);font-size:34px;font-weight:800;line-height:1;
+  letter-spacing:.01em;color:var(--t1);
+  font-variant-numeric:tabular-nums;
+  -webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;
+}
+.w-now-meta{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;gap:3px;}
+.w-now-row{display:-webkit-box;display:-ms-flexbox;display:flex;gap:6px;-webkit-box-align:baseline;-ms-flex-align:baseline;align-items:baseline;}
+.w-now-lbl{font-family:var(--fm);font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);min-width:34px;}
+.w-now-row span:last-child{font-family:var(--fm);font-size:10px;color:var(--t2);}
+
+/* Bande horaire 8h–20h — 3x plus épaisse, avec courbe de température lissée */
+.w-hourly-wrap{padding-top:9px;flex-shrink:0;}
+.w-hourly-track{position:relative;height:66px;}
+.w-hourly-inner{
+  position:absolute;inset:0;border-radius:10px;overflow:hidden;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+}
+.w-hseg{position:absolute;top:0;bottom:0;transition:opacity .3s;cursor:default;}
+#w-temp-curve{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;}
+#w-temp-curve path.w-temp-fill{fill:rgba(240,236,228,0.07);stroke:none;}
+#w-temp-curve path.w-temp-line{fill:none;stroke:rgba(240,236,228,0.55);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+#w-hourly-now{
+  position:absolute;top:-3px;bottom:-3px;width:2px;
+  background:var(--red);box-shadow:0 0 5px var(--red);
+  z-index:3;display:none;
+}
+/* Température au croisement heure actuelle / courbe — décalée pour se superposer au point */
+#w-now-on-curve{
+  position:absolute;z-index:4;display:none;
+  font-family:var(--fm);font-size:7px;color:var(--t1);
+  background:rgba(8,10,17,0.85);border:1px solid rgba(255,255,255,.14);border-radius:5px;
+  padding:1px 5px;-webkit-transform:translate(-50%,-135%);transform:translate(-50%,-135%);
+  white-space:nowrap;pointer-events:none;
+}
+/* Repères température min / max du jour, épinglés sur la courbe */
+.w-minmax-lbl{
+  position:absolute;z-index:4;
+  font-family:var(--fm);font-size:6.5px;color:var(--t2);
+  white-space:nowrap;pointer-events:none;
+}
+.w-minmax-lbl.is-max{-webkit-transform:translate(-50%,-160%);transform:translate(-50%,-160%);color:rgba(240,180,41,.85);}
+.w-minmax-lbl.is-min{-webkit-transform:translate(-50%,45%);transform:translate(-50%,45%);color:rgba(91,159,212,.85);}
+#w-tooltip{
+  position:absolute;bottom:calc(100% + 7px);left:0;z-index:5;
+  background:rgba(8,10,17,0.92);border:1px solid var(--bds);border-radius:7px;
+  padding:5px 8px;font-family:var(--fm);font-size:7px;color:var(--t1);
+  white-space:nowrap;pointer-events:none;opacity:0;
+  -webkit-transform:translateY(3px);transform:translateY(3px);
+  transition:opacity .12s,-webkit-transform .12s;transition:opacity .12s,transform .12s;
+  box-shadow:0 6px 20px rgba(0,0,0,.5);
+}
+#w-tooltip.show{opacity:1;-webkit-transform:translateY(0);transform:translateY(0);}
+#w-tooltip .w-tt-temp{color:var(--accent);font-weight:400;}
+.w-hourly-labels{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
+  margin-top:4px;font-family:var(--fm);font-size:6.5px;color:var(--t3);letter-spacing:.06em;
+}
+
+/* Prévisions 4 jours — sous la bande horaire */
+.w-forecast{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:4px;
+  padding-top:8px;margin-top:8px;border-top:1px solid var(--border);flex-shrink:0;
+}
+.w-fc-day{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;gap:2px;
+  padding:4px 2px;border-radius:7px;transition:background .15s;
+}
+.w-fc-day:hover{background:rgba(255,255,255,.03);}
+.w-fc-day .w-fc-lbl{font-family:var(--fm);font-size:6.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);}
+.w-fc-day .w-fc-icon{font-size:16px;line-height:1.1;}
+.w-fc-day .w-fc-temp{font-family:var(--fd);font-size:14px;font-weight:800;color:var(--t1);
+  font-variant-numeric:tabular-nums;-webkit-font-feature-settings:"tnum" 1;font-feature-settings:"tnum" 1;}
 
 /* ══ HOVER — effets réactifs globaux ══ */
-/* Cartes — déjà tilt 3D, ajouter glow accent subtil */
 .card{ transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease; }
 .card:hover{ border-color:rgba(212,168,83,0.18); box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 1px rgba(212,168,83,.08); }
 #card-cal:hover{ border-color:rgba(212,168,83,0.18); box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 1px rgba(212,168,83,.08); }
@@ -798,32 +1131,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 /* Boutons nav calendrier */
 .cal-nav-btn{ transition:background .15s,color .15s,transform .1s; }
 .cal-nav-btn:hover{ background:rgba(212,168,83,.14); color:var(--accent); transform:scale(1.08); }
-
-/* Boutons tabs musique/podcast */
-.sc-tab{ position:relative; overflow:hidden; }
-.sc-tab::after{ content:''; position:absolute; bottom:0; left:50%; width:0; height:1px; background:var(--accent); transition:width .2s,left .2s; }
-.sc-tab:hover::after{ width:100%; left:0; }
-.sc-tab.active::after{ width:100%; left:0; }
-
-/* Sliders volume */
-#vol-slider,#pod-vol-sl{ transition:opacity .15s; }
-#vol-slider:hover,#pod-vol-sl:hover{ opacity:1; }
-
-/* Barre de progression podcast */
-#pod-prog-wrap{ transition:height .15s,opacity .15s; }
-#pod-prog-wrap:hover{ height:5px; }
-
-/* Bouton play/pause musique + podcast */
-#yt-play-btn{ transition:opacity .15s,transform .1s,color .15s !important; }
-#yt-play-btn:hover{ opacity:1 !important; transform:scale(1.15); }
-#pod-play-btn{ transition:background .2s,border-color .2s,transform .1s; }
-#pod-play-btn:hover{ transform:scale(1.12); }
-
-/* Items RSS : styles dans the section CSS principale more */
-
-/* Prévisions météo */
-.dc{ transition:background .15s,border-color .15s,transform .1s; }
-.dc:hover{ background:rgba(212,168,83,.07); border-color:rgba(212,168,83,.2); transform:translateY(-1px); }
 
 /* Événements calendrier */
 .cal-evt{ transition:background .12s,opacity .12s,transform .1s; }
@@ -833,17 +1140,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #pom-btn{ transition:background .15s,border-color .15s,transform .1s; }
 #pom-btn:hover{ transform:scale(1.1); }
 
-/* Lien ⤢ plein écran pomo */
-#pom-fullscreen-btn{ transition:color .15s,transform .1s; }
-#pom-fullscreen-btn:hover{ transform:scale(1.2); }
-
 /* Chip étiquettes */
 .chip{ transition:color .2s; cursor:default; }
 .card:hover .chip{ color:rgba(240,236,228,.5); }
-
-/* AQI dot */
-.aqi-dot{ transition:transform .2s; }
-#card-weather:hover .aqi-dot{ transform:scale(1.4); }
 
 .rss-item{
   display:block;
@@ -1195,8 +1494,7 @@ body{ animation:appFadeIn .6s ease both; }
           <!-- Gauche : horloge -->
           <div class="ck-left">
             <div class="ck-main">
-              <div class="ck-city">France</div>
-              <div id="fr-time">--<span class="sep">:</span>--</div>
+              <div id="fr-time"><span id="fr-h">--</span><span class="sep">:</span><span id="fr-m">--</span></div>
               <div id="fr-date"></div>
             </div>
             <div class="ck-vn">
@@ -1205,15 +1503,14 @@ body{ animation:appFadeIn .6s ease both; }
               <span id="vn-diff"></span>
             </div>
           </div>
-          <!-- Droite : mini Pomodoro -->
+          <!-- Droite : pomodoro -->
           <div class="ck-right">
-            <div class="pom-header">
-              <span class="pom-header-lbl">Pomodoro</span>
-              <!-- Lien vers l'app Pomodoro complète, une page séparée non couverte par ce fichier -->
-              <a id="pom-fullscreen-btn" href="/pomodoro/" target="_blank" title="Plein écran">⤢</a>
+            <button id="pom-fullscreen-btn" title="Plein écran" aria-label="Plein écran">⤢</button>
+            <div class="pom-topbar">
+              <button id="pom-preset-btn" class="pom-mini-btn" title="Rythme travail / pause">25/5</button>
+              <span class="pom-mini-lbl">Séance <b id="pom-session-count">0</b></span>
             </div>
             <div class="pom-body">
-              <div id="pom-mode-lbl">FOCUS</div>
               <div id="pom-time">25:00</div>
               <div class="pom-prog-track">
                 <div class="pom-prog-bar" id="pom-prog"></div>
@@ -1224,6 +1521,9 @@ body{ animation:appFadeIn .6s ease both; }
                   <svg id="pom-btn-icon" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
                     <polygon points="2,1 9,5 2,9"/>
                   </svg>
+                </button>
+                <button id="skip-pause-btn" title="Skip Pause" aria-label="Skip Pause" style="margin-left:8px;">
+                  ⏭
                 </button>
                 <div class="pom-dots">
                   <div class="pom-dot active" id="pd0"></div>
@@ -1240,163 +1540,138 @@ body{ animation:appFadeIn .6s ease both; }
 
     <!-- MÉTÉO -->
     <div class="card" id="card-weather" style="animation-delay:.06s">
-      <div id="weather-bg"></div>
       <div class="ci">
-        <div class="chip">Météo — <span id="w-city">Hà Nội</span></div>
-        <div class="w-cur">
-          <div id="w-icon">⋯</div>
-          <div id="w-temp"><span class="loading">…</span></div>
-          <div class="w-meta">
-            <div id="w-desc"></div>
-            <div class="w-stats">
-              <div class="ws"><span class="ws-l">Ressenti</span><span class="ws-v" id="w-feels">–</span></div>
-              <div class="ws"><span class="ws-l">Humidité</span><span class="ws-v" id="w-hum">–</span></div>
-              <div class="ws"><span class="ws-l">Vent</span><span class="ws-v" id="w-wind">–</span></div>
-            </div>
+        <div class="chip">Météo — <span id="w-city">…</span></div>
+
+        <!-- Ressenti + UV -->
+        <div class="w-now">
+          <div class="w-now-temp" id="w-now-temp"><span class="loading">…</span></div>
+          <div class="w-now-meta">
+            <div class="w-now-row"><span class="w-now-lbl">Ressenti</span><span id="w-feels">–</span></div>
+            <div class="w-now-row"><span class="w-now-lbl">UV</span><span id="w-uv">–</span></div>
           </div>
         </div>
-        <div class="w-curve-wrap">
-          <div class="w-curve-lbl">Température — 12h</div>
-          <div id="temp-svg-wrap"><span class="loading">…</span></div>
+
+        <!-- Bande horaire 8h–20h : segments colorés par condition + courbe de température -->
+        <div class="w-hourly-wrap">
+          <div class="w-hourly-track" id="w-hourly-track">
+            <div class="w-hourly-inner" id="w-hourly-inner">
+              <svg id="w-temp-curve" viewBox="0 0 300 100" preserveAspectRatio="none"></svg>
+              <div id="w-hourly-now"></div>
+            </div>
+            <div id="w-now-on-curve"></div>
+            <div id="w-tooltip"></div>
+          </div>
+          <div class="w-hourly-labels"><span>8h</span><span>14h</span><span>20h</span></div>
         </div>
-        <div class="w-dl">Prévisions 3 jours</div>
-        <div class="w-days" id="w-days">
-          <div class="dc"><span class="loading">…</span></div>
-          <div class="dc"><span class="loading">…</span></div>
-          <div class="dc"><span class="loading">…</span></div>
-        </div>
-        <div class="divl"></div>
-        <div class="aqi-row">
-          <div class="aqi-dot" id="aqi-dot"></div>
-          <span id="aqi-val"><span class="loading">…</span></span>
-          <span id="aqi-lbl" style="margin-left:5px"></span>
-          <span class="aqi-pm" id="aqi-pm"></span>
+
+        <!-- Prévisions 4 jours : icône dominante + température moyenne -->
+        <div class="w-forecast" id="w-forecast">
+          <div class="w-fc-day"><span class="loading">…</span></div>
+          <div class="w-fc-day"><span class="loading">…</span></div>
+          <div class="w-fc-day"><span class="loading">…</span></div>
+          <div class="w-fc-day"><span class="loading">…</span></div>
         </div>
       </div>
     </div>
 
-    <!-- TODO + MUSIQUE — carte avec bascule -->
+    <!-- MUSIQUE — carrousel 3 pages : en ligne / locale / podcast -->
     <div class="card" id="card-music" style="animation-delay:.08s">
-
-      <!-- ══ VUE TODO (défaut) ══ -->
-      <div id="view-todo">
-        <div id="todo-header">
-          <button class="todo-nav-btn" id="todo-prev" title="Liste précédente">&#8249;</button>
-          <span id="todo-list-name">QUOTIDIEN</span>
-          <button class="todo-nav-btn" id="todo-next" title="Liste suivante">&#8250;</button>
-          <button class="todo-hdr-btn" id="todo-expand-btn" title="Toutes les listes">&#8862;</button>
-        </div>
-        <div id="todo-items">
-          <div class="todo-empty">Chargement…</div>
-        </div>
+      <div id="music-bg">
+        <div id="music-bg-fallback"></div>
+        <img id="music-bg-img" alt="">
+        <div id="music-bg-scrim"></div>
       </div>
 
-      <!-- ══ VUE MUSIQUE (cachée par défaut) ══ -->
-      <div id="view-music">
-        <div id="music-return-bar"></div>
-        <div class="ci">
+      <button class="music-arrow music-arrow-left" id="music-prev-page" aria-label="Page précédente">&#8249;</button>
+      <button class="music-arrow music-arrow-right" id="music-next-page" aria-label="Page suivante">&#8250;</button>
 
-          <!-- ── Toggle 2 modes (MUSIQUE / PODCAST) + bouton todos ── -->
-          <div id="audio-mode-toggle">
-            <button class="amt-btn active" data-amode="music">&#9834; MUSIQUE</button>
-            <button class="amt-btn" data-amode="local">&#128187; LOCAL</button>
-            <button class="amt-btn" data-amode="podcast">&#127897; PODCAST</button>
-            <span id="amt-matin-dot" title="Mode matin actif" style="display:none;"></span>
-          </div>
+      <div class="ci" id="music-ci">
+        <div class="music-pages-viewport">
+          <div id="music-pages">
 
-          <!-- ── MODE MUSIQUE : YouTube ── -->
-          <div id="yt-section" class="audio-mode visible">
-            <div id="sc-tabs">
-              <button class="sc-tab active" data-idx="0">&#9834; Piano</button>
-              <button class="sc-tab" data-idx="1">&#9834; Lofi</button>
-              <button class="sc-tab" data-idx="2">&#9834; Chill</button>
-            </div>
-            <div id="sc-stack" aria-hidden="true">
-              <iframe id="yt-frame-0" class="sc-frame active" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media"
-                src="https://www.youtube.com/embed/2LSB--cO1J8?autoplay=1&mute=1&vq=tiny&enablejsapi=1&loop=1&playlist=2LSB--cO1J8"
-              ></iframe>
-              <iframe id="yt-frame-1" class="sc-frame" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media"
-                data-src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=1&vq=tiny&enablejsapi=1&loop=1&playlist=jfKfPfyJRdk"
-              ></iframe>
-              <iframe id="yt-frame-2" class="sc-frame" frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media"
-                data-src="https://www.youtube.com/embed/80pOuROVGFQ?autoplay=1&mute=1&vq=tiny&enablejsapi=1&loop=1&playlist=80pOuROVGFQ"
-              ></iframe>
-            </div>
-            <div id="vol-row">
-              <button id="yt-play-btn" title="Play / Pause" style="
-                background:none;border:none;color:var(--accent);cursor:pointer;
-                display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
-                -webkit-box-align:center;-ms-flex-align:center;align-items:center;
-                justify-content:center;width:22px;height:22px;padding:0;flex-shrink:0;
-                opacity:.85;transition:opacity .15s;
-              ">
-                <svg id="yt-play-icon" width="14" height="14" viewBox="0 0 10 10" fill="currentColor">
-                  <polygon points="2,1 9,5 2,9"/>
-                </svg>
-              </button>
-              <span id="vol-icon" title="Mute/Unmute">&#128266;</span>
-              <input type="range" id="vol-slider" min="0" max="100" value="80">
-              <span id="vol-pct">80%</span>
-            </div>
-            <div id="sc-credit">
-              <span id="sc-credit-0">YT · <a href="https://www.youtube.com/watch?v=66RaBtGznrI" target="_blank">Classique 24/7 · Odd Eagle</a></span>
-              <span id="sc-credit-1" style="display:none">YT · <a href="https://www.youtube.com/watch?v=J0shA9J-4Nc" target="_blank">Lofi Mix 2</a></span>
-              <span id="sc-credit-2" style="display:none">YT · <a href="https://www.youtube.com/watch?v=u9YOvF22tsI" target="_blank">Ambient</a></span>
-            </div>
-          </div>
-
-          <!-- ── MODE LOCAL : musique du navigateur / dossier local ── -->
-          <div id="local-section" class="audio-mode">
-            <div id="local-header" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;">
-              <div>
-                <div id="local-mode-label" style="font-family:var(--fm);font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.14em;">Musique locale</div>
-                <div id="local-path-hint" style="font-family:var(--fm);font-size:7px;color:var(--t3);margin-top:4px;">Dossier local : assets/local-music/</div>
+            <!-- PAGE 1 : MUSIQUE EN LIGNE (fonctionnelle) -->
+            <div class="music-page" data-page="0">
+              <div class="music-track-tabs" id="music-online-tabs">
+                <button class="music-tab active" data-idx="0">Médiéval</button>
+                <button class="music-tab" data-idx="1">Chill Lofi</button>
+                <button class="music-tab" data-idx="2">Chill Classique</button>
               </div>
-              <button class="amt-btn" id="local-select-btn">Sélectionner</button>
+              <div class="music-title-row">
+                <div class="music-avatar" id="music-online-avatar">♫</div>
+                <div class="music-title" id="music-online-title">—</div>
+              </div>
+              <div class="music-panel">
+                <div class="music-bars-row">
+                  <div class="music-prog-wrap" id="music-online-prog-wrap"><div class="music-prog-bar" id="music-online-prog"></div></div>
+                  <div class="music-live-badge" id="music-online-live"><span class="music-live-dot"></span>LIVE</div>
+                  <div class="music-vol-wrap"><input type="range" class="music-vol" id="music-online-vol" min="0" max="100" value="80"></div>
+                </div>
+                <div class="music-buttons-row">
+                  <button class="music-play-btn" id="music-online-play" title="Play / Pause">
+                    <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
+                  </button>
+                  <button class="music-loop-btn" id="music-online-loop" title="Boucle / Aléatoire">&#8734;</button>
+                </div>
+              </div>
+              <div id="music-online-mount"></div>
             </div>
-            <div id="local-playlist" style="display:grid;gap:4px;padding:0 2px 6px;color:var(--t3);font-family:var(--fm);font-size:8.5px;">
-              <div class="todo-empty">Aucun morceau sélectionné.</div>
-            </div>
-            <div id="local-controls" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;">
-              <button class="amt-btn" id="local-prev-btn">&#8249;</button>
-              <button class="amt-btn" id="local-play-btn">▶</button>
-              <button class="amt-btn" id="local-next-btn">&#8250;</button>
-              <button class="amt-btn" id="local-loop-btn">∞</button>
-              <button class="amt-btn" id="local-shuffle-btn">&#128256;</button>
-              <span id="local-current-title" style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t1);font-family:var(--fb);font-size:8.5px;">Aucun morceau</span>
-            </div>
-            <input type="file" id="local-file-input" accept="audio/*" multiple style="display:none">
-            <audio id="local-audio" preload="metadata"></audio>
-          </div>
 
-          <!-- ── MODE PODCAST ── -->
-          <div id="pod-section" class="audio-mode">
-            <div id="pod-tabs">
-              <button class="sc-tab active" data-pod="journal">Journal 15'</button>
-              <button class="sc-tab" data-pod="matinale">Grande Matinale</button>
+            <!-- PAGE 2 : MUSIQUE LOCALE (UI seulement pour l'instant) -->
+            <div class="music-page" data-page="1">
+              <div class="music-track-tabs">
+                <span class="music-tab-static">Fichiers locaux</span>
+              </div>
+              <div class="music-title-row">
+                <div class="music-avatar">♫</div>
+                <div class="music-title">Aucun morceau</div>
+              </div>
+              <div class="music-panel">
+                <div class="music-bars-row">
+                  <div class="music-prog-wrap"><div class="music-prog-bar"></div></div>
+                  <div class="music-vol-wrap"><input type="range" class="music-vol" min="0" max="100" value="80"></div>
+                </div>
+                <div class="music-buttons-row">
+                  <button class="music-play-btn" title="Play / Pause">
+                    <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
+                  </button>
+                  <button class="music-loop-btn" title="Boucle / Aléatoire">&#8734;</button>
+                </div>
+              </div>
             </div>
-            <div id="pod-info">Chargement…</div>
-            <div id="pod-controls">
-              <button id="pod-play-btn" title="Play/Pause">
-                <svg id="pod-play-icon" width="11" height="11" viewBox="0 0 10 10" fill="currentColor">
-                  <polygon points="2,1 9,5 2,9"/>
-                </svg>
-              </button>
-              <div id="pod-prog-wrap" title="Avancer"><div id="pod-prog"></div></div>
-              <span id="pod-time">--:-- / --:--</span>
-              <span id="pod-vol-icon" title="Mute podcast">&#128266;</span>
-              <input type="range" id="pod-vol-sl" min="0" max="100" value="90">
-            </div>
-            <div id="pod-status"></div>
-            <audio id="pod-audio" preload="none"></audio>
-          </div>
 
+            <!-- PAGE 3 : PODCAST (UI seulement pour l'instant) -->
+            <div class="music-page" data-page="2">
+              <div class="music-track-tabs">
+                <span class="music-tab-static">Podcast</span>
+              </div>
+              <div class="music-title-row">
+                <div class="music-avatar">🎙️</div>
+                <div class="music-title">Aucun épisode</div>
+              </div>
+              <div class="music-panel">
+                <div class="music-bars-row">
+                  <div class="music-prog-wrap"><div class="music-prog-bar"></div></div>
+                  <div class="music-vol-wrap"><input type="range" class="music-vol" min="0" max="100" value="80"></div>
+                </div>
+                <div class="music-buttons-row">
+                  <button class="music-play-btn" title="Play / Pause">
+                    <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
+                  </button>
+                  <button class="music-loop-btn" title="Boucle / Aléatoire">&#8734;</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
-      </div><!-- /view-music -->
 
+        <div class="music-dots" id="music-dots">
+          <span class="music-dot active" data-page="0"></span>
+          <span class="music-dot" data-page="1"></span>
+          <span class="music-dot" data-page="2"></span>
+        </div>
+      </div>
     </div><!-- /card-music -->
 
     <!-- RSS LE MONDE -->
@@ -1455,18 +1730,35 @@ body{ animation:appFadeIn .6s ease both; }
 
 
 
-<!-- ══ TODOS MODAL — doit être avant le script ══ -->
-<div id="todos-modal" aria-hidden="true" role="dialog" aria-label="Toutes les listes">
-  <div id="todos-modal-bg"></div>
-  <div id="todos-modal-panel">
-    <div id="todos-modal-hdr">
-      <span id="todos-modal-icon">&#9635;</span>
-      <span id="todos-modal-title">Mes listes</span>
-      <span id="todos-modal-subtitle"></span>
-      <button id="todos-modal-close" aria-label="Fermer">&#10005;</button>
-    </div>
-    <div id="todos-modal-grid"></div>
+<!-- ══ POMODORO PLEIN ÉCRAN ══ -->
+<div id="pomo-full" aria-hidden="true">
+  <div id="pomo-full-bg"></div>
+  <button id="pomo-full-close" title="Fermer" aria-label="Fermer">&#10005;</button>
+  <div id="pomo-full-time">25:00</div>
+  <div class="pom-prog-track"><div class="pom-prog-bar" id="pomo-full-prog"></div></div>
+  <div class="pom-dots" id="pomo-full-dots">
+    <div class="pom-dot active" id="pfd0"></div>
+    <div class="pom-dot" id="pfd1"></div>
+    <div class="pom-dot" id="pfd2"></div>
+    <div class="pom-dot" id="pfd3"></div>
   </div>
+  <span class="pom-mini-lbl">Séance <b id="pom-session-count-full">0</b></span>
+  <button id="pomo-full-btn" title="Play / Pause">
+    <svg id="pomo-full-icon" width="20" height="20" viewBox="0 0 10 10" fill="currentColor">
+      <polygon points="2,1 9,5 2,9"/>
+    </svg>
+  </button>
+
+  <!-- Widget « en cours de lecture », style iOS : minimaliste, centré -->
+  <div id="pomo-music-widget">
+    <span id="pomo-music-note">♫</span>
+    <span id="pomo-music-title">—</span>
+    <button id="pomo-music-playbtn" title="Play / Pause" aria-label="Play / Pause">
+      <svg width="11" height="11" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>
+    </button>
+  </div>
+
+  <div id="pomo-full-clock">--:--</div>
 </div>
 
 <script>
@@ -1495,7 +1787,8 @@ function updateClock(){
   var d=new Date();
   try{
     var ft=d.toLocaleTimeString('fr-FR',{timeZone:'Europe/Paris',hour:'2-digit',minute:'2-digit',hour12:false}).split(':');
-    document.getElementById('fr-time').innerHTML=ft[0]+'<span class="sep">:</span>'+ft[1];
+    document.getElementById('fr-h').textContent=ft[0];
+    document.getElementById('fr-m').textContent=ft[1];
     var fd=d.toLocaleDateString('fr-FR',{timeZone:'Europe/Paris',weekday:'long',day:'numeric',month:'long'});
     document.getElementById('fr-date').textContent=fd.charAt(0).toUpperCase()+fd.slice(1);
     document.getElementById('vn-time').textContent=d.toLocaleTimeString('fr-FR',{timeZone:'Asia/Ho_Chi_Minh',hour:'2-digit',minute:'2-digit',hour12:false});
@@ -1503,70 +1796,767 @@ function updateClock(){
     var hDay=parseInt(d.toLocaleDateString('en-US',{timeZone:'Asia/Ho_Chi_Minh',day:'numeric'}),10);
     var diff=hDay-pDay;
     document.getElementById('vn-diff').textContent=diff!==0?(diff>0?'+'+diff+'j':diff+'j'):'';
+    var pomoFullClockEl = document.getElementById('pomo-full-clock');
+    if(pomoFullClockEl) pomoFullClockEl.textContent = ft[0]+':'+ft[1];
   }catch(e){}
 }
 updateClock();
 setInterval(updateClock,1000);
 
 /* ══════════════════════════════════════════
-   MÉTÉO + COURBE SVG — code retiré (dépendait d'un fetch API externe)
-   ──────────────────────────────────────────
-   Fonctionnement d'origine : appel direct depuis le navigateur (aucun
-   backend requis, cette API ne nécessite pas de clé) à Open-Meteo :
-     - https://api.open-meteo.com/v1/forecast
-       (température actuelle, ressenti, humidité, vent, code météo,
-       prévisions 3 jours)
-     - https://air-quality-api.open-meteo.com/v1/air-quality
-       (indice AQI US, PM2.5, PM10)
-   Coordonnées utilisées à l'origine : Hanoï (lat 21.0285, lon 105.8542).
-   Éléments HTML à remplir (déjà présents, avec placeholders par défaut) :
-     #w-city, #w-icon, #w-temp, #w-desc, #w-feels, #w-hum, #w-wind,
-     #w-days (3 cartes .dc pour les 3 prochains jours),
-     #temp-svg-wrap (frise horaire de température, générée en SVG),
-     #aqi-dot (pastille colorée selon l'indice), #aqi-val, #aqi-lbl, #aqi-pm,
-     #weather-bg (dégradé de fond selon la météo/l'heure du jour).
-   Cette section peut être reconstruite en JS pur, y compris sur GitHub
-   Pages, puisqu'elle ne dépend d'aucun serveur PHP.
+   POMODORO — 25 min travail / 5 min pause / grande pause de 30 min
+   toutes les 4 sessions de travail. Fonctionne entièrement côté client
+   (aucun backend), avec un son de cloche synthétisé en direct via
+   l'API Web Audio (pas de fichier audio à héberger sur GitHub Pages).
 ══════════════════════════════════════════ */
+(function(){
+  var PRESETS = [
+    { work:25*60, brk:5*60,  label:'25/5' },
+    { work:50*60, brk:10*60, label:'50/10' }
+  ];
+  var presetIdx = 0;
+  var POM_LONG = 30*60;
+  var POM_LONG_EVERY = 4;
+
+  var pomCardClock = document.getElementById('card-clock');
+  var pomFull = document.getElementById('pomo-full');
+  var pomFullBg = document.getElementById('pomo-full-bg');
+  var pomFullscreenBtn = document.getElementById('pom-fullscreen-btn');
+  var pomFullCloseBtn = document.getElementById('pomo-full-close');
+  var pomPresetBtn = document.getElementById('pom-preset-btn');
+  var pomSessionEls = [document.getElementById('pom-session-count'), document.getElementById('pom-session-count-full')];
+
+  var pomTimeEls = [document.getElementById('pom-time'), document.getElementById('pomo-full-time')];
+  var pomProgEls = [document.getElementById('pom-prog'), document.getElementById('pomo-full-prog')];
+  var pomBtnIcons = [document.getElementById('pom-btn-icon'), document.getElementById('pomo-full-icon')];
+  var pomBtns = [document.getElementById('pom-btn'), document.getElementById('pomo-full-btn')];
+  var pomDotIds = [
+    ['pd0','pd1','pd2','pd3'],
+    ['pfd0','pfd1','pfd2','pfd3']
+  ];
+
+  var state = {
+    mode: 'work',      // 'work' | 'break' | 'long'
+    remaining: PRESETS[presetIdx].work,
+    running: false
+  };
+  var workCount = 0;    // séances de travail terminées (compteur global, jamais remis à zéro)
+  var pomInterval = null;
+  var audioCtx = null;
+
+  function pomDuration(mode){
+    if(mode === 'work') return PRESETS[presetIdx].work;
+    if(mode === 'break') return PRESETS[presetIdx].brk;
+    return POM_LONG;
+  }
+
+  // Petit carillon apaisant, synthétisé (aucun fichier audio requis).
+  function playChime(){
+    try{
+      if(!audioCtx){
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if(!Ctx) return;
+        audioCtx = new Ctx();
+      }
+      if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+      var now = audioCtx.currentTime;
+      var freqs = [660, 990, 1320]; // accord clair type carillon, non agressif
+      freqs.forEach(function(f, i){
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        var start = now + i * 0.09;
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(0.12 / (i + 1), start + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 1.9);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(start);
+        osc.stop(start + 2);
+      });
+    }catch(e){}
+  }
+
+  function unlockAudio(){
+    try{
+      if(!audioCtx){
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if(Ctx) audioCtx = new Ctx();
+      }
+      if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }catch(e){}
+  }
+
+  function formatMs(sec){
+    var m = Math.floor(sec/60);
+    var s = sec%60;
+    return m+':'+(s<10?'0':'')+s;
+  }
+
+  function setModeClasses(mode){
+    [pomCardClock, pomFull].forEach(function(el){
+      if(!el) return;
+      el.classList.remove('pom-mode-work','pom-mode-break','pom-mode-long');
+      el.classList.add('pom-mode-'+mode);
+    });
+  }
+
+  function renderDots(){
+    var doneCount = workCount % POM_LONG_EVERY;
+    if(state.mode === 'long') doneCount = POM_LONG_EVERY;
+    pomDotIds.forEach(function(group){
+      group.forEach(function(id, i){
+        var el = document.getElementById(id);
+        if(!el) return;
+        el.classList.toggle('done', i < doneCount);
+        el.classList.toggle('active', state.mode === 'work' && i === doneCount);
+      });
+    });
+  }
+
+  function render(){
+    var text = formatMs(state.remaining);
+    pomTimeEls.forEach(function(el){
+      if(!el) return;
+      el.textContent = text;
+      el.classList.toggle('pom-urgent', state.remaining <= 10 && state.running);
+    });
+    var total = pomDuration(state.mode);
+    var pct = Math.max(0, Math.min(100, ((total - state.remaining) / total) * 100));
+    pomProgEls.forEach(function(el){ if(el) el.style.width = pct+'%'; });
+    pomBtnIcons.forEach(function(el){
+      if(!el) return;
+      el.innerHTML = state.running
+        ? '<rect x="2" y="1" width="2" height="8"/><rect x="6" y="1" width="2" height="8"/>'
+        : '<polygon points="2,1 9,5 2,9"/>';
+    });
+    pomSessionEls.forEach(function(el){ if(el) el.textContent = workCount; });
+    if(pomPresetBtn) pomPresetBtn.textContent = PRESETS[presetIdx].label;
+    setModeClasses(state.mode);
+    renderDots();
+  }
+
+  function tick(){
+    if(!state.running) return;
+    state.remaining--;
+    if(state.remaining <= 0){
+      advance();
+    } else {
+      render();
+    }
+  }
+
+  function advance(){
+    playChime();
+    if(state.mode === 'work'){
+      workCount++;
+      state.mode = (workCount % POM_LONG_EVERY === 0) ? 'long' : 'break';
+    } else {
+      state.mode = 'work';
+    }
+    state.remaining = pomDuration(state.mode);
+    render();
+  }
+
+  function setRunning(run){
+    state.running = run;
+    if(pomCardClock) pomCardClock.classList.toggle('pomo-active', run);
+    if(run){
+      unlockAudio();
+      if(!pomInterval) pomInterval = setInterval(tick, 1000);
+    } else if(pomInterval){
+      clearInterval(pomInterval);
+      pomInterval = null;
+    }
+    render();
+  }
+
+  function toggleRunning(){
+    setRunning(!state.running);
+  }
+
+  pomBtns.forEach(function(btn){
+    if(!btn) return;
+    btn.addEventListener('click', toggleRunning);
+  });
+
+  // Réglage du rythme travail/pause (25/5 ↔ 50/10). La séance en cours est
+  // recalée sur la nouvelle durée ; la grande pause (30 min) ne change pas.
+  if(pomPresetBtn){
+    pomPresetBtn.addEventListener('click', function(){
+      presetIdx = (presetIdx + 1) % PRESETS.length;
+      if(state.mode !== 'long'){
+        state.remaining = pomDuration(state.mode);
+      }
+      render();
+    });
+  }
+
+  // Capture une image figée du fond d'écran courant (diaporama en cours),
+  // pour que le fond du plein écran pomodoro ne change plus tant qu'il est
+  // ouvert — le diaporama continue derrière et reprend normalement à la
+  // fermeture, sans avoir été interrompu.
+  function freezeWallpaper(){
+    if(!pomFullBg) return;
+    var bgA = document.getElementById('bg-a');
+    var bgB = document.getElementById('bg-b');
+    var pick = bgA;
+    try{
+      var opA = bgA ? parseFloat(getComputedStyle(bgA).opacity) : 0;
+      var opB = bgB ? parseFloat(getComputedStyle(bgB).opacity) : 0;
+      pick = (opB > opA) ? bgB : bgA;
+    }catch(e){}
+    var img = pick ? getComputedStyle(pick).backgroundImage : '';
+    pomFullBg.style.backgroundImage = img && img !== 'none' ? img : '';
+  }
+
+  if(pomFullscreenBtn && pomFull){
+    pomFullscreenBtn.addEventListener('click', function(){
+      freezeWallpaper();
+      pomFull.classList.add('open');
+      pomFull.setAttribute('aria-hidden','false');
+      render();
+    });
+  }
+
+  function closePomoFull(){
+    if(!pomFull) return;
+    pomFull.classList.remove('open');
+    pomFull.setAttribute('aria-hidden','true');
+  }
+
+  if(pomFullCloseBtn){ pomFullCloseBtn.addEventListener('click', closePomoFull); }
+  if(pomFull){
+    pomFull.addEventListener('click', function(e){
+      if(e.target === pomFull) closePomoFull();
+    });
+  }
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closePomoFull();
+  });
+
+  render();
+})();
 
 /* ══════════════════════════════════════════
-   MUSIQUE / PODCAST / MODE MATIN — code retiré
-   ──────────────────────────────────────────
-   La carte #card-music a 3 vues qui partagent le même espace visuel
-   (Todos affiché par défaut, Musique et Podcast basculés via
-   #audio-mode-toggle). Tout le HTML/CSS reste en place ; les boutons ne
-   sont simplement plus câblés à du JS :
-
-   VUE MUSIQUE : 3 iframes YouTube cachées (son d'ambiance uniquement,
-   jamais la vidéo affichée), en autoplay muet, bascule entre 3 pistes
-   (#yt-frame-0/1/2, déjà présentes dans le HTML avec leurs vraies src).
-   Les contrôles personnalisés (#yt-play-btn, #vol-slider) pilotaient
-   l'iframe active via l'API postMessage de YouTube
-   (playVideo/pauseVideo/mute/unMute).
-
-   VUE PODCAST : récupérait le dernier épisode de 2 flux RSS France
-   Info/Inter ("Journal", "Grande Matinale") via un proxy serveur
-   (nécessaire : ces flux RSS ne renvoient pas d'en-têtes CORS, donc
-   impossible de les lire directement en JS depuis un site statique sans
-   passer par un proxy quelconque). Lecture ensuite via l'élément HTML5
-   natif "audio" (#pod-audio), ce qui fonctionne sans backend une fois
-   l'URL du MP3 obtenue.
-
-   BUS AUDIO (petit système d'exclusivité "AUDIO_BUS") : démarrer l'un des
-   deux (musique/podcast) coupait automatiquement l'autre.
-
-   MODE MATIN : entre 6h et 10h heure de Paris au chargement de la page,
-   bascule automatiquement sur la vue Podcast et tente de lancer la
-   lecture (avec contournement des restrictions d'autoplay du navigateur
-   en écoutant le premier geste utilisateur).
-
-   Éléments HTML déjà en place mais inertes sans JS : tous les boutons de
-   #card-music (.amt-btn, .sc-tab, #yt-play-btn, #vol-slider, #pod-play-btn,
-   #pod-prog-wrap, #pod-vol-sl).
+   MUSIQUE — carrousel 3 pages + lecteur YouTube (page « en ligne »)
 ══════════════════════════════════════════ */
+(function(){
+  var pagesWrap = document.getElementById('music-pages');
+  var pages = Array.prototype.slice.call(document.querySelectorAll('.music-page'));
+  var dots = Array.prototype.slice.call(document.querySelectorAll('.music-dot'));
+  var prevBtn = document.getElementById('music-prev-page');
+  var nextBtn = document.getElementById('music-next-page');
+  var bgImg = document.getElementById('music-bg-img');
+  if(!pagesWrap || !pages.length) return;
+
+  var pageIdx = 0;
+
+  function showPage(idx){
+    pageIdx = (idx + pages.length) % pages.length;
+    if(pagesWrap) pagesWrap.style.transform = 'translateX(-' + (pageIdx * (100/pages.length)) + '%)';
+    dots.forEach(function(d, i){ d.classList.toggle('active', i === pageIdx); });
+  }
+  if(prevBtn) prevBtn.addEventListener('click', function(){ showPage(pageIdx - 1); });
+  if(nextBtn) nextBtn.addEventListener('click', function(){ showPage(pageIdx + 1); });
+  dots.forEach(function(d, i){ d.addEventListener('click', function(){ showPage(i); }); });
+
+  // ── Fond : miniature du morceau en cours, floutée ; repli sur l'icône générique ──
+  var avatarEl = document.getElementById('music-online-avatar');
+  function setBackgroundThumb(videoId){
+    if(!bgImg) return;
+    bgImg.classList.remove('loaded');
+    if(!videoId){ bgImg.removeAttribute('src'); return; }
+    var url = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
+    bgImg.onload = function(){ bgImg.classList.add('loaded'); };
+    bgImg.onerror = function(){ bgImg.classList.remove('loaded'); };
+    bgImg.src = url;
+    if(avatarEl){
+      avatarEl.style.backgroundImage = 'url(' + url + ')';
+      avatarEl.textContent = '';
+    }
+  }
+
+  // ══ Page « en ligne » — lecteur YouTube unique (schéma officiel), 144p ══
+  var YT_TRACKS = [
+    { id:'eEZF9iIv5XM', label:'MedievaLo-Fi — Le chevalier médiéval' },
+    { id:'jfKfPfyJRdk', label:'Lofi Girl — Chill lofi' },
+    { id:'jXAEIWcGXwE', label:'Lofi Girl — Chill classique' }
+  ];
+  var ytActive = 0;
+  var ytPlaying = false;
+  var ytPlayer = null;
+  var ytReady = false;
+  var ytLoopMode = 0; // 0 = boucle, 1 = aléatoire
+  var ytProgTimer = null;
+
+  var ytTabs = Array.prototype.slice.call(document.querySelectorAll('#music-online-tabs .music-tab'));
+  var ytTitleEl = document.getElementById('music-online-title');
+  var ytPlayBtn = document.getElementById('music-online-play');
+  var ytProgWrap = document.getElementById('music-online-prog-wrap');
+  var ytProgBar = document.getElementById('music-online-prog');
+  var ytLiveBadge = document.getElementById('music-online-live');
+  var ytVolSlider = document.getElementById('music-online-vol');
+  var ytLoopBtn = document.getElementById('music-online-loop');
+  var ytMount = document.getElementById('music-online-mount');
+
+  function updateTitle(){
+    if(ytTitleEl) ytTitleEl.textContent = YT_TRACKS[ytActive].label;
+    var widgetTitle = document.getElementById('pomo-music-title');
+    if(widgetTitle) widgetTitle.textContent = YT_TRACKS[ytActive].label;
+    setBackgroundThumb(YT_TRACKS[ytActive].id);
+  }
+  updateTitle();
+
+  function updatePlayIcon(){
+    var svgOn = '<svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><rect x="2" y="1" width="2" height="8"/><rect x="6" y="1" width="2" height="8"/></svg>';
+    var svgOff = '<svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>';
+    if(ytPlayBtn) ytPlayBtn.innerHTML = ytPlaying ? svgOn : svgOff;
+    // Widget « en cours de lecture » du plein écran pomodoro (style iOS)
+    var widgetBtn = document.getElementById('pomo-music-playbtn');
+    if(widgetBtn) widgetBtn.innerHTML = ytPlaying ? svgOn : svgOff;
+    var widget = document.getElementById('pomo-music-widget');
+    if(widget) widget.classList.toggle('is-playing', ytPlaying);
+  }
+
+  function setLiveBadge(isLive){
+    if(ytProgWrap) ytProgWrap.style.display = isLive ? 'none' : 'block';
+    if(ytLiveBadge) ytLiveBadge.classList.toggle('show', isLive);
+  }
+
+  function toggleYtPlayPause(){
+    loadYouTubeIframeApi();
+    if(!ytPlayer || !ytReady){
+      var tries = 0;
+      var t = setInterval(function(){
+        tries++;
+        if(ytPlayer && ytReady){
+          clearInterval(t);
+          ytPlayer.playVideo();
+        } else if(tries > 40){
+          clearInterval(t);
+        }
+      }, 150);
+      return;
+    }
+    if(ytPlaying){ ytPlayer.pauseVideo(); } else { ytPlayer.playVideo(); }
+  }
+
+  function loadYouTubeIframeApi(){
+    if(window.YT && window.YT.Player){ window.onYouTubeIframeAPIReady(); return; }
+    if(window.__ytApiRequested) return;
+    window.__ytApiRequested = true;
+    var tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    var firstScript = document.getElementsByTagName('script')[0];
+    firstScript.parentNode.insertBefore(tag, firstScript);
+  }
+
+  var previousYtReadyCb = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = function(){
+    if(typeof previousYtReadyCb === 'function') previousYtReadyCb();
+    if(!ytMount || ytPlayer) return;
+    try{
+      ytPlayer = new YT.Player('music-online-mount', {
+        width:300, height:200,
+        videoId: YT_TRACKS[ytActive].id,
+        playerVars:{
+          autoplay:0, mute:0, controls:0, modestbranding:1, rel:0,
+          disablekb:1, fs:0, iv_load_policy:3, playsinline:1,
+          origin: window.location.origin
+        },
+        events:{
+          onReady:function(e){
+            ytReady = true;
+            try{
+              applyVolumeFromSlider();
+              e.target.setPlaybackQuality('tiny'); // 144p
+            }catch(err){}
+          },
+          onStateChange:function(e){
+            if(e.data === YT.PlayerState.PLAYING){
+              ytPlaying = true;
+              try{ e.target.setPlaybackQuality('tiny'); }catch(err){}
+              startProgressPoll();
+            } else if(e.data === YT.PlayerState.PAUSED){
+              ytPlaying = false;
+              stopProgressPoll();
+            } else if(e.data === YT.PlayerState.ENDED){
+              ytPlaying = false;
+              stopProgressPoll();
+              var next = ytLoopMode === 1
+                ? Math.floor(Math.random() * YT_TRACKS.length)
+                : ytActive;
+              switchTrack(next, true);
+            }
+            updatePlayIcon();
+          },
+          onError:function(){
+            var next = (ytActive + 1) % YT_TRACKS.length;
+            if(next !== ytActive) switchTrack(next, ytPlaying);
+          }
+        }
+      });
+    }catch(err){}
+  };
+
+  function switchTrack(idx, autoplay){
+    ytTabs.forEach(function(t,i){ t.classList.toggle('active', i===idx); });
+    ytActive = idx;
+    updateTitle();
+    if(ytProgBar) ytProgBar.style.width = '0%';
+    setLiveBadge(false);
+    if(!ytPlayer || !ytReady) return;
+    try{
+      ytPlayer.loadVideoById({ videoId: YT_TRACKS[idx].id });
+      ytPlayer.setPlaybackQuality('tiny');
+      if(!autoplay) ytPlayer.pauseVideo();
+    }catch(err){}
+  }
+
+  ytTabs.forEach(function(tab, i){
+    tab.addEventListener('click', function(){
+      if(i === ytActive) return;
+      switchTrack(i, ytPlaying);
+    });
+  });
+
+  if(ytPlayBtn){
+    ytPlayBtn.addEventListener('click', toggleYtPlayPause);
+  }
+  var widgetPlayBtn0 = document.getElementById('pomo-music-playbtn');
+  if(widgetPlayBtn0){ widgetPlayBtn0.addEventListener('click', toggleYtPlayPause); }
+
+  // Volume perçu plus progressif : la position du curseur (0-100) est mappée
+  // sur une courbe quadratique avant d'être appliquée au lecteur, pour que les
+  // petits ajustements en bas d'échelle restent audibles/graduels (l'oreille
+  // perçoit le volume de façon logarithmique, pas linéaire).
+  function applyVolumeFromSlider(){
+    if(!ytVolSlider) return;
+    var raw = parseInt(ytVolSlider.value, 10);
+    ytVolSlider.style.setProperty('--vol-pct', raw + '%');
+    var perceptual = Math.round(100 * Math.pow(raw / 100, 2));
+    if(ytPlayer && ytReady){
+      try{ ytPlayer.setVolume(perceptual); }catch(err){}
+    }
+  }
+  if(ytVolSlider){
+    ytVolSlider.style.setProperty('--vol-pct', ytVolSlider.value + '%');
+    ytVolSlider.addEventListener('input', applyVolumeFromSlider);
+  }
+
+  if(ytLoopBtn){
+    ytLoopBtn.addEventListener('click', function(){
+      ytLoopMode = ytLoopMode === 0 ? 1 : 0;
+      ytLoopBtn.textContent = ytLoopMode === 0 ? '\u221E' : '\u21C4';
+      ytLoopBtn.classList.toggle('active', ytLoopMode === 1);
+      ytLoopBtn.title = ytLoopMode === 0 ? 'Boucle (piste actuelle)' : 'Aléatoire (piste suivante)';
+    });
+  }
+
+  function startProgressPoll(){
+    stopProgressPoll();
+    ytProgTimer = setInterval(function(){
+      if(!ytPlayer || !ytReady || !ytProgBar) return;
+      try{
+        var dur = ytPlayer.getDuration();
+        var cur = ytPlayer.getCurrentTime();
+        var isLive = !dur || !isFinite(dur) || dur <= 0;
+        setLiveBadge(isLive);
+        if(!isLive){
+          ytProgBar.style.width = Math.min(100, (cur/dur)*100) + '%';
+        }
+      }catch(err){}
+    }, 1000);
+  }
+  function stopProgressPoll(){ if(ytProgTimer){ clearInterval(ytProgTimer); ytProgTimer = null; } }
+
+  if(ytProgWrap){
+    ytProgWrap.addEventListener('click', function(e){
+      if(!ytPlayer || !ytReady) return;
+      try{
+        var dur = ytPlayer.getDuration();
+        if(!dur || !isFinite(dur) || dur <= 0) return; // flux en direct, non « seekable »
+        var rect = ytProgWrap.getBoundingClientRect();
+        var ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+        ytPlayer.seekTo(ratio * dur, true);
+      }catch(err){}
+    });
+  }
+
+  // Charge l'API dès l'arrivée sur la page (le morceau ne joue qu'au clic play,
+  // conformément aux politiques d'autoplay des navigateurs).
+  loadYouTubeIframeApi();
+})();
 
 /* ══════════════════════════════════════════
-   CALENDRIER, MINI-CALENDRIER & MINI-POMODORO — code retiré
+   MÉTÉO — Open-Meteo (api.open-meteo.com), aucune clé requise.
+   Position : géolocalisation du navigateur ; repli sur Paris si refusée
+   ou indisponible. Le fuseau horaire local vient directement de la
+   réponse de l'API (utc_offset_seconds), donc valable pour n'importe
+   quelle position.
+══════════════════════════════════════════ */
+(function(){
+  var PARIS = { lat:48.8566, lon:2.3522, label:'Paris' };
+
+  var elCity = document.getElementById('w-city');
+  var elNowTemp = document.getElementById('w-now-temp');
+  var elFeels = document.getElementById('w-feels');
+  var elUv = document.getElementById('w-uv');
+  var elForecast = document.getElementById('w-forecast');
+  var elTrack = document.getElementById('w-hourly-track');
+  var elInner = document.getElementById('w-hourly-inner');
+  var elNowMarker = document.getElementById('w-hourly-now');
+  var elCurve = document.getElementById('w-temp-curve');
+  var elNowOnCurve = document.getElementById('w-now-on-curve');
+  var elTooltip = document.getElementById('w-tooltip');
+  if(!elNowTemp || !elTrack) return;
+
+  // Catégorisation des codes météo WMO (Open-Meteo) : icône, teinte
+  // (verre teinté, faible opacité) et libellé pour l'infobulle.
+  function weatherInfo(code){
+    var table = [
+      { codes:[0],           icon:'☀️', color:'rgba(240,180,41,.38)',  label:'Ciel dégagé' },
+      { codes:[1],           icon:'🌤️', color:'rgba(240,180,41,.24)',  label:'Plutôt dégagé' },
+      { codes:[2],           icon:'⛅',  color:'rgba(180,180,175,.26)', label:'Partiellement nuageux' },
+      { codes:[3],           icon:'☁️',  color:'rgba(150,155,165,.32)', label:'Couvert' },
+      { codes:[45,48],       icon:'🌫️', color:'rgba(150,155,165,.18)', label:'Brouillard' },
+      { codes:[51,53,55,56,57], icon:'🌦️', color:'rgba(140,190,230,.26)', label:'Bruine' },
+      { codes:[61,63,66,67], icon:'🌧️', color:'rgba(91,159,212,.34)',  label:'Pluie' },
+      { codes:[65,82],       icon:'🌧️', color:'rgba(55,110,170,.44)',  label:'Forte pluie' },
+      { codes:[80,81],       icon:'🌦️', color:'rgba(91,159,212,.30)',  label:'Averses' },
+      { codes:[71,73,75,77,85,86], icon:'❄️', color:'rgba(220,230,240,.36)', label:'Neige' },
+      { codes:[95,96,99],    icon:'⛈️', color:'rgba(172,130,220,.38)', label:'Orage' }
+    ];
+    for(var i=0;i<table.length;i++){ if(table[i].codes.indexOf(code) !== -1) return table[i]; }
+    return { icon:'—', color:'rgba(150,155,165,.16)', label:'—' };
+  }
+
+  function buildUrl(lat, lon){
+    return 'https://api.open-meteo.com/v1/forecast'
+      + '?latitude=' + lat + '&longitude=' + lon
+      + '&current=temperature_2m,apparent_temperature,weather_code'
+      + '&hourly=weather_code,uv_index,temperature_2m'
+      + '&daily=weather_code,temperature_2m_max,temperature_2m_min'
+      + '&timezone=auto'
+      + '&forecast_days=4';
+  }
+
+  function getLocalHour(utcOffsetSeconds){
+    var nowMs = Date.now();
+    var localMs = nowMs + (utcOffsetSeconds * 1000);
+    var d = new Date(localMs);
+    return d.getUTCHours() + d.getUTCMinutes() / 60;
+  }
+
+  function renderNow(data){
+    var cur = data.current;
+    if(!cur) return;
+    elNowTemp.textContent = Math.round(cur.temperature_2m) + '°';
+    if(elFeels) elFeels.textContent = Math.round(cur.apparent_temperature) + '°';
+    if(elUv && data.hourly && data.hourly.time){
+      var nowIdx = data.hourly.time.indexOf(cur.time);
+      if(nowIdx === -1){
+        var nowMsUv = new Date(cur.time).getTime();
+        var best = 0, bestDiff = Infinity;
+        data.hourly.time.forEach(function(t, i){
+          var diff = Math.abs(new Date(t).getTime() - nowMsUv);
+          if(diff < bestDiff){ bestDiff = diff; best = i; }
+        });
+        nowIdx = best;
+      }
+      var uv = data.hourly.uv_index[nowIdx];
+      elUv.textContent = (uv !== undefined && uv !== null) ? Math.round(uv*10)/10 : '–';
+    }
+  }
+
+  function renderForecast(data){
+    if(!elForecast || !data.daily) return;
+    var d = data.daily;
+    elForecast.innerHTML = '';
+    for(var i = 0; i < 4 && i < d.time.length; i++){
+      var date = new Date(d.time[i] + 'T00:00:00');
+      var lbl = date.toLocaleDateString('fr-FR', { weekday:'short' });
+      var info = weatherInfo(d.weather_code[i]);
+      var avg = Math.round((d.temperature_2m_max[i] + d.temperature_2m_min[i]) / 2);
+      var col = document.createElement('div');
+      col.className = 'w-fc-day';
+      col.innerHTML =
+        '<span class="w-fc-lbl">' + lbl.replace('.','') + '</span>' +
+        '<span class="w-fc-icon">' + info.icon + '</span>' +
+        '<span class="w-fc-temp">' + avg + '°</span>';
+      elForecast.appendChild(col);
+    }
+  }
+
+  function showTooltip(html, centerPct){
+    if(!elTooltip) return;
+    elTooltip.innerHTML = html;
+    elTooltip.classList.add('show');
+    var trackW = elTrack.clientWidth;
+    var ttW = elTooltip.offsetWidth;
+    var left = (centerPct/100) * trackW - ttW/2;
+    left = Math.max(2, Math.min(trackW - ttW - 2, left));
+    elTooltip.style.left = left + 'px';
+  }
+  function hideTooltip(){ if(elTooltip) elTooltip.classList.remove('show'); }
+
+  function renderHourly(data){
+    if(!elTrack || !elInner || !data.hourly) return;
+    elInner.querySelectorAll('.w-hseg').forEach(function(el){ el.remove(); });
+    elTrack.querySelectorAll('.w-minmax-lbl').forEach(function(el){ el.remove(); });
+
+    var codes = [], temps = [];
+    for(var h = 8; h <= 19; h++){
+      codes.push(data.hourly.weather_code[h] !== undefined ? data.hourly.weather_code[h] : 0);
+      temps.push(data.hourly.temperature_2m[h] !== undefined ? data.hourly.temperature_2m[h] : null);
+    }
+    // Regroupe les heures consécutives de même condition en un seul segment
+    var segs = [];
+    var startIdx = 0;
+    for(var i = 1; i <= codes.length; i++){
+      var changed = (i === codes.length) || (weatherInfo(codes[i]).color !== weatherInfo(codes[startIdx]).color);
+      if(changed){
+        segs.push({ start:startIdx, end:i, info:weatherInfo(codes[startIdx]) });
+        startIdx = i;
+      }
+    }
+    segs.forEach(function(seg){
+      var leftPct = (seg.start / 12) * 100;
+      var widthPct = ((seg.end - seg.start) / 12) * 100;
+      var segTemps = temps.slice(seg.start, seg.end).filter(function(t){ return t !== null; });
+      var avgT = segTemps.length ? Math.round(segTemps.reduce(function(a,b){return a+b;},0)/segTemps.length) : null;
+      var div = document.createElement('div');
+      div.className = 'w-hseg';
+      div.style.left = leftPct + '%';
+      div.style.width = widthPct + '%';
+      div.style.background = seg.info.color;
+      var hStart = 8 + seg.start, hEnd = 8 + seg.end;
+      var tooltipHtml = seg.info.label +
+        (avgT !== null ? ' · <span class="w-tt-temp">' + avgT + '°</span>' : '') +
+        ' · ' + hStart + 'h–' + hEnd + 'h';
+      div.addEventListener('mouseenter', function(){ showTooltip(tooltipHtml, leftPct + widthPct/2); });
+      div.addEventListener('mouseleave', hideTooltip);
+      elInner.insertBefore(div, elNowMarker);
+    });
+
+    // Courbe de température lissée (aucun angle brutal : quadratique par points)
+    var vw = 300, vh = 100;
+    var trackH = elTrack.clientHeight || 66;
+    var pxScale = trackH / vh;
+    var pts = [];
+    var validTemps = temps.filter(function(t){ return t !== null; });
+    var tMin = validTemps.length ? Math.min.apply(null, validTemps) : 0;
+    var tMax = validTemps.length ? Math.max.apply(null, validTemps) : 1;
+    var range = (tMax - tMin) || 1;
+    for(var p = 0; p < temps.length; p++){
+      var t = temps[p] === null ? tMin : temps[p];
+      var x = (p / (temps.length - 1)) * vw;
+      var y = 74 - ((t - tMin) / range) * 44; // reste dans la partie haute de la bande
+      pts.push({ x:x, y:y, t:t });
+    }
+    if(elCurve){
+      var linePath = pts.length ? ('M ' + pts[0].x.toFixed(1) + ' ' + pts[0].y.toFixed(1)) : '';
+      for(var k = 0; k < pts.length - 1; k++){
+        var a = pts[k], b = pts[k+1];
+        var midX = (a.x+b.x)/2, midY = (a.y+b.y)/2;
+        linePath += (k === 0 ? ' L ' : ' Q ' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) + ' ') + midX.toFixed(1) + ' ' + midY.toFixed(1);
+      }
+      if(pts.length > 1){
+        var last = pts[pts.length-1], prev = pts[pts.length-2];
+        linePath += ' Q ' + prev.x.toFixed(1) + ' ' + prev.y.toFixed(1) + ' ' + last.x.toFixed(1) + ' ' + last.y.toFixed(1);
+      }
+      var fillPath = linePath + ' L ' + vw + ' ' + vh + ' L 0 ' + vh + ' Z';
+      elCurve.innerHTML =
+        '<path class="w-temp-fill" d="' + fillPath + '"></path>' +
+        '<path class="w-temp-line" d="' + linePath + '"></path>';
+    }
+
+    // Repères min / max du jour, épinglés sur la courbe à l'heure où ils surviennent
+    if(pts.length){
+      var minIdx = 0, maxIdx = 0;
+      pts.forEach(function(pt, idx){
+        if(pt.t < pts[minIdx].t) minIdx = idx;
+        if(pt.t > pts[maxIdx].t) maxIdx = idx;
+      });
+      [{ idx:maxIdx, cls:'is-max' }, { idx:minIdx, cls:'is-min' }].forEach(function(m){
+        var pt = pts[m.idx];
+        var lbl = document.createElement('div');
+        lbl.className = 'w-minmax-lbl ' + m.cls;
+        lbl.style.left = ((pt.x / vw) * 100) + '%';
+        lbl.style.top = (pt.y * pxScale) + 'px';
+        lbl.textContent = Math.round(pt.t) + '°';
+        elTrack.appendChild(lbl);
+      });
+    }
+
+    // Marqueur rouge de l'heure actuelle + température au point de croisement
+    // avec la courbe (interpolée, légèrement décalée pour se superposer au trait).
+    var localHour = getLocalHour(data.utc_offset_seconds || 0);
+    if(elNowMarker || elNowOnCurve){
+      var inRange = localHour >= 8 && localHour <= 20;
+      if(elNowMarker){
+        if(inRange){
+          var pct = ((localHour - 8) / 12) * 100;
+          elNowMarker.style.left = pct + '%';
+          elNowMarker.style.display = 'block';
+        } else {
+          elNowMarker.style.display = 'none';
+        }
+      }
+      if(elNowOnCurve){
+        if(inRange && pts.length > 1){
+          var wf = (localHour - 8) / 12;
+          var pFloatIdx = wf * (pts.length - 1);
+          var i0 = Math.max(0, Math.min(pts.length - 1, Math.floor(pFloatIdx)));
+          var i1 = Math.min(pts.length - 1, i0 + 1);
+          var frac = pFloatIdx - i0;
+          var interpT = pts[i0].t + (pts[i1].t - pts[i0].t) * frac;
+          var interpY = pts[i0].y + (pts[i1].y - pts[i0].y) * frac;
+          var pctNow = ((localHour - 8) / 12) * 100;
+          elNowOnCurve.style.left = pctNow + '%';
+          elNowOnCurve.style.top = (interpY * pxScale) + 'px';
+          elNowOnCurve.textContent = Math.round(interpT) + '°';
+          elNowOnCurve.style.display = 'block';
+        } else {
+          elNowOnCurve.style.display = 'none';
+        }
+      }
+    }
+  }
+
+  function loadWeather(lat, lon, label){
+    if(elCity) elCity.textContent = label;
+    fetch(buildUrl(lat, lon))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        renderNow(data);
+        renderForecast(data);
+        renderHourly(data);
+      })
+      .catch(function(){
+        elNowTemp.innerHTML = '<span class="err-txt">Météo indisponible</span>';
+      });
+  }
+
+  function useFallback(){ loadWeather(PARIS.lat, PARIS.lon, PARIS.label); }
+
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      function(pos){
+        loadWeather(pos.coords.latitude, pos.coords.longitude, 'Ma position');
+      },
+      function(){ useFallback(); },
+      { timeout: 6000, maximumAge: 10*60*1000 }
+    );
+  } else {
+    useFallback();
+  }
+})();
+
+/* ══════════════════════════════════════════
+   CALENDRIER, MINI-CALENDRIER — code retiré
    ──────────────────────────────────────────
    CALENDRIER (#cal-grid, #cal-days-bar) : vue de 4 jours simultanés,
    tranche horaire 7h-23h (52px par heure). Les événements venaient d'un
@@ -1583,32 +2573,6 @@ setInterval(updateClock,1000);
    MINI-CALENDRIER MENSUEL (#cal-mini-panel, #cal-mini-grid) : petit
    calendrier du mois courant, navigable (#mini-prev / #mini-next), jour
    actuel marqué (classe .mini-day.is-today).
-
-   MINI-POMODORO (dans la carte horloge : #pom-time, #pom-mode-lbl,
-   #pom-prog, #pom-btn, #pd0..#pd3) : interrogeait toutes les 10s un timer
-   dont l'état (mode, temps restant, en cours ou non) était géré côté
-   serveur par l'app Pomodoro séparée (/pomodoro/, non couverte par ce
-   fichier). Le bouton play/pause envoyait une commande au serveur. Les
-   valeurs actuellement figées dans le HTML ("25:00", "FOCUS", 1ᵉʳ point
-   actif) sont de simples placeholders visuels, pas un vrai décompte.
-══════════════════════════════════════════ */
-
-/* ══════════════════════════════════════════
-   TODOS / RAPPELS — code retiré
-   ──────────────────────────────────────────
-   6 listes fixes : Quotidien, Dashboard, Courses, Moyen terme, Long terme,
-   La Parisienne. Navigation entre listes via #todo-prev / #todo-next
-   (#todo-list-name affiche le nom de la liste courante), #todo-items
-   recevait les items de la liste active. Le bouton #todo-expand-btn
-   ouvrait une modale (#todos-modal, déjà présente dans le HTML) montrant
-   toutes les listes à la fois, en grille (#todos-modal-grid).
-   Les données venaient d'un fichier JSON alimenté par un Raccourci iOS qui
-   lisait l'app Rappels du téléphone et envoyait son contenu périodiquement
-   à un script serveur — une synchronisation unidirectionnelle et
-   périodique, pas un vrai bridge temps réel bidirectionnel.
-   Cocher un item (case à cocher, classes .todo-check / .todo-check.done
-   déjà stylées) le faisait disparaître avec un petit fondu, et
-   persistait l'état auprès du serveur.
 ══════════════════════════════════════════ */
 
 /* ══════════════════════════════════════════
@@ -1777,461 +2741,6 @@ setInterval(updateClock,1000);
     renderCalendar();
   })();
 </script>
-<script>
- (function(){
-   var modeButtons = document.querySelectorAll('#audio-mode-toggle [data-amode]');
-   var sections = {
-     music: document.getElementById('yt-section'),
-     local: document.getElementById('local-section'),
-     podcast: document.getElementById('pod-section')
-   };
-
-   var ytTabs = Array.from(document.querySelectorAll('#sc-tabs .sc-tab'));
-   var ytFrames = [
-     document.getElementById('yt-frame-0'),
-     document.getElementById('yt-frame-1'),
-     document.getElementById('yt-frame-2')
-   ];
-   var ytCredits = [
-     document.getElementById('sc-credit-0'),
-     document.getElementById('sc-credit-1'),
-     document.getElementById('sc-credit-2')
-   ];
-   var ytPlayBtn = document.getElementById('yt-play-btn');
-   var ytPlayIcon = document.getElementById('yt-play-icon');
-   var volIcon = document.getElementById('vol-icon');
-   var volSlider = document.getElementById('vol-slider');
-   var volPct = document.getElementById('vol-pct');
-
-   var localAudio = document.getElementById('local-audio');
-   var localPlaylistEl = document.getElementById('local-playlist');
-   var localCurrentTitle = document.getElementById('local-current-title');
-   var localFileInput = document.getElementById('local-file-input');
-   var localSelectBtn = document.getElementById('local-select-btn');
-   var localPrevBtn = document.getElementById('local-prev-btn');
-   var localPlayBtn = document.getElementById('local-play-btn');
-   var localNextBtn = document.getElementById('local-next-btn');
-   var localLoopBtn = document.getElementById('local-loop-btn');
-   var localShuffleBtn = document.getElementById('local-shuffle-btn');
-
-   var localFiles = [];
-   var localIndex = 0;
-   var localLoop = false;
-   var localShuffle = false;
-
-   // Cette constante indique l'emplacement où tu peux stocker des fichiers audio dans le repo.
-   // Ajoute les fichiers dans assets/local-music/ et liste-les ici si tu veux les charger automatiquement.
-   var localMusicFolder = 'assets/local-music/';
-   var localStaticList = [
-     'assets/local-music/Lofi Girl goes on holidays ☀️.mp3',
-     'assets/local-music/MedievaLo-Fi  Lofi Beats for the Medieval Knight you always wanted to be 👑.mp3'
-   ];
-
-   var ytActive = 0;
-   var ytPlaying = true;
-   var ytMuted = true;
-   var ytVolume = 80;
-   var ytPlayers = [null, null, null];
-   var ytPlayerReady = [false, false, false];
-   var ytApiLoaded = false;
-
-   function loadYouTubeIframeApi(){
-     if(window.YT && window.YT.Player){
-       ytApiLoaded = true;
-       createAllYtPlayers();
-       return;
-     }
-     var tag = document.createElement('script');
-     tag.src = 'https://www.youtube.com/iframe_api';
-     var firstScript = document.getElementsByTagName('script')[0];
-     firstScript.parentNode.insertBefore(tag, firstScript);
-   }
-
-   window.onYouTubeIframeAPIReady = function(){
-     ytApiLoaded = true;
-     createAllYtPlayers();
-   };
-
-   function createAllYtPlayers(){
-     ytFrames.forEach(function(frame, index){
-       ensureYtFrame(index);
-       createYtPlayer(index);
-     });
-   }
-
-   function createYtPlayer(index){
-     if(!window.YT || !YT.Player) return;
-     if(ytPlayers[index]) return;
-     var frame = ytFrames[index];
-     if(!frame || !frame.id) return;
-     // extract playlist id if present in src or data-src
-     var playerVars = { autoplay: 0, controls: 0, rel: 0, modestbranding: 1 };
-     try{
-       ytPlayers[index] = new YT.Player(frame.id, {
-         playerVars: playerVars,
-         events: {
-           onReady: function(){
-             ytPlayerReady[index] = true;
-             var player = ytPlayers[index];
-             if(!player) return;
-             try{
-               if(ytMuted) player.mute(); else player.unMute();
-               if(typeof player.setVolume === 'function') player.setVolume(ytVolume);
-             }catch(e){}
-             if(index === ytActive && ytPlaying){
-               try{ player.playVideo(); }catch(e){}
-             }
-             updateYtControls();
-           },
-           onStateChange: function(event){
-             // YT.PlayerState: -1 unstarted, 0 ended, 1 playing, 2 paused
-             if(event.data === 1){ ytPlaying = true; }
-             else if(event.data === 2){ ytPlaying = false; }
-             else if(event.data === 0){ ytPlaying = false; }
-             updateYtControls();
-           }
-         }
-       });
-     }catch(e){
-       ytPlayers[index] = null;
-     }
-   }
-
-   function updateMode(mode){
-     modeButtons.forEach(function(button){
-       button.classList.toggle('active', button.dataset.amode === mode);
-     });
-     Object.keys(sections).forEach(function(key){
-       var section = sections[key];
-       if(!section) return;
-       section.classList.toggle('visible', key === mode);
-     });
-     if(mode !== 'music'){
-       pauseYoutube();
-     }
-     if(mode !== 'local'){
-       pauseLocal();
-     }
-   }
-
-   modeButtons.forEach(function(button){
-     button.addEventListener('click', function(){
-       updateMode(this.dataset.amode);
-     });
-   });
-
-   function sendYTCommand(frame, func, args){
-     var index = ytFrames.indexOf(frame);
-     if(index >= 0 && ytPlayers[index] && ytPlayerReady[index]){
-       var player = ytPlayers[index];
-       if(player && typeof player[func] === 'function'){
-         try{
-           player[func].apply(player, args || []);
-           return;
-         }catch(e){}
-       }
-     }
-     if(!frame || !frame.contentWindow) return;
-     try{
-       frame.contentWindow.postMessage(JSON.stringify({ event:'command', func:func, args:args||[] }), '*');
-     }catch(e){}
-   }
-
-   function ensureYtFrame(index){
-     var frame = ytFrames[index];
-     if(!frame) return;
-     if(!frame.src || frame.src.trim() === ''){
-       var src = frame.getAttribute('data-src');
-       if(src) frame.src = src;
-     }
-   }
-
-   function setActiveYt(index){
-     if(index === ytActive) return;
-     if(ytFrames[ytActive]) ytFrames[ytActive].classList.remove('active');
-     if(ytTabs[ytActive]) ytTabs[ytActive].classList.remove('active');
-     if(ytCredits[ytActive]) ytCredits[ytActive].style.display = 'none';
-     ytActive = index;
-     if(ytTabs[ytActive]) ytTabs[ytActive].classList.add('active');
-     if(ytFrames[ytActive]) ytFrames[ytActive].classList.add('active');
-     if(ytCredits[ytActive]) ytCredits[ytActive].style.display = '';
-     ensureYtFrame(ytActive);
-     // ensure player creation
-     createYtPlayer(ytActive);
-     // if player ready, control it directly, otherwise poll until ready
-     var idx = ytActive;
-     function tryPlayPause(){
-       var p = ytPlayers[idx];
-       if(p && ytPlayerReady[idx]){
-         try{
-           if(ytPlaying) p.playVideo(); else p.pauseVideo();
-         }catch(e){}
-         updateYtControls();
-       } else {
-         var tries = 0;
-         var t = setInterval(function(){
-           tries++;
-           if(ytPlayers[idx] && ytPlayerReady[idx]){
-             try{ if(ytPlaying) ytPlayers[idx].playVideo(); else ytPlayers[idx].pauseVideo(); }catch(e){}
-             updateYtControls();
-             clearInterval(t);
-           } else if(tries > 20){
-             clearInterval(t);
-           }
-         }, 150);
-       }
-     }
-     tryPlayPause();
-   }
-
-   function updateYtControls(){
-     if(ytPlayIcon){
-       ytPlayIcon.innerHTML = ytPlaying ? '<rect x="2" y="1" width="2" height="8"/><rect x="6" y="1" width="2" height="8"/>' : '<polygon points="2,1 9,5 2,9"/>';
-     }
-     if(volIcon){
-       volIcon.textContent = ytMuted ? '🔇' : '🔊';
-     }
-     if(volPct){
-       volPct.textContent = ytMuted ? 'MUTE' : ytVolume + '%';
-     }
-   }
-
-   function toggleYtPlay(){
-     var frame = ytFrames[ytActive];
-     ytPlaying = !ytPlaying;
-     if(ytPlaying){
-       ensureYtFrame(ytActive);
-       sendYTCommand(frame, 'playVideo');
-     } else {
-       sendYTCommand(frame, 'pauseVideo');
-     }
-     updateYtControls();
-   }
-
-   function pauseYoutube(){
-     ytPlaying = false;
-     var frame = ytFrames[ytActive];
-     sendYTCommand(frame, 'pauseVideo');
-     updateYtControls();
-   }
-
-   function setYtVolume(value){
-     ytVolume = Math.min(100, Math.max(0, value));
-     if(volSlider) volSlider.value = ytVolume;
-     if(volPct) volPct.textContent = ytMuted ? 'MUTE' : ytVolume + '%';
-     var p = ytPlayers[ytActive];
-     if(p && ytPlayerReady[ytActive]){
-       try{ p.setVolume(ytVolume); }catch(e){}
-     } else {
-       sendYTCommand(ytFrames[ytActive], 'setVolume', [ytVolume]);
-     }
-   }
-
-   function toggleYtMute(){
-     ytMuted = !ytMuted;
-     var p = ytPlayers[ytActive];
-     if(p && ytPlayerReady[ytActive]){
-       try{ if(ytMuted) p.mute(); else p.unMute(); }catch(e){}
-     } else {
-       var frame = ytFrames[ytActive];
-       sendYTCommand(frame, ytMuted ? 'mute' : 'unMute');
-     }
-     updateYtControls();
-   }
-
-   ytTabs.forEach(function(tab, index){
-     tab.addEventListener('click', function(){
-       if(index === ytActive) return;
-       if(ytFrames[ytActive]) sendYTCommand(ytFrames[ytActive], 'pauseVideo');
-       setActiveYt(index);
-     });
-   });
-
-   if(ytPlayBtn){
-     ytPlayBtn.addEventListener('click', function(){
-       toggleYtPlay();
-     });
-   }
-
-   if(volIcon){
-     volIcon.addEventListener('click', function(){
-       toggleYtMute();
-     });
-   }
-
-   if(volSlider){
-     volSlider.addEventListener('input', function(){
-       setYtVolume(parseInt(this.value, 10));
-     });
-   }
-
-   function updateLocalPlayButton(){
-     if(!localPlayBtn) return;
-     localPlayBtn.textContent = localAudio && !localAudio.paused ? '▮▮' : '▶';
-   }
-
-   function updateLocalButtons(){
-     updateLocalPlayButton();
-     if(localLoopBtn) localLoopBtn.classList.toggle('active', localLoop);
-     if(localShuffleBtn) localShuffleBtn.classList.toggle('active', localShuffle);
-   }
-
-   function pauseLocal(){
-     if(localAudio && !localAudio.paused){
-       localAudio.pause();
-     }
-     updateLocalButtons();
-   }
-
-   function refreshLocalPlaylist(){
-     if(!localPlaylistEl) return;
-     localPlaylistEl.innerHTML = '';
-     if(!localFiles.length){
-       var empty = document.createElement('div');
-       empty.className = 'todo-empty';
-       empty.textContent = 'Aucun morceau sélectionné.';
-       localPlaylistEl.appendChild(empty);
-       if(localCurrentTitle) localCurrentTitle.textContent = 'Aucun morceau';
-       return;
-     }
-     localFiles.forEach(function(track, index){
-       var item = document.createElement('button');
-       item.type = 'button';
-       item.className = 'local-track' + (index === localIndex ? ' active' : '');
-       item.innerHTML = '<span class="track-meta">' + track.name + '</span>';
-       item.addEventListener('click', function(){
-         setLocalTrack(index);
-       });
-       localPlaylistEl.appendChild(item);
-     });
-   }
-
-   function setLocalTrack(index){
-     if(index < 0 || index >= localFiles.length) return;
-     localIndex = index;
-     var track = localFiles[index];
-     if(!track) return;
-     if(track.url){
-       localAudio.src = track.url;
-     } else if(track.path){
-       localAudio.src = track.path;
-     }
-     if(localCurrentTitle) localCurrentTitle.textContent = track.name;
-     refreshLocalPlaylist();
-     localAudio.play().catch(function(){});
-     updateLocalButtons();
-   }
-
-   function maybeLoadStaticLocalFiles(){
-     if(!localStaticList.length) return;
-     localFiles = localStaticList.map(function(path){
-       return { name: path.split('/').pop(), path: path };
-     });
-     refreshLocalPlaylist();
-     setLocalTrack(0);
-   }
-
-   if(localSelectBtn){
-     localSelectBtn.addEventListener('click', function(){
-       if(localFileInput) localFileInput.click();
-     });
-   }
-
-   if(localFileInput){
-     localFileInput.addEventListener('change', function(event){
-       var files = Array.from(event.target.files || []);
-       if(!files.length) return;
-       var newTracks = files.map(function(file){
-         return { name: file.name, url: URL.createObjectURL(file), file: file };
-       });
-       localFiles = localFiles.concat(newTracks);
-       refreshLocalPlaylist();
-       if(localFiles.length && !localAudio.src){
-         setLocalTrack(localIndex);
-       }
-     });
-   }
-
-   if(localPlayBtn){
-     localPlayBtn.addEventListener('click', function(){
-       if(!localFiles.length) return;
-       if(localAudio.paused){
-         localAudio.play();
-       } else {
-         localAudio.pause();
-       }
-     });
-   }
-
-   if(localPrevBtn){
-     localPrevBtn.addEventListener('click', function(){
-       if(!localFiles.length) return;
-       var next = localShuffle ? Math.floor(Math.random() * localFiles.length) : (localIndex - 1 + localFiles.length) % localFiles.length;
-       setLocalTrack(next);
-     });
-   }
-
-   if(localNextBtn){
-     localNextBtn.addEventListener('click', function(){
-       if(!localFiles.length) return;
-       var next = localShuffle ? Math.floor(Math.random() * localFiles.length) : (localIndex + 1) % localFiles.length;
-       setLocalTrack(next);
-     });
-   }
-
-   if(localLoopBtn){
-     localLoopBtn.addEventListener('click', function(){
-       localLoop = !localLoop;
-       updateLocalButtons();
-     });
-   }
-
-   if(localShuffleBtn){
-     localShuffleBtn.addEventListener('click', function(){
-       localShuffle = !localShuffle;
-       updateLocalButtons();
-     });
-   }
-
-   if(localAudio){
-     localAudio.addEventListener('play', updateLocalButtons);
-     localAudio.addEventListener('pause', updateLocalButtons);
-     localAudio.addEventListener('ended', function(){
-       if(!localFiles.length) return;
-       if(localShuffle){
-         setLocalTrack(Math.floor(Math.random() * localFiles.length));
-         return;
-       }
-       var next = localIndex + 1;
-       if(next >= localFiles.length){
-         if(localLoop){
-           next = 0;
-         } else {
-           updateLocalButtons();
-           return;
-         }
-       }
-       setLocalTrack(next);
-     });
-   }
-
-   if(localAudio){
-     localAudio.addEventListener('loadedmetadata', function(){
-       if(localCurrentTitle && localFiles[localIndex]){
-         localCurrentTitle.textContent = localFiles[localIndex].name;
-       }
-     });
-   }
-
-   if(ytFrames[0]){
-     ensureYtFrame(0);
-   }
-   loadYouTubeIframeApi();
-   updateYtControls();
-   updateLocalButtons();
-   maybeLoadStaticLocalFiles();
- })();
-</script>
 
 
 <!-- ══════════════════════════════════════════
@@ -2246,5 +2755,196 @@ setInterval(updateClock,1000);
      la page").
 ══════════════════════════════════════════ -->
 
-</body>
+<!-- SETTINGS PANEL (hidden) + GitHub API helpers & calendar layout helpers -->
+<style>
+  /* Settings panel styles */
+  #settings-panel{
+    position:fixed;right:12px;bottom:12px;width:340px;background:linear-gradient(180deg,rgba(12,14,18,.96),rgba(8,9,11,.98));
+    border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px;z-index:1200;display:none;box-shadow:0 8px 30px rgba(0,0,0,.6);
+  }
+  #settings-panel h3{margin:0 0 8px;font-family:var(--fm);font-size:12px;color:var(--t1)}
+  #settings-panel label{display:block;font-family:var(--fm);font-size:11px;color:var(--t3);margin-top:8px}
+  #settings-panel input[type=text],#settings-panel textarea,#settings-panel input[type=password]{width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,.04);background:transparent;color:var(--t1);box-sizing:border-box}
+  #settings-panel .row{display:flex;gap:8px;margin-top:8px}
+  #settings-panel .btn{margin-top:10px;padding:8px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.06);background:var(--adim);color:var(--t2);cursor:pointer}
+  #settings-toggle{position:fixed;right:12px;bottom:12px;width:40px;height:40px;border-radius:10px;z-index:1199;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+  /* calendar event styles (iOS-like pill with left accent) */
+  .cal-event{
+    position:absolute;box-sizing:border-box;padding:6px 8px;border-radius:6px;background:rgba(212,168,83,0.16);color:var(--t1);font-family:var(--fm);font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  }
+  .cal-event .evt-left-accent{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:6px 0 0 6px;background:var(--accent);opacity:1}
+  .cal-allday-cell .cal-event{position:relative;margin-bottom:6px}
+</style>
+
+<div id="settings-toggle" title="Réglages (cache)">&#9881;</div>
+<div id="settings-panel" aria-hidden="true">
+  <h3>Réglages (cache)</h3>
+  <label>Liens calendrier (iCal URLs, 1 par ligne)</label>
+  <textarea id="settings-cal-links" rows="4" placeholder="https://..."></textarea>
+
+  <label>Couleur accent (hex)</label>
+  <input id="settings-accent" type="text" placeholder="#d4a853" />
+
+  <label>Token GitHub (optionnel — pour sauvegarde serveur)</label>
+  <input id="settings-github-token" type="password" placeholder="ghp_xxx — Ne pas committer" />
+
+  <div class="row">
+    <button id="settings-save" class="btn">Sauvegarder</button>
+    <button id="settings-close" class="btn">Fermer</button>
+  </div>
+  <div style="margin-top:8px;font-size:11px;color:var(--t3)">Note : le token n'est pas stocké dans le repo. Configurez un token avec droits repo (push) si vous voulez activer la sauvegarde serveur via l'API GitHub.</div>
+</div>
+
+<script>
+/* --- GitHub helper: read/update JSON file in repo ---
+   Requires: owner, repo, path, token (token handled by user via settings panel)
+   This is a minimal implementation using the REST API v3 (contents endpoint).
+*/
+const GH_OWNER = 'plfruleux';
+const GH_REPO = 'Dashboard';
+const GH_STATE_PATH = 'data/pomodoro_state.json';
+const GH_SETTINGS_PATH = 'data/settings.json';
+
+async function ghGetFile(path, token){
+  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`;
+  const res = await fetch(url, {headers: token ? {Authorization: 'token '+token} : {}});
+  if(!res.ok) throw new Error('ghGetFile: '+res.status+' '+await res.text());
+  return res.json();
+}
+
+async function ghPutFile(path, contentObj, message, token){
+  // get existing to retrieve sha (if exists)
+  let sha = null;
+  try{ const existing = await ghGetFile(path, token); sha = existing.sha; }catch(e){ /* file may not exist */ }
+  const payload = {
+    message: message || 'Update via Dashboard UI',
+    content: btoa(unescape(encodeURIComponent(JSON.stringify(contentObj, null, 2)))),
+  };
+  if(sha) payload.sha = sha;
+  const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${path}`;
+  const res = await fetch(url, {method:'PUT', headers: {Authorization: 'token '+token, 'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  if(!res.ok) throw new Error('ghPutFile: '+res.status+' '+await res.text());
+  return res.json();
+}
+
+/* --- Settings panel behaviour --- */
+document.getElementById('settings-toggle').addEventListener('click', function(){
+  const p = document.getElementById('settings-panel');
+  if(p.style.display === 'block'){ p.style.display='none'; p.setAttribute('aria-hidden','true'); }
+  else { p.style.display='block'; p.setAttribute('aria-hidden','false'); }
+});
+document.getElementById('settings-close').addEventListener('click', function(){
+  document.getElementById('settings-panel').style.display='none';
+});
+
+document.getElementById('settings-save').addEventListener('click', async function(){
+  const links = document.getElementById('settings-cal-links').value.trim().split(/\n+/).filter(Boolean);
+  const accent = document.getElementById('settings-accent').value.trim() || '#d4a853';
+  const token = document.getElementById('settings-github-token').value.trim();
+  const settings = {calendarLinks: links, accent: accent};
+
+  // Try to save to GitHub if token provided
+  if(token){
+    try{
+      await ghPutFile(GH_SETTINGS_PATH, settings, 'Update settings from dashboard UI', token);
+      alert('Settings sauvegardés dans le repo.');
+    }catch(e){
+      console.error(e); alert('Erreur sauvegarde serveur: '+e.message);
+    }
+  }else{
+    // fallback: localStorage
+    localStorage.setItem('dashboard_settings', JSON.stringify(settings));
+    alert('Settings sauvegardés localement (localStorage).');
+  }
+});
+
+/* --- Pomodoro server-backed helpers --- */
+async function loadPomodoroState(token){
+  try{
+    const data = await ghGetFile(GH_STATE_PATH, token);
+    const json = JSON.parse(decodeURIComponent(escape(atob(data.content))));
+    return json;
+  }catch(e){
+    // fallback default
+    return {remaining:1500,running:false,sessionCount:0};
+  }
+}
+async function savePomodoroState(state, token){
+  if(!token) { localStorage.setItem('pomo_state', JSON.stringify(state)); return; }
+  try{
+    await ghPutFile(GH_STATE_PATH, state, 'Update pomodoro state', token);
+  }catch(e){ console.error('savePomodoroState', e); throw e; }
+}
+
+/* --- Skip pause button handler --- */
+document.getElementById('skip-pause-btn').addEventListener('click', async function(){
+  // Minimal integration: call app's skip logic if present, otherwise update state on server
+  try{
+    if(typeof window.skipPomodoroPause === 'function'){ window.skipPomodoroPause(); return; }
+    const token = document.getElementById('settings-github-token').value.trim();
+    const st = await loadPomodoroState(token);
+    // naive: set running true and remaining to work duration (e.g., 25min)
+    st.running = true; st.remaining = 25*60; st.currentPhase = 'work';
+    if(typeof savePomodoroState === 'function') await savePomodoroState(st, token);
+    else await savePomodoroState(st, token);
+    alert('Pause passée.');
+  }catch(e){ console.error(e); alert('Erreur skip pause: '+e.message); }
+});
+
+/* --- Calendar layout helper: compute juxtaposed layout for overlapping events ---
+   events: array of {id,start, end, allDay, el}
+   container: element where events are absolutely positioned
+   This function assigns style left/width in % and top/height in px (caller responsible for top/height)
+*/
+function layoutEventsJuxtapose(events){
+  // sort by start
+  events.sort((a,b)=>a.start - b.start);
+  const groups = [];
+  events.forEach(ev=>{
+    let placed=false;
+    for(const g of groups){
+      // if ev starts after all events in group end -> not overlapping
+      if(ev.start >= g.maxEnd){
+        continue;
+      }
+      // if overlaps with group -> add
+      if(ev.start < g.maxEnd){ g.items.push(ev); g.maxEnd = Math.max(g.maxEnd, ev.end); placed=true; break; }
+    }
+    if(!placed) groups.push({items:[ev], maxEnd:ev.end});
+  });
+
+  // For each group, perform column layout
+  groups.forEach(group=>{
+    const cols = [];
+    group.items.forEach(ev=>{
+      // find first column where no overlap
+      let placed=false;
+      for(let i=0;i<cols.length;i++){
+        if(ev.start >= cols[i]){ // no overlap
+          cols[i]=ev.end; ev.col=i; placed=true; break;
+        }
+      }
+      if(!placed){ ev.col = cols.length; cols.push(ev.end); }
+      ev.totalCols = cols.length; // this will be approximate; adjust below
+    });
+    // fix totalCols for each event (max cols used)
+    const total = cols.length;
+    group.items.forEach(ev=> ev.totalCols = total);
+
+    // apply styles
+    group.items.forEach(ev=>{
+      const leftPct = (ev.col / ev.totalCols) * 100;
+      const widthPct = (1 / ev.totalCols) * 100;
+      if(ev.el){
+        ev.el.style.left = leftPct+'%';
+        ev.el.style.width = widthPct+'%';
+      }
+    });
+  });
+}
+
+/* --- Small note for the AI/human deployer: see in-file instructions below --- */
+</script>
+
 </html>
