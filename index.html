@@ -374,7 +374,32 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .aqi-pm{font-family:var(--fm);font-size:7px;color:var(--t3);margin-left:auto;} 
 
 /* ══ MUSIQUE / PODCAST — carte fractionnée ══ */
-#card-music{flex-shrink:0;overflow:hidden;} 
+#card-music{
+  flex-shrink:0;
+  overflow:hidden;
+  /* Hauteur réduite à 66.7% (réduction de 1/3) — hauteur seulement */
+  height:66.67%;
+  max-height:66.67%;
+  display:flex;
+  flex-direction:column;
+}
+
+/* Ajustements internes pour la tuile musique réduite */
+#card-music .ci{padding:4px;height:auto;overflow:hidden;}
+#card-music .amt-btn{font-size:6px;padding:3px 7px;}
+#card-music .sc-tab{font-size:10px;padding:4px 8px;}
+#card-music #vol-row{padding:6px;gap:6px;align-items:center;}
+#card-music #yt-play-btn{width:20px;height:20px;}
+#card-music #pod-vol-sl{width:36px;height:2px;}
+#card-music #pod-time,#card-music #pod-status,#card-music #pod-vol-icon{font-size:6px;}
+#card-music #todo-list-name{font-size:7px;}
+#card-music .todo-nav-btn{font-size:16px;padding:0 4px;}
+#card-music .sc-frame{width:100%;height:calc(100% - 70px);max-height:100%;display:block;border:0;}
+#card-music #sc-stack{overflow:hidden;}
+#card-music iframe{max-width:100%;}
+#card-music .ci > *{box-sizing:border-box;}
+#card-music .ci > .scrollable{overflow:auto;}
+ 
 #card-music .ci{padding:0;height:auto;} 
 
 /* ── Toggle 2 modes (MUSIQUE / PODCAST) ── */
@@ -531,7 +556,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #audio-mode{display:none}
 
 /* ══ TODO TILE ══ */
-#card-music{ /* min-height retiré : la carte s'adapte au contenu */ } 
+#card-music{ /* min-height retiré : la carte s'adapte au contenu */
+  /* Hauteur réduite appliquée plus haut — règle conservée pour compatibilité */
+} 
 #view-todo{ display:none;flex-direction:column;height:100%;min-height:200px; } 
 #view-music{ display:block;position:relative; } 
 
