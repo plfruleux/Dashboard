@@ -380,6 +380,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 }
 #pom-btn:hover{background:rgba(212,168,83,.22);border-color:rgba(212,168,83,.65);} 
 #pom-btn svg{display:block;}
+.pom-skip-btn{
+  display:none;width:22px;height:22px;border-radius:50%;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  color:rgba(240,236,228,.6);cursor:pointer;flex-shrink:0;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:color .15s,border-color .15s,-webkit-transform .12s;transition:color .15s,border-color .15s,transform .12s;
+}
+.pom-skip-btn svg{display:block;}
+.pom-skip-btn:hover{color:var(--accent);border-color:rgba(212,168,83,.4);}
+.pom-skip-btn:active{-webkit-transform:scale(.9);transform:scale(.9);}
+#card-clock.pom-mode-break .pom-skip-btn,
+#card-clock.pom-mode-long .pom-skip-btn{display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;}
 .pom-dots{display:-webkit-box;display:-ms-flexbox;display:flex;gap:4px;}
 .pom-dot{width:4px;height:4px;border-radius:50%;background:rgba(240,236,228,.15);transition:all .4s;} 
 .pom-dot.done{background:rgba(240,236,228,.35);} 
@@ -439,14 +452,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   -webkit-transform:scale(1);transform:scale(1);
 }
 #pomo-full-close{
-  position:absolute;top:20px;right:22px;
+  position:absolute;top:18px;right:18px;
   background:none;border:1px solid rgba(255,255,255,.12);
   color:var(--t3);width:30px;height:30px;border-radius:50%;cursor:pointer;
+  padding:0;line-height:1;
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  font-size:13px;transition:color .15s,border-color .15s,-webkit-transform .15s;transition:color .15s,border-color .15s,transform .15s;
+  font-size:12px;transition:color .15s,border-color .15s,-webkit-transform .15s;transition:color .15s,border-color .15s,transform .15s;
 }
+#pomo-full-close span{display:block;-webkit-transform:translateY(-.5px);transform:translateY(-.5px);}
 #pomo-full-close:hover{color:var(--accent);border-color:rgba(212,168,83,.4);-webkit-transform:rotate(90deg);transform:rotate(90deg);}
 #pomo-full-time{
   font-family:var(--fd);font-size:min(24vw,220px);font-weight:800;
@@ -472,6 +487,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   margin-top:4px;
 }
 #pomo-full-btn:hover{background:rgba(212,168,83,.22);-webkit-transform:scale(1.06);transform:scale(1.06);}
+.pomo-full-controls-row{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  gap:14px;
+}
+.pom-skip-btn-full{
+  width:36px;height:36px;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);
+}
+#pomo-full .pom-skip-btn{display:none;}
+#pomo-full.pom-mode-break .pom-skip-btn,
+#pomo-full.pom-mode-long .pom-skip-btn{display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;}
 
 /* Widget « lecture en cours », style iOS : pilule de verre compacte, centrée */
 #pomo-music-widget{
@@ -507,7 +535,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #pomo-music-playbtn svg{display:block;}
 
 #pomo-full-clock{
-  position:absolute;bottom:22px;left:0;right:0;text-align:center;
+  position:absolute;bottom:9px;left:0;right:0;text-align:center;
   font-family:var(--fm);font-size:10px;letter-spacing:.12em;color:var(--t3);
 }
 
@@ -527,15 +555,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   position:absolute;inset:-16px;z-index:0;
   background-image:url('assets/img/music-fallback.png');
   background-size:cover;background-position:center;
-  -webkit-filter:blur(8px) saturate(1.1) brightness(.68);
-  filter:blur(8px) saturate(1.1) brightness(.68);
+  -webkit-filter:blur(1.6px) saturate(1.1) brightness(.68);
+  filter:blur(1.6px) saturate(1.1) brightness(.68);
 }
 #music-bg-img{
   position:absolute;inset:-16px;z-index:1;
   width:auto;height:auto;max-width:none;
   object-fit:cover;opacity:0;transition:opacity .5s ease;
-  -webkit-filter:blur(8px) saturate(1.15) brightness(.68);
-  filter:blur(8px) saturate(1.15) brightness(.68);
+  -webkit-filter:blur(1.6px) saturate(1.15) brightness(.68);
+  filter:blur(1.6px) saturate(1.15) brightness(.68);
 }
 #music-bg-img.loaded{opacity:1;}
 #music-bg-scrim{
@@ -572,10 +600,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 }
 .music-page{
   -webkit-box-flex:0;-ms-flex:0 0 33.3333%;flex:0 0 33.3333%;width:33.3333%;
-  padding:13px 38px 15px;
+  padding:9px 38px 10px;
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
-  -ms-flex-direction:column;flex-direction:column;gap:10px;
+  -ms-flex-direction:column;flex-direction:column;gap:7px;
   box-sizing:border-box;
 }
 
@@ -608,7 +636,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   gap:8px;min-width:0;
 }
 .music-avatar{
-  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
   background-size:cover;background-position:center;
   background-color:rgba(255,255,255,.08);
   border:1px solid rgba(255,255,255,.18);
@@ -616,10 +644,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
-  font-size:11px;color:rgba(255,255,255,.5);
+  font-size:10px;color:rgba(255,255,255,.5);
 }
 .music-title{
-  font-family:var(--fb);font-size:12.5px;font-weight:500;color:#fff;
+  font-family:var(--fb);font-size:11.5px;font-weight:500;color:#fff;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
   text-shadow:0 1px 6px rgba(0,0,0,.45);
   letter-spacing:.01em;
@@ -629,13 +657,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 .music-panel{
   background:linear-gradient(155deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.04) 100%);
   border:1px solid rgba(255,255,255,.14);
-  border-radius:14px;
-  padding:12px 14px 11px;
+  border-radius:12px;
+  padding:8px 12px 8px;
   -webkit-backdrop-filter:blur(12px) saturate(1.25);backdrop-filter:blur(12px) saturate(1.25);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 10px 26px rgba(0,0,0,.36);
   display:-webkit-box;display:-ms-flexbox;display:flex;
   -webkit-box-orient:vertical;-webkit-box-direction:normal;
-  -ms-flex-direction:column;flex-direction:column;gap:12px;
+  -ms-flex-direction:column;flex-direction:column;gap:8px;
   margin-top:auto;
 }
 
@@ -688,7 +716,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   gap:14px;
 }
 .music-play-btn{
-  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
   background:linear-gradient(155deg, rgba(212,168,83,.32), rgba(212,168,83,.16));
   border:1px solid rgba(212,168,83,.5);
   color:#fff;cursor:pointer;
@@ -704,7 +732,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 
 .music-loop-btn{
   flex-shrink:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.6);
-  width:26px;height:26px;border-radius:50%;font-size:11px;cursor:pointer;
+  width:22px;height:22px;border-radius:50%;font-size:11px;cursor:pointer;
   display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
   -webkit-box-align:center;-ms-flex-align:center;align-items:center;
   -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
@@ -1090,7 +1118,133 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   letter-spacing:.05em;white-space:nowrap;
 }
 
-/* ── Bouton debug caché ── */
+/* ── Bouton réglages calendrier — caché, comme l'ancien bouton debug ── */
+#cal-settings-btn{
+  position:absolute;bottom:6px;right:8px;z-index:20;
+  width:16px;height:16px;border-radius:50%;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  color:rgba(240,236,228,.4);cursor:pointer;
+  font-size:8px;line-height:1;padding:0;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  opacity:0;transition:opacity .3s,background .2s,border-color .2s,-webkit-transform .3s;transition:opacity .3s,background .2s,border-color .2s,transform .3s;
+}
+#card-cal:hover #cal-settings-btn{opacity:1;}
+#cal-settings-btn:hover{background:rgba(212,168,83,.18);border-color:var(--accent);color:var(--accent);-webkit-transform:rotate(45deg);transform:rotate(45deg);}
+
+/* ── Panneau de réglages calendrier ── */
+#cal-settings-modal{
+  position:fixed;inset:0;z-index:900;
+  display:none;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  padding:16px;
+}
+#cal-settings-modal.open{display:-webkit-box;display:-ms-flexbox;display:flex;}
+#cal-settings-bg{
+  position:absolute;inset:0;background:rgba(4,5,9,0.75);
+  -webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);
+  cursor:pointer;
+}
+#cal-settings-panel{
+  position:relative;z-index:1;width:min(94vw,440px);max-height:min(88vh,640px);
+  background:linear-gradient(150deg,rgba(14,16,26,0.98) 0%,rgba(9,11,18,0.99) 100%);
+  border:1px solid rgba(255,255,255,.12);border-top:1px solid rgba(255,255,255,.20);
+  border-radius:14px;overflow:hidden;
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;
+  box-shadow:0 32px 80px rgba(0,0,0,.75), 0 0 0 1px rgba(212,168,83,.06);
+}
+.cs-hdr{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:justify;-ms-flex-pack:justify;justify-content:space-between;
+  padding:13px 16px;border-bottom:1px solid rgba(255,255,255,.08);
+  font-family:var(--fm);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--t1);
+  flex-shrink:0;
+}
+#cal-settings-close{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--t3);
+  width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:11px;
+  display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  -webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:color .15s,border-color .15s,-webkit-transform .15s;transition:color .15s,border-color .15s,transform .15s;
+}
+#cal-settings-close:hover{color:var(--accent);border-color:rgba(212,168,83,.4);-webkit-transform:rotate(90deg);transform:rotate(90deg);}
+.cs-body{
+  padding:14px 16px 16px;overflow-y:auto;-webkit-box-flex:1;-ms-flex:1;flex:1;
+  scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent;
+}
+.cs-section-lbl{
+  font-family:var(--fm);font-size:7px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--t3);margin-bottom:8px;
+}
+#cs-cal-list{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;gap:7px;margin-bottom:9px;}
+.cs-cal-row{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;
+  gap:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;padding:6px 7px;
+}
+.cs-cal-row input[type="color"]{
+  width:20px;height:20px;border:none;border-radius:50%;flex-shrink:0;
+  cursor:pointer;background:none;padding:0;
+}
+.cs-cal-row input[type="color"]::-webkit-color-swatch-wrapper{padding:0;border-radius:50%;}
+.cs-cal-row input[type="color"]::-webkit-color-swatch{border:1px solid rgba(255,255,255,.3);border-radius:50%;}
+.cs-cal-label{
+  width:64px;flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:5px;color:var(--t1);font-family:var(--fb);font-size:10px;padding:5px 6px;outline:none;
+}
+.cs-cal-url{
+  -webkit-box-flex:1;-ms-flex:1;flex:1;min-width:0;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  border-radius:5px;color:var(--t2);font-family:var(--fm);font-size:8.5px;padding:5px 6px;outline:none;
+}
+.cs-cal-label:focus,.cs-cal-url:focus,.cs-input:focus{border-color:rgba(212,168,83,.4);}
+.cs-cal-remove{
+  flex-shrink:0;background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;
+  width:20px;height:20px;display:-webkit-inline-box;display:-ms-inline-flexbox;display:inline-flex;
+  -webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center;
+  transition:color .15s;
+}
+.cs-cal-remove:hover{color:#e05c5c;}
+.cs-btn-ghost{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--t2);
+  font-family:var(--fm);font-size:8px;letter-spacing:.06em;border-radius:7px;
+  padding:7px 10px;cursor:pointer;transition:color .15s,border-color .15s,background .15s;width:100%;
+}
+.cs-btn-ghost:hover{color:var(--t1);background:rgba(255,255,255,.08);}
+.cs-divider{height:1px;background:rgba(255,255,255,.08);margin:14px 0;}
+.cs-row{margin-bottom:7px;}
+.cs-input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+  border-radius:6px;color:var(--t1);font-family:var(--fm);font-size:9px;
+  padding:7px 9px;outline:none;box-sizing:border-box;
+}
+.cs-hint{
+  font-family:var(--fb);font-size:8.5px;line-height:1.5;color:var(--t3);
+  margin:6px 0 12px;
+}
+.cs-actions{display:-webkit-box;display:-ms-flexbox;display:flex;gap:8px;margin-top:4px;}
+.cs-btn-primary{
+  -webkit-box-flex:1;-ms-flex:1;flex:1;
+  background:rgba(212,168,83,.16);border:1px solid rgba(212,168,83,.4);color:var(--accent);
+  font-family:var(--fm);font-size:8px;letter-spacing:.06em;border-radius:7px;
+  padding:8px 10px;cursor:pointer;transition:background .15s,-webkit-transform .1s;transition:background .15s,transform .1s;
+}
+.cs-btn-primary:hover{background:rgba(212,168,83,.26);}
+.cs-btn-primary:active,.cs-btn-ghost:active{-webkit-transform:scale(.97);transform:scale(.97);}
+#cs-status{
+  margin-top:10px;font-family:var(--fm);font-size:8px;color:var(--t3);line-height:1.5;
+  min-height:12px;white-space:pre-wrap;
+}
+#cs-status.is-error{color:#e07a7a;}
+#cs-status.is-ok{color:#7ec98f;}
+
+
 #debug-btn{
   position:fixed;bottom:8px;left:10px;z-index:100;
   width:16px;height:16px;border-radius:50%;
@@ -1129,6 +1283,103 @@ body{ animation:appFadeIn .6s ease both; }
 </style>
 </head>
 <body>
+
+<!--
+════════════════════════════════════════════════════════════════════════
+  TUTORIEL SYNCHRONISATION CALENDRIER — À L'ATTENTION DE L'IA/DEV QUI
+  PREND LE RELAIS CÔTÉ GITHUB
+════════════════════════════════════════════════════════════════════════
+
+CONTEXTE / POURQUOI CE SYSTÈME EXISTE
+--------------------------------------
+Cette page affiche un calendrier 4 jours alimenté par des flux iCloud
+publiés (ICS). Problème : ces flux ne renvoient pas d'en-têtes CORS, donc
+un fetch() direct depuis le JavaScript de CETTE page échouera toujours,
+quoi qu'on fasse côté navigateur. Il n'y a pas de contournement propre
+purement client. La solution retenue : un job GitHub Actions planifié
+récupère les flux ICS côté serveur (le runner GitHub, pas le navigateur),
+les convertit en JSON, et committe ce JSON dans le dépôt. La page se
+contente ensuite de fetch('data/calendar.json') — même origine que la
+page (GitHub Pages), donc zéro souci CORS.
+
+FICHIERS DÉJÀ FOURNIS DANS CE DÉPÔT (rien à écrire, juste à activer)
+--------------------------------------------------------------------
+  .github/workflows/sync-calendars.yml   → le workflow planifié
+  scripts/sync-calendars.js              → le script Node qui fait le travail
+  package.json                           → dépendance (node-ical)
+  calendars.json                         → config (liste des flux ICS + couleurs)
+  data/calendar.json                     → sortie générée (placeholder vide au départ)
+
+ÉTAPES DE MISE EN ROUTE (à faire une fois, sur github.com)
+-------------------------------------------------------------
+1. Vérifier que les Actions sont activées sur le dépôt :
+   Settings → Actions → General → "Allow all actions and reusable
+   workflows" doit être coché. C'est activé par défaut sur un dépôt
+   dont l'utilisateur est propriétaire, donc probablement déjà bon.
+
+2. Vérifier les permissions d'écriture du workflow :
+   Settings → Actions → General → tout en bas, section "Workflow
+   permissions" → sélectionner "Read and write permissions".
+   Sans ça, l'étape de commit automatique (stefanzweifel/git-auto-commit-action)
+   dans le workflow échouera avec une erreur 403 lors du push.
+
+3. Pousser ces fichiers sur la branche utilisée par GitHub Pages (main,
+   sauf configuration différente). Rien d'autre à faire pour que le
+   pipeline tourne : le premier déclenchement aura lieu au prochain cron
+   (max 20 min), ou peut être lancé immédiatement via l'onglet Actions
+   du dépôt → sélectionner "Sync calendars" → bouton "Run workflow".
+
+4. Vérifier que ça fonctionne :
+   Onglet Actions du dépôt → le run "Sync calendars" doit passer au vert.
+   Si un calendrier échoue (mauvaise URL, flux non public…), le script
+   log un "ECHEC" pour cette source mais continue les autres — vérifier
+   les logs du run si data/calendar.json reste vide de façon inattendue.
+
+5. Alimenter calendars.json avec de vrais flux :
+   Deux façons, au choix :
+     a) Manuellement : éditer calendars.json à la racine du dépôt,
+        ajouter des entrées { "url": "...", "label": "...", "color": "#hex" }
+        dans le tableau "calendars", commit. Le push déclenche
+        automatiquement une synchronisation (voir le "on: push" du
+        workflow).
+     b) Depuis le panneau de réglages caché de la page (icône ⚙ en bas à
+        droite de la carte calendrier) : coller les URLs ICS + couleurs,
+        renseigner "owner/repo" + une branche + un Personal Access Token
+        (fine-grained, scope Contents: Read/Write + Actions: Read/Write,
+        limité à CE dépôt — créé sur
+        github.com/settings/personal-access-tokens/new), puis
+        "Enregistrer sur GitHub". Ce bouton committe calendars.json via
+        l'API GitHub Contents directement depuis le navigateur. Le bouton
+        "Synchroniser maintenant" à côté déclenche le workflow tout de
+        suite (workflow_dispatch via l'API Actions) plutôt que d'attendre
+        le prochain cron.
+
+   Pour obtenir l'URL ICS d'un calendrier iCloud : app Calendrier (Mac) →
+   clic droit sur le calendrier → "Partager le calendrier" → cocher
+   "Calendrier public" → copier le lien (commence par webcal://, à
+   remplacer par https:// — les deux pointent vers le même flux, https
+   est juste plus simple à fetch en Node).
+
+LIMITES CONNUES À GARDER EN TÊTE
+----------------------------------
+- Un calendrier iCloud "public" est accessible à quiconque a le lien.
+  S'il est commité dans calendars.json sur un dépôt PUBLIC (nécessaire
+  pour GitHub Pages gratuit), l'URL du flux est techniquement visible
+  dans l'historique git. Le contenu des événements (data/calendar.json)
+  l'est aussi. Ce n'est pas indexé nulle part, mais ce n'est pas privé
+  au sens strict.
+- Le token personnel collé dans le panneau de réglages est stocké en
+  clair dans le localStorage du navigateur utilisé — jamais transmis
+  ailleurs qu'à l'API GitHub, mais à ne pas saisir sur un poste partagé.
+- Le cron GitHub Actions ("*/20 * * * *") est une fréquence indicative :
+  GitHub peut retarder les crons de plusieurs minutes en période de
+  forte charge sur la plateforme — comportement documenté, pas un bug
+  du workflow ci-joint.
+- Le calendrier ne conserve que la fenêtre définie dans calendars.json
+  (windowDaysPast / windowDaysFuture, 1 jour passé / 14 jours futurs par
+  défaut) pour garder data/calendar.json léger — pas un historique complet.
+════════════════════════════════════════════════════════════════════════
+-->
 
 <!-- ══════════════════════════════════════════════
    ⚙️  CONFIGURATION
@@ -1219,6 +1470,9 @@ body{ animation:appFadeIn .6s ease both; }
                   <svg id="pom-btn-icon" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
                     <polygon points="2,1 9,5 2,9"/>
                   </svg>
+                </button>
+                <button id="pom-skip-btn" class="pom-skip-btn" title="Passer la pause">
+                  <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><polygon points="1,1 6,5 1,9"/><rect x="7" y="1" width="2" height="8"/></svg>
                 </button>
                 <div class="pom-dots">
                   <div class="pom-dot active" id="pd0"></div>
@@ -1412,10 +1666,54 @@ body{ animation:appFadeIn .6s ease both; }
       </div>
     </div>
     <div id="cal-days-bar"><div></div></div>
+    <div id="cal-allday-bar"></div>
     <div id="cal-body">
       <div id="cal-grid"></div>
     </div>
+    <button id="cal-settings-btn" title="Réglages calendrier" aria-label="Réglages calendrier">&#9881;</button>
   </div><!-- /card-cal -->
+
+  <!-- ══ RÉGLAGES CALENDRIER (panneau caché) ══ -->
+  <div id="cal-settings-modal" aria-hidden="true">
+    <div id="cal-settings-bg"></div>
+    <div id="cal-settings-panel">
+      <div class="cs-hdr">
+        <span>Réglages calendrier</span>
+        <button id="cal-settings-close" aria-label="Fermer">&#10005;</button>
+      </div>
+      <div class="cs-body">
+        <div class="cs-section-lbl">Calendriers (flux ICS publiés)</div>
+        <div id="cs-cal-list"></div>
+        <button id="cs-add-cal" class="cs-btn-ghost">+ Ajouter un calendrier</button>
+
+        <div class="cs-divider"></div>
+        <div class="cs-section-lbl">Dépôt GitHub</div>
+        <div class="cs-row">
+          <input id="cs-gh-repo" class="cs-input" placeholder="owner/repo (ex: pl/pldash)">
+        </div>
+        <div class="cs-row">
+          <input id="cs-gh-branch" class="cs-input" placeholder="branche" value="main">
+        </div>
+        <div class="cs-row">
+          <input id="cs-gh-token" class="cs-input" type="password" placeholder="Personal Access Token (stocké uniquement ici)">
+        </div>
+        <div class="cs-hint">
+          Token « fine-grained » limité à ce dépôt, permissions Contents:
+          Read/Write + Actions: Read/Write. Créé sur
+          github.com/settings/personal-access-tokens/new. Il n'est jamais
+          envoyé ailleurs qu'à l'API GitHub, mais reste visible dans le
+          stockage local de ce navigateur — à ne pas coller sur un poste
+          partagé.
+        </div>
+
+        <div class="cs-actions">
+          <button id="cs-save-github" class="cs-btn-primary">Enregistrer sur GitHub</button>
+          <button id="cs-run-sync" class="cs-btn-ghost">Synchroniser maintenant</button>
+        </div>
+        <div id="cs-status"></div>
+      </div>
+    </div>
+  </div>
 
 </div><!-- /grid -->
 
@@ -1428,7 +1726,7 @@ body{ animation:appFadeIn .6s ease both; }
 <!-- ══ POMODORO PLEIN ÉCRAN ══ -->
 <div id="pomo-full" aria-hidden="true">
   <div id="pomo-full-bg"></div>
-  <button id="pomo-full-close" title="Fermer" aria-label="Fermer">&#10005;</button>
+  <button id="pomo-full-close" title="Fermer" aria-label="Fermer"><span>&#10005;</span></button>
   <div id="pomo-full-time">25:00</div>
   <div class="pom-prog-track"><div class="pom-prog-bar" id="pomo-full-prog"></div></div>
   <div class="pom-dots" id="pomo-full-dots">
@@ -1438,11 +1736,16 @@ body{ animation:appFadeIn .6s ease both; }
     <div class="pom-dot" id="pfd3"></div>
   </div>
   <span class="pom-mini-lbl">Séance <b id="pom-session-count-full">0</b></span>
-  <button id="pomo-full-btn" title="Play / Pause">
-    <svg id="pomo-full-icon" width="20" height="20" viewBox="0 0 10 10" fill="currentColor">
-      <polygon points="2,1 9,5 2,9"/>
-    </svg>
-  </button>
+  <div class="pomo-full-controls-row">
+    <button id="pomo-full-btn" title="Play / Pause">
+      <svg id="pomo-full-icon" width="20" height="20" viewBox="0 0 10 10" fill="currentColor">
+        <polygon points="2,1 9,5 2,9"/>
+      </svg>
+    </button>
+    <button id="pomo-full-skip-btn" class="pom-skip-btn pom-skip-btn-full" title="Passer la pause">
+      <svg width="13" height="13" viewBox="0 0 10 10" fill="currentColor"><polygon points="1,1 6,5 1,9"/><rect x="7" y="1" width="2" height="8"/></svg>
+    </button>
+  </div>
 
   <!-- Widget « en cours de lecture », style iOS : minimaliste, centré -->
   <div id="pomo-music-widget">
@@ -1519,7 +1822,9 @@ setInterval(updateClock,1000);
   var pomFullscreenBtn = document.getElementById('pom-fullscreen-btn');
   var pomFullCloseBtn = document.getElementById('pomo-full-close');
   var pomPresetBtn = document.getElementById('pom-preset-btn');
+  var pomSkipBtns = [document.getElementById('pom-skip-btn'), document.getElementById('pomo-full-skip-btn')];
   var pomSessionEls = [document.getElementById('pom-session-count'), document.getElementById('pom-session-count-full')];
+  var POMO_STORAGE_KEY = 'pomoState_v1';
 
   var pomTimeEls = [document.getElementById('pom-time'), document.getElementById('pomo-full-time')];
   var pomProgEls = [document.getElementById('pom-prog'), document.getElementById('pomo-full-prog')];
@@ -1538,6 +1843,60 @@ setInterval(updateClock,1000);
   var workCount = 0;    // séances de travail terminées (compteur global, jamais remis à zéro)
   var pomInterval = null;
   var audioCtx = null;
+
+  // ── Persistance (localStorage) ──
+  // GitHub Pages est un hébergement 100% statique : il n'existe pas de
+  // « serveur » à qui envoyer une mise à jour à chaque seconde qui passe.
+  // localStorage est la solution honnête au problème réel décrit (un
+  // rafraîchissement de page ne doit pas faire perdre la progression) :
+  // il persiste réellement entre les rechargements, contrairement aux
+  // variables JS en mémoire utilisées jusqu'ici. Limite à connaître :
+  // ceci reste local à CE navigateur/appareil, pas synchronisé entre
+  // Mac et iPhone (pour ça il faudrait un vrai backend, comme pour les
+  // calendriers plus bas dans ce fichier).
+  function persistPomoState(){
+    try{
+      localStorage.setItem(POMO_STORAGE_KEY, JSON.stringify({
+        mode: state.mode,
+        remaining: state.remaining,
+        running: state.running,
+        presetIdx: presetIdx,
+        workCount: workCount,
+        savedAt: Date.now()
+      }));
+    }catch(e){}
+  }
+
+  function restorePomoState(){
+    var raw;
+    try{ raw = localStorage.getItem(POMO_STORAGE_KEY); }catch(e){ return; }
+    if(!raw) return;
+    var saved;
+    try{ saved = JSON.parse(raw); }catch(e){ return; }
+    if(!saved || typeof saved.remaining !== 'number') return;
+    presetIdx = (saved.presetIdx === 0 || saved.presetIdx === 1) ? saved.presetIdx : presetIdx;
+    workCount = typeof saved.workCount === 'number' ? saved.workCount : 0;
+    state.mode = saved.mode || 'work';
+    state.remaining = saved.remaining;
+    state.running = !!saved.running;
+    // Si le minuteur tournait, rattrape le temps écoulé pendant que la page
+    // était fermée/rafraîchie, en cascadant sur les phases suivantes si besoin.
+    if(state.running && saved.savedAt){
+      var elapsed = Math.floor((Date.now() - saved.savedAt) / 1000);
+      var guard = 0;
+      while(elapsed > 0 && guard < 50){
+        guard++;
+        if(elapsed < state.remaining){
+          state.remaining -= elapsed;
+          elapsed = 0;
+        } else {
+          elapsed -= state.remaining;
+          state.remaining = 0;
+          advanceSilent();
+        }
+      }
+    }
+  }
 
   function pomDuration(mode){
     if(mode === 'work') return PRESETS[presetIdx].work;
@@ -1630,6 +1989,7 @@ setInterval(updateClock,1000);
     if(pomPresetBtn) pomPresetBtn.textContent = PRESETS[presetIdx].label;
     setModeClasses(state.mode);
     renderDots();
+    persistPomoState();
   }
 
   function tick(){
@@ -1642,8 +2002,7 @@ setInterval(updateClock,1000);
     }
   }
 
-  function advance(){
-    playChime();
+  function advanceSilent(){
     if(state.mode === 'work'){
       workCount++;
       state.mode = (workCount % POM_LONG_EVERY === 0) ? 'long' : 'break';
@@ -1651,6 +2010,18 @@ setInterval(updateClock,1000);
       state.mode = 'work';
     }
     state.remaining = pomDuration(state.mode);
+  }
+
+  function advance(){
+    playChime();
+    advanceSilent();
+    render();
+  }
+
+  function skipBreak(){
+    if(state.mode === 'work') return; // ne concerne que les pauses
+    state.mode = 'work';
+    state.remaining = pomDuration('work');
     render();
   }
 
@@ -1674,6 +2045,11 @@ setInterval(updateClock,1000);
   pomBtns.forEach(function(btn){
     if(!btn) return;
     btn.addEventListener('click', toggleRunning);
+  });
+
+  pomSkipBtns.forEach(function(btn){
+    if(!btn) return;
+    btn.addEventListener('click', skipBreak);
   });
 
   // Réglage du rythme travail/pause (25/5 ↔ 50/10). La séance en cours est
@@ -1731,6 +2107,11 @@ setInterval(updateClock,1000);
     if(e.key === 'Escape') closePomoFull();
   });
 
+  restorePomoState();
+  if(state.running){
+    if(pomCardClock) pomCardClock.classList.add('pomo-active');
+    if(!pomInterval) pomInterval = setInterval(tick, 1000);
+  }
   render();
 })();
 
@@ -2341,7 +2722,14 @@ setInterval(updateClock,1000);
     var calRange = document.getElementById('cal-range-label');
     var calDaysBar = document.getElementById('cal-days-bar');
     var calGrid = document.getElementById('cal-grid');
+    var calAllDayBar = document.getElementById('cal-allday-bar');
+    var calSyncInfo = document.getElementById('cal-sync-info');
     if(!calPrev || !calNext || !calToday || !calRange || !calDaysBar || !calGrid) return;
+
+    var DAY_START_HOUR = 8;
+    var DAY_END_HOUR = 20;
+    var HOUR_PX = 52;
+    var allEvents = []; // toutes les occurrences chargées depuis data/calendar.json
 
     function addDays(date, days){
       var next = new Date(date.getTime());
@@ -2369,15 +2757,124 @@ setInterval(updateClock,1000);
       return start.toLocaleDateString('fr-FR', options) + ' – ' + end.toLocaleDateString('fr-FR', options);
     }
 
+    // #rrggbb → "r,g,b" (pour fabriquer un rgba() transparent à partir de
+    // la couleur choisie dans le panneau de réglages).
+    function hexToRgbTriplet(hex){
+      if(!hex) return '212,168,83';
+      var m = hex.replace('#','');
+      if(m.length === 3){ m = m.split('').map(function(c){return c+c;}).join(''); }
+      var num = parseInt(m, 16);
+      if(isNaN(num)) return '212,168,83';
+      return [(num>>16)&255, (num>>8)&255, num&255].join(',');
+    }
+
     var today = setMidnight(new Date());
     var currentStart = setMidnight(today);
+
+    // ── Chargement des événements (généré par l'Action GitHub, cf. tuto) ──
+    function loadEvents(){
+      fetch('data/calendar.json', { cache: 'no-store' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          if(!data){ return; }
+          allEvents = (data.events || []).map(function(e){
+            return {
+              id: e.id, title: e.title,
+              start: new Date(e.start), end: new Date(e.end),
+              allDay: !!e.allDay, cal: e.cal, color: e.color || '#d4a853'
+            };
+          });
+          if(calSyncInfo){
+            calSyncInfo.textContent = data.generatedAt
+              ? ('Sync ' + new Date(data.generatedAt).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}))
+              : '–';
+          }
+          renderCalendar();
+        })
+        .catch(function(){ /* Pas encore de data/calendar.json (premier déploiement) : rien à afficher, silencieux. */ });
+    }
+
+    function eventsForDay(day){
+      return allEvents.filter(function(e){ return isSameDay(e.start, day) || (e.allDay && e.start <= day && e.end > day); });
+    }
+
+    // Empile les événements en colonnes juxtaposées quand ils se chevauchent
+    // (regroupement par cluster, puis première colonne libre disponible).
+    function layoutColumns(events){
+      var sorted = events.slice().sort(function(a,b){ return a.start - b.start || (b.end - b.start) - (a.end - a.start); });
+      var clusters = [];
+      var current = null;
+      sorted.forEach(function(evt){
+        if(!current || evt.start >= current.maxEnd){
+          current = { events: [evt], maxEnd: evt.end };
+          clusters.push(current);
+        } else {
+          current.events.push(evt);
+          if(evt.end > current.maxEnd) current.maxEnd = evt.end;
+        }
+      });
+      var placed = [];
+      clusters.forEach(function(cluster){
+        var cols = []; // fin de chaque colonne active
+        cluster.events.forEach(function(evt){
+          var colIdx = cols.findIndex(function(endTime){ return endTime <= evt.start; });
+          if(colIdx === -1){ colIdx = cols.length; cols.push(evt.end); }
+          else { cols[colIdx] = evt.end; }
+          placed.push({ evt: evt, col: colIdx });
+        });
+        var totalCols = cols.length;
+        placed.slice(-cluster.events.length).forEach(function(p){ p.totalCols = totalCols; });
+      });
+      return placed;
+    }
+
+    function renderDayAllDay(day){
+      var items = allEvents.filter(function(e){ return e.allDay && e.start <= addDays(day,1) && e.end > day; });
+      if(!items.length) return '<div class="cal-allday-cell"></div>';
+      return '<div class="cal-allday-cell">' + items.map(function(e){
+        return '<div class="cal-allday-pill" style="background:rgba(' + hexToRgbTriplet(e.color) + ',.22);border-left:3px solid ' + e.color + ';" title="' + e.title.replace(/"/g,'&quot;') + '">' + e.title + '</div>';
+      }).join('') + '</div>';
+    }
+
+    function renderDayEvents(day){
+      var dayStart = new Date(day.getTime()); dayStart.setHours(DAY_START_HOUR,0,0,0);
+      var dayEnd = new Date(day.getTime()); dayEnd.setHours(DAY_END_HOUR,0,0,0);
+      var timed = eventsForDay(day).filter(function(e){ return !e.allDay; });
+      var placed = layoutColumns(timed);
+      var now = new Date();
+
+      return placed.map(function(p){
+        var evt = p.evt;
+        var s = evt.start < dayStart ? dayStart : evt.start;
+        var e = evt.end > dayEnd ? dayEnd : evt.end;
+        if(e <= dayStart || s >= dayEnd) return '';
+        var startHour = s.getHours() + s.getMinutes()/60;
+        var endHour = e.getHours() + e.getMinutes()/60;
+        var top = (startHour - DAY_START_HOUR) * HOUR_PX;
+        var height = Math.max(18, (endHour - startHour) * HOUR_PX);
+        var width = 100 / p.totalCols;
+        var left = p.col * width;
+        var isPast = evt.end < now;
+        var sizeClass = height < 30 ? ' micro' : (height < 40 ? ' tiny' : '');
+        var timeLabel = evt.start.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+        return '<div class="cal-evt' + sizeClass + (isPast ? ' is-past' : '') + '" style="' +
+          'top:' + top + 'px;height:' + height + 'px;' +
+          'left:calc(' + left + '% + 2px);width:calc(' + width + '% - 4px);' +
+          'background:rgba(' + hexToRgbTriplet(evt.color) + ',.16);border-left:2px solid ' + evt.color + ';" ' +
+          'title="' + evt.title.replace(/"/g,'&quot;') + '">' +
+          '<span class="cal-evt-time">' + timeLabel + '</span>' +
+          '<span class="cal-evt-title">' + evt.title + '</span>' +
+        '</div>';
+      }).join('');
+    }
 
     function renderCalendar(){
       calRange.textContent = formatRangeLabel(currentStart);
       var dayHeaders = ['<div></div>'];
       var gridColumns = ['<div class="cal-time-col">'];
+      var alldayCells = ['<div class="cal-allday-spacer"></div>'];
 
-      for(var hour = 8; hour <= 20; hour++){
+      for(var hour = DAY_START_HOUR; hour <= DAY_END_HOUR; hour++){
         var label = hour.toString().padStart(2, '0') + 'h';
         gridColumns.push('<div class="cal-time-slot">' + label + '</div>');
       }
@@ -2394,14 +2891,21 @@ setInterval(updateClock,1000);
         );
 
         var daySlots = '';
-        for(var h = 8; h <= 20; h++){
+        for(var h = DAY_START_HOUR; h <= DAY_END_HOUR; h++){
           daySlots += '<div class="cal-col-slot"></div>';
         }
-        gridColumns.push('<div class="cal-col' + isTodayClass + '" data-date="' + day.toISOString().slice(0,10) + '">' + daySlots + '</div>');
+        gridColumns.push(
+          '<div class="cal-col' + isTodayClass + '" data-date="' + day.toISOString().slice(0,10) + '" style="position:relative;">' +
+            daySlots + renderDayEvents(day) +
+          '</div>'
+        );
+
+        alldayCells.push(renderDayAllDay(day));
       }
 
       calDaysBar.innerHTML = dayHeaders.join('');
       calGrid.innerHTML = gridColumns.join('');
+      if(calAllDayBar) calAllDayBar.innerHTML = alldayCells.join('');
     }
 
     function animateShift(delta, direction){
@@ -2434,6 +2938,171 @@ setInterval(updateClock,1000);
     });
 
     renderCalendar();
+    loadEvents();
+  })();
+</script>
+<script>
+  /* ══════════════════════════════════════════
+     RÉGLAGES CALENDRIER — panneau caché
+     ──────────────────────────────────────────
+     Édite la liste des calendriers à synchroniser et peut committer
+     calendars.json directement sur GitHub via l'API Contents (token
+     personnel saisi une fois, stocké dans localStorage de CE navigateur).
+     Le rendu réel des événements ne se met à jour qu'après le passage de
+     l'Action GitHub (planifiée, ou déclenchée manuellement via le bouton
+     "Synchroniser maintenant" ci-dessous) — voir le tutoriel plus bas
+     dans ce fichier pour la mise en route complète.
+  ══════════════════════════════════════════ */
+  (function(){
+    var STORAGE_KEY = 'calSettings_v1';
+    var btn = document.getElementById('cal-settings-btn');
+    var modal = document.getElementById('cal-settings-modal');
+    var bg = document.getElementById('cal-settings-bg');
+    var closeBtn = document.getElementById('cal-settings-close');
+    var listEl = document.getElementById('cs-cal-list');
+    var addBtn = document.getElementById('cs-add-cal');
+    var repoInput = document.getElementById('cs-gh-repo');
+    var branchInput = document.getElementById('cs-gh-branch');
+    var tokenInput = document.getElementById('cs-gh-token');
+    var saveBtn = document.getElementById('cs-save-github');
+    var syncBtn = document.getElementById('cs-run-sync');
+    var statusEl = document.getElementById('cs-status');
+    if(!btn || !modal) return;
+
+    var defaultState = {
+      calendars: [{ label:'Perso', url:'', color:'#d4a853' }],
+      repo: '', branch: 'main', token: ''
+    };
+    var state = defaultState;
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) state = Object.assign({}, defaultState, JSON.parse(raw));
+    }catch(e){}
+
+    function persist(){
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+    }
+
+    function renderList(){
+      listEl.innerHTML = '';
+      state.calendars.forEach(function(cal, idx){
+        var row = document.createElement('div');
+        row.className = 'cs-cal-row';
+        row.innerHTML =
+          '<input type="color" value="' + (cal.color || '#d4a853') + '">' +
+          '<input type="text" class="cs-cal-label" placeholder="Nom" value="' + (cal.label || '').replace(/"/g,'&quot;') + '">' +
+          '<input type="text" class="cs-cal-url" placeholder="https://p•••-caldav.icloud.com/published/…" value="' + (cal.url || '').replace(/"/g,'&quot;') + '">' +
+          '<button class="cs-cal-remove" title="Retirer">&#10005;</button>';
+        row.querySelector('input[type="color"]').addEventListener('input', function(){ cal.color = this.value; persist(); });
+        row.querySelector('.cs-cal-label').addEventListener('input', function(){ cal.label = this.value; persist(); });
+        row.querySelector('.cs-cal-url').addEventListener('input', function(){ cal.url = this.value; persist(); });
+        row.querySelector('.cs-cal-remove').addEventListener('click', function(){
+          state.calendars.splice(idx, 1);
+          persist(); renderList();
+        });
+        listEl.appendChild(row);
+      });
+    }
+
+    function openModal(){
+      renderList();
+      repoInput.value = state.repo || '';
+      branchInput.value = state.branch || 'main';
+      tokenInput.value = state.token || '';
+      statusEl.textContent = '';
+      statusEl.className = '';
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+    }
+    function closeModal(){
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    btn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    bg.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+
+    addBtn.addEventListener('click', function(){
+      state.calendars.push({ label:'Nouveau', url:'', color:'#5b9fd4' });
+      persist(); renderList();
+    });
+
+    repoInput.addEventListener('input', function(){ state.repo = this.value.trim(); persist(); });
+    branchInput.addEventListener('input', function(){ state.branch = this.value.trim() || 'main'; persist(); });
+    tokenInput.addEventListener('input', function(){ state.token = this.value.trim(); persist(); });
+
+    function setStatus(text, kind){
+      statusEl.textContent = text;
+      statusEl.className = kind || '';
+    }
+
+    function ghHeaders(){
+      return {
+        'Authorization': 'Bearer ' + state.token,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      };
+    }
+
+    // Écrit calendars.json à la racine du dépôt via l'API GitHub Contents.
+    // Doit d'abord lire le sha du fichier existant (sinon 404 → création).
+    function saveToGithub(){
+      if(!state.repo || !state.token){
+        setStatus('Renseigne le dépôt (owner/repo) et le token avant d\'enregistrer.', 'is-error');
+        return;
+      }
+      setStatus('Enregistrement…');
+      var apiBase = 'https://api.github.com/repos/' + state.repo + '/contents/calendars.json';
+      var content = {
+        windowDaysPast: 1,
+        windowDaysFuture: 14,
+        calendars: state.calendars.filter(function(c){ return c.url; })
+      };
+      var contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2))));
+
+      fetch(apiBase + '?ref=' + encodeURIComponent(state.branch), { headers: ghHeaders() })
+        .then(function(r){ return r.status === 200 ? r.json() : null; })
+        .then(function(existing){
+          var body = {
+            message: 'chore: update calendars.json via dashboard settings panel',
+            content: contentB64,
+            branch: state.branch
+          };
+          if(existing && existing.sha) body.sha = existing.sha;
+          return fetch(apiBase, { method:'PUT', headers: ghHeaders(), body: JSON.stringify(body) });
+        })
+        .then(function(r){
+          if(!r.ok) return r.json().then(function(j){ throw new Error(j.message || ('HTTP ' + r.status)); });
+          setStatus('calendars.json mis à jour sur GitHub. La synchronisation se fera au prochain passage planifié (~20 min), ou clique « Synchroniser maintenant ».', 'is-ok');
+        })
+        .catch(function(err){ setStatus('Échec : ' + err.message, 'is-error'); });
+    }
+
+    // Déclenche immédiatement le workflow (workflow_dispatch) au lieu
+    // d'attendre le prochain cron planifié.
+    function runSyncNow(){
+      if(!state.repo || !state.token){
+        setStatus('Renseigne le dépôt (owner/repo) et le token avant de synchroniser.', 'is-error');
+        return;
+      }
+      setStatus('Déclenchement de la synchronisation…');
+      var url = 'https://api.github.com/repos/' + state.repo + '/actions/workflows/sync-calendars.yml/dispatches';
+      fetch(url, {
+        method:'POST', headers: ghHeaders(),
+        body: JSON.stringify({ ref: state.branch || 'main' })
+      }).then(function(r){
+        if(r.status === 204){
+          setStatus('Synchronisation lancée — l\'onglet Actions du dépôt GitHub affichera la progression (quelques secondes à ~1 min).', 'is-ok');
+        } else {
+          return r.json().then(function(j){ throw new Error(j.message || ('HTTP ' + r.status)); });
+        }
+      }).catch(function(err){ setStatus('Échec : ' + err.message, 'is-error'); });
+    }
+
+    saveBtn.addEventListener('click', saveToGithub);
+    syncBtn.addEventListener('click', runSyncNow);
   })();
 </script>
 
